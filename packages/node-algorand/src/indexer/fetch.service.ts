@@ -33,7 +33,7 @@ import { getLogger } from '../utils/logger';
 import { profiler, profilerWrap } from '../utils/profiler';
 import { isBaseHandler, isCustomHandler } from '../utils/project';
 import { delay } from '../utils/promise';
-import * as SubstrateUtil from '../utils/substrate';
+import * as AlgorandUtils from '../utils/substrate';
 import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
 import { BlockedQueue } from './BlockedQueue';
@@ -59,11 +59,11 @@ const { argv } = getYargsOption();
 
 const fetchBlocksBatches = argv.profiler
   ? profilerWrap(
-      SubstrateUtil.fetchBlocksBatches,
-      'SubstrateUtil',
+      AlgorandUtils.fetchBlocksBatches,
+      'AlgorandUtils',
       'fetchBlocksBatches',
     )
-  : SubstrateUtil.fetchBlocksBatches;
+  : AlgorandUtils.fetchBlocksBatches;
 
 function eventFilterToQueryEntry(
   filter: SubstrateEventFilter,
@@ -545,11 +545,11 @@ export class FetchService implements OnApplicationShutdown {
           const blockHash = await this.api.rpc.chain.getBlockHash(
             specVersion.start,
           );
-          await SubstrateUtil.prefetchMetadata(this.api, blockHash);
+          await AlgorandUtils.prefetchMetadata(this.api, blockHash);
         }
       }
     } else {
-      await SubstrateUtil.prefetchMetadata(this.api, blockHash);
+      await AlgorandUtils.prefetchMetadata(this.api, blockHash);
     }
   }
 

@@ -3328,6 +3328,25 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@subql/common-algorand@workspace:packages/common-algorand":
+  version: 0.0.0-use.local
+  resolution: "@subql/common-algorand@workspace:packages/common-algorand"
+  dependencies:
+    "@types/bn.js": 4.11.6
+    "@types/detect-port": ^1
+    "@types/js-yaml": ^4.0.5
+    "@types/pino": ^6.3.12
+    "@types/semver": ^7.3.9
+    "@types/tar": ^6.1.1
+    axios: ^0.27.2
+    class-transformer: 0.5.1
+    class-validator: ^0.13.2
+    js-yaml: ^4.1.0
+    reflect-metadata: ^0.1.13
+    semver: ^7.3.5
+  languageName: unknown
+  linkType: soft
+
 "@subql/common-substrate@workspace:*, @subql/common-substrate@workspace:packages/common-substrate":
   version: 0.0.0-use.local
   resolution: "@subql/common-substrate@workspace:packages/common-substrate"
@@ -3375,6 +3394,57 @@ __metadata:
     js-yaml: ^4.1.0
     reflect-metadata: ^0.1.13
     semver: ^7.3.5
+  languageName: unknown
+  linkType: soft
+
+"@subql/node-algorand@workspace:packages/node-algorand":
+  version: 0.0.0-use.local
+  resolution: "@subql/node-algorand@workspace:packages/node-algorand"
+  dependencies:
+    "@apollo/client": 3.5.8
+    "@nestjs/common": ^8.2.6
+    "@nestjs/core": ^8.2.6
+    "@nestjs/event-emitter": ^1.0.0
+    "@nestjs/platform-express": ^8.2.6
+    "@nestjs/schedule": ^1.0.2
+    "@nestjs/schematics": ^8.0.5
+    "@nestjs/testing": ^8.2.6
+    "@polkadot/api": 8.2.1
+    "@subql/common": "workspace:*"
+    "@subql/common-substrate": "workspace:*"
+    "@subql/types": "workspace:*"
+    "@subql/utils": "workspace:*"
+    "@subql/x-merkle-mountain-range": 2.0.0-0.1.2
+    "@types/app-module-path": ^2.2.0
+    "@types/express": ^4.17.13
+    "@types/jest": ^27.4.0
+    "@types/lodash": ^4.14.178
+    "@types/pino": ^6.3.12
+    "@types/supertest": ^2.0.11
+    "@types/tar": ^6.1.1
+    "@types/yargs": ^16.0.4
+    "@willsoto/nestjs-prometheus": ^4.4.0
+    app-module-path: ^2.2.0
+    dayjs: ^1.10.7
+    dotenv: ^15.0.1
+    eventemitter2: ^6.4.5
+    lodash: ^4.17.21
+    merkle-tools: ^1.4.1
+    nodemon: ^2.0.15
+    parse-json: ^6.0.2
+    pg: ^8.7.1
+    prom-client: ^14.0.1
+    reflect-metadata: ^0.1.13
+    rimraf: ^3.0.2
+    rxjs: ^7.5.2
+    sequelize: 6.19.0
+    supertest: ^6.2.2
+    tar: ^6.1.11
+    typescript: ^4.4.4
+    vm2: ^3.9.9
+    yargs: ^16.2.0
+  bin:
+    subql-node: ./bin/run
   languageName: unknown
   linkType: soft
 
@@ -3523,6 +3593,17 @@ __metadata:
     yargs: ^16.2.0
   bin:
     subql-query: ./bin/run
+  languageName: unknown
+  linkType: soft
+
+"@subql/types-algorand@workspace:packages/types-algorand":
+  version: 0.0.0-use.local
+  resolution: "@subql/types-algorand@workspace:packages/types-algorand"
+  dependencies:
+    "@polkadot/api": ^8
+    "@types/app-module-path": ^2.2.0
+  peerDependencies:
+    "@polkadot/api": ^8
   languageName: unknown
   linkType: soft
 

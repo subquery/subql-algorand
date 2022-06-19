@@ -9,8 +9,10 @@
   },
   "references": [
     { "path": "../common" },
+    { "path": "../common-algorand" },
     { "path": "../common-substrate" },
     { "path": "../types" },
+    { "path": "../types-algorand" },
     { "path": "../utils" }
   ],
   "include": ["src/**/*"]
