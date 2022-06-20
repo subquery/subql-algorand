@@ -275,19 +275,7 @@ export async function prefetchMetadata(
 //   });
 // }
 
-async function getBlockByHeight(
-  api: Indexer,
-  height: number,
-): Promise<SignedBlock> {
-  // const blockHash = await api.rpc.chain.getBlockHash(height).catch((e) => {
-  //   logger.error(`failed to fetch BlockHash ${height}`);
-  //   throw e;
-  // });
-  // return api.rpc.chain.getBlock(blockHash).catch((e) => {
-  //   logger.error(`failed to fetch Block ${blockHash}`);
-  //   throw e;
-  // });
-
+async function getBlockByHeight(api: Indexer, height: number): Promise<any> {
   try {
     const blockInfo = await api.lookupBlock(height).do();
     return blockInfo;
@@ -301,7 +289,7 @@ export async function fetchBlocksRange(
   api: Indexer,
   startHeight: number,
   endHeight: number,
-): Promise<SignedBlock[]> {
+): Promise<any[]> {
   return Promise.all(
     range(startHeight, endHeight + 1).map(async (height) =>
       getBlockByHeight(api, height),
@@ -312,7 +300,7 @@ export async function fetchBlocksRange(
 export async function fetchBlocksArray(
   api: Indexer,
   blockArray: number[],
-): Promise<anyu[]> {
+): Promise<any[]> {
   return Promise.all(
     blockArray.map(async (height) => getBlockByHeight(api, height)),
   );
@@ -351,7 +339,7 @@ export async function fetchBlocksBatches(
   blockArray: number[],
   overallSpecVer?: number,
   // specVersionMap?: number[],
-): Promise<BlockContent[]> {
+): Promise<any[]> {
   const blocks = await fetchBlocksArray(api, blockArray);
   // const blockHashs = blocks.map((b) => b.block.header.hash);
   // const parentBlockHashs = blocks.map((b) => b.block.header.parentHash);

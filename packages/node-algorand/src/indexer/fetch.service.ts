@@ -27,7 +27,7 @@ import {
 } from '@subql/types';
 
 import { Indexer } from 'algosdk';
-import { isUndefined, range, sortBy, uniqBy } from 'lodash';
+import { isUndefined, range, sortBy, take, uniqBy } from 'lodash';
 import { NodeConfig } from '../configure/NodeConfig';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import * as AlgorandUtils from '../utils/algorand';
@@ -259,7 +259,7 @@ export class FetchService implements OnApplicationShutdown {
           } catch (e) {
             logger.error(
               e,
-              `failed to index block at height ${block.block.block.header.number.toString()} ${
+              `failed to index block at height ${0} ${
                 e.handler ? `${e.handler}(${e.handlerArgs ?? ''})` : ''
               }`,
             );
@@ -383,7 +383,8 @@ export class FetchService implements OnApplicationShutdown {
         await delay(1);
         continue;
       }
-      if (this.useDictionary) {
+      // disable dictionary
+      if (this.useDictionary || false) {
         const queryEndBlock = startBlockHeight + DICTIONARY_MAX_QUERY_SIZE;
         try {
           const dictionary = await this.dictionaryService.getDictionary(
@@ -431,10 +432,11 @@ export class FetchService implements OnApplicationShutdown {
 
   async fillBlockBuffer(): Promise<void> {
     while (!this.isShutdown) {
-      const takeCount = Math.min(
+      let takeCount = Math.min(
         this.blockBuffer.freeSize,
         Math.round(this.batchSizeScale * this.nodeConfig.batchSize),
       );
+      takeCount = Math.min(5, takeCount);
 
       if (this.blockNumberBuffer.size === 0 || takeCount === 0) {
         await delay(1);
@@ -450,6 +452,7 @@ export class FetchService implements OnApplicationShutdown {
         bufferBlocks,
         specChanged ? undefined : this.parentSpecVersion,
       );
+
       logger.info(
         `fetch block [${bufferBlocks[0]},${
           bufferBlocks[bufferBlocks.length - 1]

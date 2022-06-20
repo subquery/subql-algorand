@@ -76,9 +76,9 @@ export class IndexerManager {
   ) {}
 
   @profiler(argv.profiler)
-  async indexBlock(blockContent: BlockContent): Promise<void> {
-    const { block } = blockContent;
-    const blockHeight = block.block.header.number.toNumber();
+  async indexBlock(blockContent: any): Promise<void> {
+    const block = blockContent;
+    const blockHeight = block.round;
     this.eventEmitter.emit(IndexerEvent.BlockProcessing, {
       height: blockHeight,
       timestamp: Date.now(),
@@ -87,15 +87,13 @@ export class IndexerManager {
     this.storeService.setTransaction(tx);
     this.storeService.setBlockHeight(blockHeight);
 
-    let poiBlockHash: Uint8Array;
+    //let poiBlockHash: Uint8Array;
     try {
       // Injected runtimeVersion from fetch service might be outdated
       const runtimeVersion = await this.fetchService.getRuntimeVersion(block);
       const apiAt = await this.apiService.getPatchedApi(block, runtimeVersion);
 
-      this.filteredDataSources = this.filterDataSources(
-        block.block.header.number.toNumber(),
-      );
+      this.filteredDataSources = this.filterDataSources(block.round);
 
       const datasources = this.filteredDataSources.concat(
         ...(await this.dynamicDsService.getDynamicDatasources()),
@@ -149,31 +147,31 @@ export class IndexerManager {
         this.projectService.setBlockOffset(blockHeight - 1);
       }
 
-      if (this.nodeConfig.proofOfIndex) {
-        //check if operation is null, then poi will not be inserted
-        if (!u8aEq(operationHash, NULL_MERKEL_ROOT)) {
-          const poiBlock = PoiBlock.create(
-            blockHeight,
-            block.block.header.hash.toHex(),
-            operationHash,
-            await this.poiService.getLatestPoiBlockHash(),
-            this.project.id,
-          );
-          poiBlockHash = poiBlock.hash;
-          await this.storeService.setPoi(poiBlock, { transaction: tx });
-          this.poiService.setLatestPoiBlockHash(poiBlockHash);
-          await this.storeService.setMetadataBatch(
-            [{ key: 'lastPoiHeight', value: blockHeight }],
-            { transaction: tx },
-          );
-        }
-      }
+      // if (this.nodeConfig.proofOfIndex) {
+      //   //check if operation is null, then poi will not be inserted
+      //   if (!u8aEq(operationHash, NULL_MERKEL_ROOT)) {
+      //     const poiBlock = PoiBlock.create(
+      //       blockHeight,
+      //       block.block.header.hash.toHex(),
+      //       operationHash,
+      //       await this.poiService.getLatestPoiBlockHash(),
+      //       this.project.id,
+      //     );
+      //     poiBlockHash = poiBlock.hash;
+      //     await this.storeService.setPoi(poiBlock, { transaction: tx });
+      //     this.poiService.setLatestPoiBlockHash(poiBlockHash);
+      //     await this.storeService.setMetadataBatch(
+      //       [{ key: 'lastPoiHeight', value: blockHeight }],
+      //       { transaction: tx },
+      //     );
+      //   }
+      // }
     } catch (e) {
       await tx.rollback();
       throw e;
     }
     await tx.commit();
-    this.fetchService.latestProcessed(block.block.header.number.toNumber());
+    this.fetchService.latestProcessed(block.round);
   }
 
   async start(): Promise<void> {
@@ -219,40 +217,40 @@ export class IndexerManager {
   }
 
   private async indexBlockData(
-    { block, events, extrinsics }: BlockContent,
+    block: BlockContent,
     dataSources: SubqlProjectDs[],
     getVM: (d: SubqlProjectDs) => IndexerSandbox,
   ): Promise<void> {
     await this.indexBlockContent(block, dataSources, getVM);
 
     // Run initialization events
-    const initEvents = events.filter((evt) => evt.phase.isInitialization);
-    for (const event of initEvents) {
-      await this.indexEvent(event, dataSources, getVM);
-    }
+    // const initEvents = events.filter((evt) => evt.phase.isInitialization);
+    // for (const event of initEvents) {
+    //   await this.indexEvent(event, dataSources, getVM);
+    // }
 
-    for (const extrinsic of extrinsics) {
-      await this.indexExtrinsic(extrinsic, dataSources, getVM);
+    // for (const extrinsic of extrinsics) {
+    //   await this.indexExtrinsic(extrinsic, dataSources, getVM);
 
-      // Process extrinsic events
-      const extrinsicEvents = events
-        .filter((e) => e.extrinsic?.idx === extrinsic.idx)
-        .sort((a, b) => a.idx - b.idx);
+    //   // Process extrinsic events
+    //   const extrinsicEvents = events
+    //     .filter((e) => e.extrinsic?.idx === extrinsic.idx)
+    //     .sort((a, b) => a.idx - b.idx);
 
-      for (const event of extrinsicEvents) {
-        await this.indexEvent(event, dataSources, getVM);
-      }
-    }
+    //   for (const event of extrinsicEvents) {
+    //     await this.indexEvent(event, dataSources, getVM);
+    //   }
+    // }
 
-    // Run finalization events
-    const finalizeEvents = events.filter((evt) => evt.phase.isFinalization);
-    for (const event of finalizeEvents) {
-      await this.indexEvent(event, dataSources, getVM);
-    }
+    // // Run finalization events
+    // const finalizeEvents = events.filter((evt) => evt.phase.isFinalization);
+    // for (const event of finalizeEvents) {
+    //   await this.indexEvent(event, dataSources, getVM);
+    // }
   }
 
   private async indexBlockContent(
-    block: SubstrateBlock,
+    block: any,
     dataSources: SubqlProjectDs[],
     getVM: (d: SubqlProjectDs) => IndexerSandbox,
   ): Promise<void> {
@@ -261,25 +259,25 @@ export class IndexerManager {
     }
   }
 
-  private async indexExtrinsic(
-    extrinsic: SubstrateExtrinsic,
-    dataSources: SubqlProjectDs[],
-    getVM: (d: SubqlProjectDs) => IndexerSandbox,
-  ): Promise<void> {
-    for (const ds of dataSources) {
-      await this.indexData(SubstrateHandlerKind.Call, extrinsic, ds, getVM(ds));
-    }
-  }
+  // private async indexExtrinsic(
+  //   extrinsic: SubstrateExtrinsic,
+  //   dataSources: SubqlProjectDs[],
+  //   getVM: (d: SubqlProjectDs) => IndexerSandbox,
+  // ): Promise<void> {
+  //   for (const ds of dataSources) {
+  //     await this.indexData(SubstrateHandlerKind.Call, extrinsic, ds, getVM(ds));
+  //   }
+  // }
 
-  private async indexEvent(
-    event: SubstrateEvent,
-    dataSources: SubqlProjectDs[],
-    getVM: (d: SubqlProjectDs) => IndexerSandbox,
-  ): Promise<void> {
-    for (const ds of dataSources) {
-      await this.indexData(SubstrateHandlerKind.Event, event, ds, getVM(ds));
-    }
-  }
+  // private async indexEvent(
+  //   event: SubstrateEvent,
+  //   dataSources: SubqlProjectDs[],
+  //   getVM: (d: SubqlProjectDs) => IndexerSandbox,
+  // ): Promise<void> {
+  //   for (const ds of dataSources) {
+  //     await this.indexData(SubstrateHandlerKind.Event, event, ds, getVM(ds));
+  //   }
+  // }
 
   private async indexData<K extends SubstrateHandlerKind>(
     kind: K,

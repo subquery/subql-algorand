@@ -50,7 +50,7 @@ export class ApiService implements OnApplicationShutdown {
         'X-API-key': this.project.network.apiKey,
       };
       baseServer = this.project.network.algorandRpc;
-      port = this.project.network.port;
+      port = this.project.network.port ?? '';
     } catch (e) {
       logger.error(e);
       process.exit(1);

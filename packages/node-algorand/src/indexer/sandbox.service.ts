@@ -39,7 +39,7 @@ const DEFAULT_OPTION: NodeVMOptions = {
       ? ['*']
       : ['assert', 'buffer', 'crypto', 'util', 'path'],
     external: true,
-    context: 'sandbox',
+    // context: 'sandbox',
   },
   wrapper: 'commonjs',
   sourceExtensions: ['js', 'cjs'],
