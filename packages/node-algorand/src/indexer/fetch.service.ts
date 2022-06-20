@@ -27,7 +27,7 @@ import {
 } from '@subql/types';
 
 import { Indexer } from 'algosdk';
-import { isUndefined, range, sortBy, take, uniqBy } from 'lodash';
+import { isUndefined, range, sortBy, uniqBy } from 'lodash';
 import { NodeConfig } from '../configure/NodeConfig';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import * as AlgorandUtils from '../utils/algorand';
@@ -127,7 +127,8 @@ export class FetchService implements OnApplicationShutdown {
   private latestFinalizedHeight: number;
   private latestProcessedHeight: number;
   private latestBufferedHeight: number;
-  private blockBuffer: BlockedQueue<BlockContent>;
+  // changed this to block inteface
+  private blockBuffer: BlockedQueue<any>;
   private blockNumberBuffer: BlockedQueue<number>;
   private isShutdown = false;
   private parentSpecVersion: number;

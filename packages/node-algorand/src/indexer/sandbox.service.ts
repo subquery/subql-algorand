@@ -19,7 +19,6 @@ import { timeout } from '../utils/promise';
 import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
 import { StoreService } from './store.service';
-import { ApiAt } from './types';
 
 const { argv } = getYargsOption();
 
@@ -39,7 +38,7 @@ const DEFAULT_OPTION: NodeVMOptions = {
       ? ['*']
       : ['assert', 'buffer', 'crypto', 'util', 'path'],
     external: true,
-    // context: 'sandbox',
+    context: 'sandbox',
   },
   wrapper: 'commonjs',
   sourceExtensions: ['js', 'cjs'],
@@ -116,7 +115,10 @@ export class SandboxService {
     private readonly project: SubqueryProject,
   ) {}
 
-  getDsProcessor(ds: SubqlProjectDs, api: ApiAt): IndexerSandbox {
+  getDsProcessor(
+    ds: SubqlProjectDs,
+    // api: ApiAt
+  ): IndexerSandbox {
     const entry = this.getDataSourceEntry(ds);
     let processor = this.processorCache[entry];
     if (!processor) {
@@ -132,7 +134,7 @@ export class SandboxService {
       );
       this.processorCache[entry] = processor;
     }
-    processor.freeze(api, 'api');
+    // processor.freeze(api, 'api');
     if (argv.unsafe) {
       processor.freeze(this.apiService.getApi(), 'unsafeApi');
     }

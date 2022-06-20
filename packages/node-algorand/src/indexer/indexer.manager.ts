@@ -3,8 +3,8 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ApiPromise } from '@polkadot/api';
-import { RuntimeVersion } from '@polkadot/types/interfaces';
+// import { ApiPromise } from '@polkadot/api';
+// import { RuntimeVersion } from '@polkadot/types/interfaces';
 import { hexToU8a, u8aEq } from '@polkadot/util';
 import {
   isBlockHandlerProcessor,
@@ -23,6 +23,7 @@ import {
   SubstrateEvent,
   SubstrateExtrinsic,
 } from '@subql/types';
+import { Indexer } from 'algosdk';
 import { Sequelize } from 'sequelize';
 import { NodeConfig } from '../configure/NodeConfig';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
@@ -41,7 +42,7 @@ import { IndexerEvent } from './events';
 import { FetchService } from './fetch.service';
 import { MmrService } from './mmr.service';
 import { PoiService } from './poi.service';
-import { PoiBlock } from './PoiBlock';
+//import { PoiBlock } from './PoiBlock';
 import { ProjectService } from './project.service';
 import { IndexerSandbox, SandboxService } from './sandbox.service';
 import { StoreService } from './store.service';
@@ -54,7 +55,7 @@ const { argv } = getYargsOption();
 
 @Injectable()
 export class IndexerManager {
-  private api: ApiPromise;
+  private api: Indexer;
   private filteredDataSources: SubqlProjectDs[];
   private blockOffset: number;
 
@@ -90,8 +91,8 @@ export class IndexerManager {
     //let poiBlockHash: Uint8Array;
     try {
       // Injected runtimeVersion from fetch service might be outdated
-      const runtimeVersion = await this.fetchService.getRuntimeVersion(block);
-      const apiAt = await this.apiService.getPatchedApi(block, runtimeVersion);
+      // const runtimeVersion = await this.fetchService.getRuntimeVersion(block);
+      // const apiAt = await this.apiService.getPatchedApi(block, runtimeVersion);
 
       this.filteredDataSources = this.filterDataSources(block.round);
 
@@ -103,7 +104,7 @@ export class IndexerManager {
         blockContent,
         datasources,
         (ds: SubqlProjectDs) => {
-          const vm = this.sandboxService.getDsProcessor(ds, apiAt);
+          const vm = this.sandboxService.getDsProcessor(ds);
 
           // Inject function to create ds into vm
           vm.freeze(
@@ -178,7 +179,7 @@ export class IndexerManager {
     await this.projectService.init();
     await this.fetchService.init();
 
-    this.api = this.apiService.getApi();
+    this.api = this.apiService.getIndexer();
     const startHeight = this.projectService.startHeight;
 
     void this.fetchService.startLoop(startHeight).catch((err) => {
@@ -190,8 +191,7 @@ export class IndexerManager {
   }
 
   private filterDataSources(nextProcessingHeight: number): SubqlProjectDs[] {
-    let filteredDs: SubqlProjectDs[];
-    filteredDs = this.project.dataSources.filter(
+    const filteredDs = this.project.dataSources.filter(
       (ds) => ds.startBlock <= nextProcessingHeight,
     );
     if (filteredDs.length === 0) {
@@ -199,15 +199,15 @@ export class IndexerManager {
       process.exit(1);
     }
     // perform filter for custom ds
-    filteredDs = filteredDs.filter((ds) => {
-      if (isCustomDs(ds)) {
-        return this.dsProcessorService
-          .getDsProcessor(ds)
-          .dsFilterProcessor(ds, this.api);
-      } else {
-        return true;
-      }
-    });
+    // filteredDs = filteredDs.filter((ds) => {
+    //   if (isCustomDs(ds)) {
+    //     return this.dsProcessorService
+    //       .getDsProcessor(ds)
+    //       .dsFilterProcessor(ds, this.api);
+    //   } else {
+    //     return true;
+    //   }
+    // });
 
     if (!filteredDs.length) {
       logger.error(`Did not find any datasources with associated processor`);
@@ -281,7 +281,7 @@ export class IndexerManager {
 
   private async indexData<K extends SubstrateHandlerKind>(
     kind: K,
-    data: SubstrateRuntimeHandlerInputMap[K],
+    data: any,
     ds: SubqlProjectDs,
     vm: IndexerSandbox,
   ): Promise<void> {
@@ -383,7 +383,7 @@ export class IndexerManager {
         input: data,
         ds,
         filter: handler.filter,
-        api: this.api,
+        api: null,
         assets,
       })
       .catch((e) => {
