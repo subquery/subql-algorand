@@ -26,14 +26,15 @@ import {
   SubstrateCustomHandler,
 } from '@subql/types';
 
+import { Indexer } from 'algosdk';
 import { isUndefined, range, sortBy, uniqBy } from 'lodash';
 import { NodeConfig } from '../configure/NodeConfig';
 import { SubqueryProject } from '../configure/SubqueryProject';
+import * as AlgorandUtils from '../utils/algorand';
 import { getLogger } from '../utils/logger';
 import { profiler, profilerWrap } from '../utils/profiler';
 import { isBaseHandler, isCustomHandler } from '../utils/project';
 import { delay } from '../utils/promise';
-import * as AlgorandUtils from '../utils/substrate';
 import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
 import { BlockedQueue } from './BlockedQueue';
@@ -159,6 +160,9 @@ export class FetchService implements OnApplicationShutdown {
 
   get api(): ApiPromise {
     return this.apiService.getApi();
+  }
+  get algorandApi(): Indexer {
+    return this.apiService.getIndexer();
   }
 
   // TODO: if custom ds doesn't support dictionary, use baseFilter, if yes, let
@@ -442,7 +446,7 @@ export class FetchService implements OnApplicationShutdown {
         bufferBlocks[bufferBlocks.length - 1],
       );
       const blocks = await fetchBlocksBatches(
-        this.api,
+        this.algorandApi,
         bufferBlocks,
         specChanged ? undefined : this.parentSpecVersion,
       );

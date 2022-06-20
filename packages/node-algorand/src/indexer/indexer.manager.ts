@@ -27,9 +27,9 @@ import { Sequelize } from 'sequelize';
 import { NodeConfig } from '../configure/NodeConfig';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { SubqueryRepo } from '../entities';
+import * as SubstrateUtil from '../utils/algorand';
 import { getLogger } from '../utils/logger';
 import { profiler } from '../utils/profiler';
-import * as SubstrateUtil from '../utils/substrate';
 import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
 import {

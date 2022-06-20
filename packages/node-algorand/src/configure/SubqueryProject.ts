@@ -9,6 +9,7 @@ import {
   RunnerSpecs,
   validateSemver,
 } from '@subql/common';
+import { AlgorandProjectNetworkConfig } from '@subql/common-algorand';
 import {
   SubstrateProjectNetworkConfig,
   parseSubstrateProjectManifest,
@@ -27,6 +28,8 @@ import {
   updateDataSourcesV0_2_0,
 } from '../utils/project';
 
+// udpated
+
 export type SubqlProjectDs = SubstrateDataSource & {
   mapping: SubstrateDataSource['mapping'] & { entryScript: string };
 };
@@ -42,7 +45,7 @@ const NOT_SUPPORT = (name: string) => () => {
 export class SubqueryProject {
   id: string;
   root: string;
-  network: Partial<SubstrateProjectNetworkConfig>;
+  network: Partial<AlgorandProjectNetworkConfig>;
   dataSources: SubqlProjectDs[];
   schema: GraphQLSchema;
   templates: SubqlProjectDsTemplate[];
@@ -51,7 +54,7 @@ export class SubqueryProject {
 
   static async create(
     path: string,
-    networkOverrides?: Partial<SubstrateProjectNetworkConfig>,
+    networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
     readerOptions?: ReaderOptions,
   ): Promise<SubqueryProject> {
     // We have to use reader here, because path can be remote or local

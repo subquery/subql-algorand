@@ -8,10 +8,12 @@ import { ApiOptions, RpcMethodResult } from '@polkadot/api/types';
 import { BlockHash, RuntimeVersion } from '@polkadot/types/interfaces';
 import { AnyFunction, DefinitionRpcExt } from '@polkadot/types/types';
 import { SubstrateBlock } from '@subql/types';
+import algosdk, { Indexer } from 'algosdk';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { getLogger } from '../utils/logger';
 import { IndexerEvent, NetworkMetadataPayload } from './events';
 import { ApiAt } from './types';
+// updated
 
 const NOT_SUPPORT = (name: string) => () => {
   throw new Error(`${name}() is not supported`);
@@ -26,6 +28,7 @@ export class ApiService implements OnApplicationShutdown {
   private currentBlockNumber: number;
   private currentRuntimeVersion: RuntimeVersion;
   private apiOption: ApiOptions;
+  private indexerClient: Indexer;
   networkMeta: NetworkMetadataPayload;
 
   constructor(
@@ -39,9 +42,15 @@ export class ApiService implements OnApplicationShutdown {
 
   async init(): Promise<ApiService> {
     let chainTypes, network;
+    let token, baseServer, port;
     try {
       chainTypes = this.project.chainTypes;
       network = this.project.network;
+      token = {
+        'X-API-key': this.project.network.apiKey,
+      };
+      baseServer = this.project.network.algorandRpc;
+      port = this.project.network.port;
     } catch (e) {
       logger.error(e);
       process.exit(1);
@@ -63,6 +72,8 @@ export class ApiService implements OnApplicationShutdown {
     };
     this.api = await ApiPromise.create(this.apiOption);
 
+    this.indexerClient = new algosdk.Indexer(token, baseServer, port);
+
     this.eventEmitter.emit(IndexerEvent.ApiConnected, { value: 1 });
     this.api.on('connected', () => {
       this.eventEmitter.emit(IndexerEvent.ApiConnected, { value: 1 });
@@ -77,21 +88,24 @@ export class ApiService implements OnApplicationShutdown {
       genesisHash: this.api.genesisHash.toString(),
     };
 
-    if (network.chainId && network.chainId !== this.networkMeta.genesisHash) {
-      const err = new Error(
-        `Network chainId doesn't match expected genesisHash. expected="${
-          network.chainId ?? network.genesisHash
-        }" actual="${this.networkMeta.genesisHash}`,
-      );
-      logger.error(err, err.message);
-      throw err;
-    }
+    // if (network.chainId && network.chainId !== this.networkMeta.genesisHash) {
+    //   const err = new Error(
+    //     `Network chainId doesn't match expected genesisHash. expected="${
+    //       network.chainId ?? network.genesisHash
+    //     }" actual="${this.networkMeta.genesisHash}`,
+    //   );
+    //   logger.error(err, err.message);
+    //   throw err;
+    // }
 
     return this;
   }
 
   getApi(): ApiPromise {
     return this.api;
+  }
+  getIndexer(): Indexer {
+    return this.indexerClient;
   }
 
   async getPatchedApi(
