@@ -3,6 +3,7 @@
 
 import {ApiPromise} from '@polkadot/api';
 import {RegistryTypes} from '@polkadot/types/types';
+import {Indexer} from 'algosdk';
 import {SubstrateBlock, SubstrateEvent, SubstrateExtrinsic} from './interfaces';
 
 export enum SubstrateDatasourceKind {
@@ -163,7 +164,7 @@ export interface SubstrateDatasourceProcessor<
 > {
   kind: K;
   validate(ds: DS, assets: Record<string, string>): void;
-  dsFilterProcessor(ds: DS, api: ApiPromise): boolean;
+  dsFilterProcessor(ds: DS, api: Indexer): boolean;
   handlerProcessors: P;
 }
 
