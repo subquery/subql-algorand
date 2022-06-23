@@ -26,14 +26,15 @@ import {
   SubstrateCustomHandler,
 } from '@subql/types';
 
+import { Indexer } from 'algosdk';
 import { isUndefined, range, sortBy, uniqBy } from 'lodash';
 import { NodeConfig } from '../configure/NodeConfig';
 import { SubqueryProject } from '../configure/SubqueryProject';
+import * as AlgorandUtils from '../utils/algorand';
 import { getLogger } from '../utils/logger';
 import { profiler, profilerWrap } from '../utils/profiler';
 import { isBaseHandler, isCustomHandler } from '../utils/project';
 import { delay } from '../utils/promise';
-import * as SubstrateUtil from '../utils/substrate';
 import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
 import { BlockedQueue } from './BlockedQueue';
@@ -59,11 +60,11 @@ const { argv } = getYargsOption();
 
 const fetchBlocksBatches = argv.profiler
   ? profilerWrap(
-      SubstrateUtil.fetchBlocksBatches,
-      'SubstrateUtil',
+      AlgorandUtils.fetchBlocksBatches,
+      'AlgorandUtils',
       'fetchBlocksBatches',
     )
-  : SubstrateUtil.fetchBlocksBatches;
+  : AlgorandUtils.fetchBlocksBatches;
 
 function eventFilterToQueryEntry(
   filter: SubstrateEventFilter,
@@ -126,7 +127,8 @@ export class FetchService implements OnApplicationShutdown {
   private latestFinalizedHeight: number;
   private latestProcessedHeight: number;
   private latestBufferedHeight: number;
-  private blockBuffer: BlockedQueue<BlockContent>;
+  // changed this to block inteface
+  private blockBuffer: BlockedQueue<any>;
   private blockNumberBuffer: BlockedQueue<number>;
   private isShutdown = false;
   private parentSpecVersion: number;
@@ -159,6 +161,9 @@ export class FetchService implements OnApplicationShutdown {
 
   get api(): ApiPromise {
     return this.apiService.getApi();
+  }
+  get algorandApi(): Indexer {
+    return this.apiService.getIndexer();
   }
 
   // TODO: if custom ds doesn't support dictionary, use baseFilter, if yes, let
@@ -255,7 +260,7 @@ export class FetchService implements OnApplicationShutdown {
           } catch (e) {
             logger.error(
               e,
-              `failed to index block at height ${block.block.block.header.number.toString()} ${
+              `failed to index block at height ${0} ${
                 e.handler ? `${e.handler}(${e.handlerArgs ?? ''})` : ''
               }`,
             );
@@ -379,7 +384,8 @@ export class FetchService implements OnApplicationShutdown {
         await delay(1);
         continue;
       }
-      if (this.useDictionary) {
+      // disable dictionary
+      if (this.useDictionary || false) {
         const queryEndBlock = startBlockHeight + DICTIONARY_MAX_QUERY_SIZE;
         try {
           const dictionary = await this.dictionaryService.getDictionary(
@@ -427,10 +433,11 @@ export class FetchService implements OnApplicationShutdown {
 
   async fillBlockBuffer(): Promise<void> {
     while (!this.isShutdown) {
-      const takeCount = Math.min(
+      let takeCount = Math.min(
         this.blockBuffer.freeSize,
         Math.round(this.batchSizeScale * this.nodeConfig.batchSize),
       );
+      takeCount = Math.min(5, takeCount);
 
       if (this.blockNumberBuffer.size === 0 || takeCount === 0) {
         await delay(1);
@@ -442,10 +449,11 @@ export class FetchService implements OnApplicationShutdown {
         bufferBlocks[bufferBlocks.length - 1],
       );
       const blocks = await fetchBlocksBatches(
-        this.api,
+        this.algorandApi,
         bufferBlocks,
         specChanged ? undefined : this.parentSpecVersion,
       );
+
       logger.info(
         `fetch block [${bufferBlocks[0]},${
           bufferBlocks[bufferBlocks.length - 1]
@@ -545,11 +553,11 @@ export class FetchService implements OnApplicationShutdown {
           const blockHash = await this.api.rpc.chain.getBlockHash(
             specVersion.start,
           );
-          await SubstrateUtil.prefetchMetadata(this.api, blockHash);
+          await AlgorandUtils.prefetchMetadata(this.api, blockHash);
         }
       }
     } else {
-      await SubstrateUtil.prefetchMetadata(this.api, blockHash);
+      await AlgorandUtils.prefetchMetadata(this.api, blockHash);
     }
   }
 

@@ -32,9 +32,6 @@
       "@subql/types-terra/*": ["packages/types-terra/src/*"],
       "@subql/validator": ["packages/validator/src"],
       "@subql/validator/*": ["packages/validator/src/*"],
-      // updated
-      "@subql/common-algorand": ["packages/common-algorand/src"],
-      "@subql/types-algorand": ["packages/types-algorand/src"],
     },
     "skipLibCheck": true
   },
@@ -48,10 +45,6 @@
     {"path": "packages/types-terra"},
     {"path": "packages/utils"},
     {"path": "packages/validator"},
-    //updated
-    {"path": "packages/common-algorand"},
-    {"path": "packages/node-algorand"},
-    {"path": "packages/types-algorand"},
   ],
   "include": ["packages/**/*"],
   "exclude": ["**/node_modules/**"],

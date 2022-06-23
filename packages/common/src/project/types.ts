@@ -19,3 +19,11 @@ export interface ProjectNetworkConfig {
 export interface FileReference {
   file: string;
 }
+
+export interface AlgorandProjectNetworkConfig extends ProjectNetworkConfig {
+  genesisHash?: string;
+  chainId?: string;
+  apiKey?: string;
+  algorandRpc?: string;
+  port?: number;
+}

@@ -5,15 +5,14 @@ import { ApiPromise } from '@polkadot/api';
 import { ApiDecoration } from '@polkadot/api/types';
 import {
   Entity,
-  SubstrateBlock,
-  SubstrateEvent,
-  SubstrateExtrinsic,
+  // SubstrateBlock,
+  // SubstrateEvent,
+  // SubstrateExtrinsic,
 } from '@subql/types';
-
+import { Transaction } from 'algosdk';
 export interface BlockContent {
-  block: SubstrateBlock;
-  extrinsics: SubstrateExtrinsic[];
-  events: SubstrateEvent[];
+  description: string;
+  transactions: Transaction[];
 }
 
 export enum OperationType {
