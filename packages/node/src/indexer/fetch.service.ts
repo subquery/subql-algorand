@@ -13,27 +13,26 @@ import {
   isCustomDs,
   isRuntimeDs,
   isRuntimeDataSourceV0_3_0,
-  SubstrateCallFilter,
-  SubstrateEventFilter,
-  SubstrateHandlerKind,
-  SubstrateHandler,
-  SubstrateDataSource,
-  SubstrateRuntimeHandlerFilter,
+  AlgorandHandlerKind,
+  AlgorandHandler,
+  AlgorandDataSource,
+  AlgorandRuntimeHandlerFilter,
 } from '@subql/common-substrate';
 import {
   DictionaryQueryEntry,
   SubstrateBlock,
-  SubstrateCustomHandler,
+  AlgorandCustomHandler,
 } from '@subql/types';
 
-import { isUndefined, range, sortBy, template, uniqBy } from 'lodash';
+import { Indexer } from 'algosdk';
+import { isUndefined, range, sortBy, uniqBy } from 'lodash';
 import { NodeConfig } from '../configure/NodeConfig';
-import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import { SubqueryProject } from '../configure/SubqueryProject';
+import * as AlgorandUtils from '../utils/algorand';
 import { getLogger } from '../utils/logger';
 import { profiler, profilerWrap } from '../utils/profiler';
 import { isBaseHandler, isCustomHandler } from '../utils/project';
 import { delay } from '../utils/promise';
-import * as SubstrateUtil from '../utils/substrate';
 import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
 import { BlockedQueue } from './BlockedQueue';
@@ -43,7 +42,6 @@ import {
   SpecVersion,
 } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';
-import { DynamicDsService } from './dynamic-ds.service';
 import { IndexerEvent } from './events';
 import { BlockContent } from './types';
 
@@ -60,41 +58,11 @@ const { argv } = getYargsOption();
 
 const fetchBlocksBatches = argv.profiler
   ? profilerWrap(
-      SubstrateUtil.fetchBlocksBatches,
-      'SubstrateUtil',
+      AlgorandUtils.fetchBlocksBatches,
+      'AlgorandUtils',
       'fetchBlocksBatches',
     )
-  : SubstrateUtil.fetchBlocksBatches;
-
-function eventFilterToQueryEntry(
-  filter: SubstrateEventFilter,
-): DictionaryQueryEntry {
-  return {
-    entity: 'events',
-    conditions: [
-      { field: 'module', value: filter.module },
-      {
-        field: 'event',
-        value: filter.method,
-      },
-    ],
-  };
-}
-
-function callFilterToQueryEntry(
-  filter: SubstrateCallFilter,
-): DictionaryQueryEntry {
-  return {
-    entity: 'extrinsics',
-    conditions: [
-      { field: 'module', value: filter.module },
-      {
-        field: 'call',
-        value: filter.method,
-      },
-    ],
-  };
-}
+  : AlgorandUtils.fetchBlocksBatches;
 
 function checkMemoryUsage(batchSize: number, batchSizeScale: number): number {
   const memoryData = getHeapStatistics();
@@ -127,7 +95,8 @@ export class FetchService implements OnApplicationShutdown {
   private latestFinalizedHeight: number;
   private latestProcessedHeight: number;
   private latestBufferedHeight: number;
-  private blockBuffer: BlockedQueue<BlockContent>;
+  // changed this to block inteface
+  private blockBuffer: BlockedQueue<any>;
   private blockNumberBuffer: BlockedQueue<number>;
   private isShutdown = false;
   private parentSpecVersion: number;
@@ -136,7 +105,6 @@ export class FetchService implements OnApplicationShutdown {
   private batchSizeScale: number;
   private specVersionMap: SpecVersion[];
   private currentRuntimeVersion: RuntimeVersion;
-  private templateDynamicDatasouces: SubqlProjectDs[];
 
   constructor(
     private apiService: ApiService,
@@ -144,7 +112,6 @@ export class FetchService implements OnApplicationShutdown {
     private project: SubqueryProject,
     private dictionaryService: DictionaryService,
     private dsProcessorService: DsProcessorService,
-    private dynamicDsService: DynamicDsService,
     private eventEmitter: EventEmitter2,
   ) {
     this.blockBuffer = new BlockedQueue<BlockContent>(
@@ -163,12 +130,11 @@ export class FetchService implements OnApplicationShutdown {
   get api(): ApiPromise {
     return this.apiService.getApi();
   }
-
-  async syncDynamicDatascourcesFromMeta(): Promise<void> {
-    this.templateDynamicDatasouces =
-      await this.dynamicDsService.getDynamicDatasources();
+  get algorandApi(): Indexer {
+    return this.apiService.getIndexer();
   }
 
+  // TODO: if custom ds doesn't support dictionary, use baseFilter, if yes, let
   getDictionaryQueryEntries(): DictionaryQueryEntry[] {
     const queryEntries: DictionaryQueryEntry[] = [];
 
@@ -180,19 +146,18 @@ export class FetchService implements OnApplicationShutdown {
         (ds as RuntimeDataSourceV0_0_1).filter.specName ===
           this.api.runtimeVersion.specName.toString(),
     );
-
-    for (const ds of dataSources.concat(this.templateDynamicDatasouces)) {
+    for (const ds of dataSources) {
       const plugin = isCustomDs(ds)
         ? this.dsProcessorService.getDsProcessor(ds)
         : undefined;
       for (const handler of ds.mapping.handlers) {
         const baseHandlerKind = this.getBaseHandlerKind(ds, handler);
-        let filterList: SubstrateRuntimeHandlerFilter[];
+        let filterList: AlgorandRuntimeHandlerFilter[];
         if (isCustomDs(ds)) {
           const processor = plugin.handlerProcessors[handler.kind];
           if (processor.dictionaryQuery) {
             const queryEntry = processor.dictionaryQuery(
-              (handler as SubstrateCustomHandler).filter,
+              (handler as AlgorandCustomHandler).filter,
               ds,
             );
             if (queryEntry) {
@@ -200,39 +165,18 @@ export class FetchService implements OnApplicationShutdown {
               continue;
             }
           }
-          filterList =
-            this.getBaseHandlerFilters<SubstrateRuntimeHandlerFilter>(
-              ds,
-              handler.kind,
-            );
+          filterList = this.getBaseHandlerFilters<AlgorandRuntimeHandlerFilter>(
+            ds,
+            handler.kind,
+          );
         } else {
           filterList = [handler.filter];
         }
         filterList = filterList.filter((f) => f);
         if (!filterList.length) return [];
         switch (baseHandlerKind) {
-          case SubstrateHandlerKind.Block:
+          case AlgorandHandlerKind.Block:
             return [];
-          case SubstrateHandlerKind.Call: {
-            for (const filter of filterList as SubstrateCallFilter[]) {
-              if (filter.module !== undefined && filter.method !== undefined) {
-                queryEntries.push(callFilterToQueryEntry(filter));
-              } else {
-                return [];
-              }
-            }
-            break;
-          }
-          case SubstrateHandlerKind.Event: {
-            for (const filter of filterList as SubstrateEventFilter[]) {
-              if (filter.module !== undefined && filter.method !== undefined) {
-                queryEntries.push(eventFilterToQueryEntry(filter));
-              } else {
-                return [];
-              }
-            }
-            break;
-          }
           default:
         }
       }
@@ -263,7 +207,7 @@ export class FetchService implements OnApplicationShutdown {
           } catch (e) {
             logger.error(
               e,
-              `failed to index block at height ${block.block.block.header.number.toString()} ${
+              `failed to index block at height ${0} ${
                 e.handler ? `${e.handler}(${e.handlerArgs ?? ''})` : ''
               }`,
             );
@@ -275,16 +219,12 @@ export class FetchService implements OnApplicationShutdown {
     return () => (stopper = true);
   }
 
-  updateDictionary() {
+  async init(): Promise<void> {
     this.dictionaryQueryEntries = this.getDictionaryQueryEntries();
     this.useDictionary =
       !!this.dictionaryQueryEntries?.length &&
       !!this.project.network.dictionary;
-  }
 
-  async init(): Promise<void> {
-    await this.syncDynamicDatascourcesFromMeta();
-    this.updateDictionary();
     this.eventEmitter.emit(IndexerEvent.UsingDictionary, {
       value: Number(this.useDictionary),
     });
@@ -391,7 +331,8 @@ export class FetchService implements OnApplicationShutdown {
         await delay(1);
         continue;
       }
-      if (this.useDictionary) {
+      // disable dictionary
+      if (this.useDictionary || false) {
         const queryEndBlock = startBlockHeight + DICTIONARY_MAX_QUERY_SIZE;
         try {
           const dictionary = await this.dictionaryService.getDictionary(
@@ -413,7 +354,6 @@ export class FetchService implements OnApplicationShutdown {
                 ),
               );
             } else {
-              console.log(`dictioanry put number ${batchBlocks}`);
               this.blockNumberBuffer.putAll(batchBlocks);
               this.setLatestBufferedHeight(batchBlocks[batchBlocks.length - 1]);
             }
@@ -440,10 +380,11 @@ export class FetchService implements OnApplicationShutdown {
 
   async fillBlockBuffer(): Promise<void> {
     while (!this.isShutdown) {
-      const takeCount = Math.min(
+      let takeCount = Math.min(
         this.blockBuffer.freeSize,
         Math.round(this.batchSizeScale * this.nodeConfig.batchSize),
       );
+      takeCount = Math.min(5, takeCount);
 
       if (this.blockNumberBuffer.size === 0 || takeCount === 0) {
         await delay(1);
@@ -455,10 +396,11 @@ export class FetchService implements OnApplicationShutdown {
         bufferBlocks[bufferBlocks.length - 1],
       );
       const blocks = await fetchBlocksBatches(
-        this.api,
+        this.algorandApi,
         bufferBlocks,
         specChanged ? undefined : this.parentSpecVersion,
       );
+
       logger.info(
         `fetch block [${bufferBlocks[0]},${
           bufferBlocks[bufferBlocks.length - 1]
@@ -558,11 +500,11 @@ export class FetchService implements OnApplicationShutdown {
           const blockHash = await this.api.rpc.chain.getBlockHash(
             specVersion.start,
           );
-          await SubstrateUtil.prefetchMetadata(this.api, blockHash);
+          await AlgorandUtils.prefetchMetadata(this.api, blockHash);
         }
       }
     } else {
-      await SubstrateUtil.prefetchMetadata(this.api, blockHash);
+      await AlgorandUtils.prefetchMetadata(this.api, blockHash);
     }
   }
 
@@ -576,14 +518,6 @@ export class FetchService implements OnApplicationShutdown {
       endBlockHeight = this.latestFinalizedHeight;
     }
     return endBlockHeight;
-  }
-
-  async resetForNewDs(blockHeight: number): Promise<void> {
-    await this.syncDynamicDatascourcesFromMeta();
-    this.updateDictionary();
-    this.blockBuffer.reset();
-    this.blockNumberBuffer.reset();
-    this.setLatestBufferedHeight(blockHeight);
   }
 
   private dictionaryValidation(
@@ -617,9 +551,9 @@ export class FetchService implements OnApplicationShutdown {
   }
 
   private getBaseHandlerKind(
-    ds: SubstrateDataSource,
-    handler: SubstrateHandler,
-  ): SubstrateHandlerKind {
+    ds: AlgorandDataSource,
+    handler: AlgorandHandler,
+  ): AlgorandHandlerKind {
     if (isRuntimeDs(ds) && isBaseHandler(handler)) {
       return handler.kind;
     } else if (isCustomDs(ds) && isCustomHandler(handler)) {
@@ -635,8 +569,8 @@ export class FetchService implements OnApplicationShutdown {
     }
   }
 
-  private getBaseHandlerFilters<T extends SubstrateRuntimeHandlerFilter>(
-    ds: SubstrateDataSource,
+  private getBaseHandlerFilters<T extends AlgorandRuntimeHandlerFilter>(
+    ds: AlgorandDataSource,
     handlerKind: string,
   ): T[] {
     if (isCustomDs(ds)) {

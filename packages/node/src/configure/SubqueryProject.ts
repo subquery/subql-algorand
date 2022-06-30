@@ -10,12 +10,12 @@ import {
   validateSemver,
 } from '@subql/common';
 import {
-  SubstrateProjectNetworkConfig,
-  parseSubstrateProjectManifest,
+  AlgorandProjectNetworkConfig,
+  parseAlgorandProjectManifest,
   ProjectManifestV0_2_0Impl,
   ProjectManifestV0_2_1Impl,
   ProjectManifestV0_3_0Impl,
-  SubstrateDataSource,
+  AlgorandDataSource,
   FileType,
   ProjectManifestV1_0_0Impl,
 } from '@subql/common-substrate';
@@ -27,8 +27,8 @@ import {
   updateDataSourcesV0_2_0,
 } from '../utils/project';
 
-export type SubqlProjectDs = SubstrateDataSource & {
-  mapping: SubstrateDataSource['mapping'] & { entryScript: string };
+export type SubqlProjectDs = AlgorandDataSource & {
+  mapping: AlgorandDataSource['mapping'] & { entryScript: string };
 };
 
 export type SubqlProjectDsTemplate = Omit<SubqlProjectDs, 'startBlock'> & {
@@ -42,7 +42,7 @@ const NOT_SUPPORT = (name: string) => () => {
 export class SubqueryProject {
   id: string;
   root: string;
-  network: Partial<SubstrateProjectNetworkConfig>;
+  network: Partial<AlgorandProjectNetworkConfig>;
   dataSources: SubqlProjectDs[];
   schema: GraphQLSchema;
   templates: SubqlProjectDsTemplate[];
@@ -51,7 +51,7 @@ export class SubqueryProject {
 
   static async create(
     path: string,
-    networkOverrides?: Partial<SubstrateProjectNetworkConfig>,
+    networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
     readerOptions?: ReaderOptions,
   ): Promise<SubqueryProject> {
     // We have to use reader here, because path can be remote or local
@@ -62,7 +62,7 @@ export class SubqueryProject {
       throw new Error(`Get manifest from project path ${path} failed`);
     }
 
-    const manifest = parseSubstrateProjectManifest(projectSchema);
+    const manifest = parseAlgorandProjectManifest(projectSchema);
 
     if (manifest.isV0_0_1) {
       NOT_SUPPORT('0.0.1');
@@ -118,7 +118,7 @@ async function loadProjectFromManifestBase(
   projectManifest: SUPPORT_MANIFEST,
   reader: Reader,
   path: string,
-  networkOverrides?: Partial<SubstrateProjectNetworkConfig>,
+  networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
 ): Promise<SubqueryProject> {
   const root = await getProjectRoot(reader);
 
@@ -167,7 +167,7 @@ async function loadProjectFromManifest0_2_1(
   projectManifest: ProjectManifestV0_2_1Impl,
   reader: Reader,
   path: string,
-  networkOverrides?: Partial<SubstrateProjectNetworkConfig>,
+  networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
 ): Promise<SubqueryProject> {
   const project = await loadProjectFromManifestBase(
     projectManifest,
@@ -185,7 +185,7 @@ async function loadProjectFromManifest1_0_0(
   projectManifest: ProjectManifestV1_0_0Impl,
   reader: Reader,
   path: string,
-  networkOverrides?: Partial<SubstrateProjectNetworkConfig>,
+  networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
 ): Promise<SubqueryProject> {
   const project = await loadProjectFromManifestBase(
     projectManifest,

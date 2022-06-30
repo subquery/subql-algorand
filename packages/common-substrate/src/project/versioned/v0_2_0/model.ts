@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {BaseMapping, ProjectManifestBaseImpl} from '@subql/common';
-import {SubstrateCustomDatasource, SubstrateNetworkFilter} from '@subql/types';
+import {AlgorandCustomDataSource, AlgorandNetworkFilter} from '@subql/types';
 import {plainToClass, Transform, TransformFnParams, Type} from 'class-transformer';
 import {
   Equals,
@@ -15,7 +15,7 @@ import {
   validateSync,
 } from 'class-validator';
 import {CustomDataSourceBase, RuntimeDataSourceBase} from '../../models';
-import {CustomDatasourceV0_2_0, SubstrateProjectManifestV0_2_0, RuntimeDataSourceV0_2_0} from './types';
+import {CustomDataSourceV0_2_0, SubstrateProjectManifestV0_2_0, RuntimeDataSourceV0_2_0} from './types';
 
 export class FileType {
   @IsString()
@@ -59,11 +59,11 @@ export class SubstrateRuntimeDataSourceV0_2_0Impl extends RuntimeDataSourceBase 
 
 export class SubstrateCustomDataSourceV0_2_0Impl<
     K extends string = string,
-    T extends SubstrateNetworkFilter = SubstrateNetworkFilter,
+    T extends AlgorandNetworkFilter = AlgorandNetworkFilter,
     M extends BaseMapping<any, any> = BaseMapping<Record<string, unknown>, any>
   >
   extends CustomDataSourceBase<K, T, M>
-  implements SubstrateCustomDatasource<K, T, M>
+  implements AlgorandCustomDataSource<K, T, M>
 {
   validate(): void {
     return validateObject(this, 'failed to validate custom datasource.');
@@ -86,7 +86,7 @@ export class DeploymentV0_2_0 {
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (RuntimeDataSourceV0_2_0 | CustomDatasourceV0_2_0)[];
+  dataSources: (RuntimeDataSourceV0_2_0 | CustomDataSourceV0_2_0)[];
   @ValidateNested()
   @Type(() => ProjectNetworkDeploymentV0_2_0)
   network: ProjectNetworkDeploymentV0_2_0;
@@ -118,7 +118,7 @@ export class ProjectManifestV0_2_0Impl<D extends object = DeploymentV0_2_0>
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (RuntimeDataSourceV0_2_0 | CustomDatasourceV0_2_0)[];
+  dataSources: (RuntimeDataSourceV0_2_0 | CustomDataSourceV0_2_0)[];
   protected _deployment: D;
 
   get deployment(): D {

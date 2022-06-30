@@ -12,9 +12,9 @@ import { MetadataRepo } from './entities/Metadata.entity';
 
 const logger = getLogger('dynamic-ds');
 
-const METADATA_KEY = 'dynamicDatasources';
+const METADATA_KEY = 'dynamicDataSources';
 
-interface DatasourceParams {
+interface DataSourceParams {
   templateName: string;
   args?: Record<string, unknown>;
   startBlock: number;
@@ -35,14 +35,14 @@ export class DynamicDsService {
 
   private _datasources: SubqlProjectDs[];
 
-  async createDynamicDatasource(
-    params: DatasourceParams,
+  async createDynamicDataSource(
+    params: DataSourceParams,
     tx: Transaction,
   ): Promise<SubqlProjectDs> {
     try {
-      const ds = await this.getDatasource(params);
+      const ds = await this.getDataSource(params);
 
-      await this.saveDynamicDatasourceParams(params, tx);
+      await this.saveDynamicDataSourceParams(params, tx);
 
       logger.info(
         `Created new dynamic datasource from template: "${params.templateName}"`,
@@ -58,13 +58,13 @@ export class DynamicDsService {
     }
   }
 
-  async getDynamicDatasources(): Promise<SubqlProjectDs[]> {
+  async getDynamicDataSources(): Promise<SubqlProjectDs[]> {
     if (!this._datasources) {
       try {
-        const params = await this.getDynamicDatasourceParams();
+        const params = await this.getDynamicDataSourceParams();
 
         this._datasources = await Promise.all(
-          params.map((params) => this.getDatasource(params)),
+          params.map((params) => this.getDataSource(params)),
         );
       } catch (e) {
         logger.error(`Unable to get dynamic datasources:\n${e.message}`);
@@ -75,7 +75,7 @@ export class DynamicDsService {
     return this._datasources;
   }
 
-  private async getDynamicDatasourceParams(): Promise<DatasourceParams[]> {
+  private async getDynamicDataSourceParams(): Promise<DataSourceParams[]> {
     assert(this.metaDataRepo, `Model _metadata does not exist`);
     const record = await this.metaDataRepo.findByPk(METADATA_KEY);
     const results = record?.value;
@@ -87,11 +87,11 @@ export class DynamicDsService {
     return JSON.parse(results);
   }
 
-  private async saveDynamicDatasourceParams(
-    dsParams: DatasourceParams,
+  private async saveDynamicDataSourceParams(
+    dsParams: DataSourceParams,
     tx: Transaction,
   ): Promise<void> {
-    const existing = await this.getDynamicDatasourceParams();
+    const existing = await this.getDynamicDataSourceParams();
 
     assert(this.metaDataRepo, `Model _metadata does not exist`);
     await this.metaDataRepo.upsert(
@@ -100,8 +100,8 @@ export class DynamicDsService {
     );
   }
 
-  private async getDatasource(
-    params: DatasourceParams,
+  private async getDataSource(
+    params: DataSourceParams,
   ): Promise<SubqlProjectDs> {
     const template = this.project.templates.find(
       (t) => t.name === params.templateName,

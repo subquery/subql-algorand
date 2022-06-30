@@ -3,11 +3,11 @@
 
 import {
   // ISubqlProjectManifest as ISubstrateProjectManifest,
-  SubstrateDatasource,
-  SubstrateDatasourceKind,
+  AlgorandDataSource,
+  AlgorandDataSourceKind,
 } from '@subql/types';
 import {ISubstrateProjectManifest} from '../../types';
-import {RuntimeDataSourceV0_2_0, CustomDatasourceV0_2_0} from '../v0_2_0/types';
+import {RuntimeDataSourceV0_2_0, CustomDataSourceV0_2_0} from '../v0_2_0/types';
 
 export interface SubstrateProjectManifestV0_3_0 extends ISubstrateProjectManifest {
   name: string;
@@ -25,9 +25,9 @@ export interface SubstrateProjectManifestV0_3_0 extends ISubstrateProjectManifes
     };
   };
 
-  dataSources: (RuntimeDataSourceV0_2_0 | CustomDatasourceV0_2_0)[];
+  dataSources: (RuntimeDataSourceV0_2_0 | CustomDataSourceV0_2_0)[];
 }
 
-export function isRuntimeDataSourceV0_3_0(dataSource: SubstrateDatasource): dataSource is RuntimeDataSourceV0_2_0 {
-  return dataSource.kind === SubstrateDatasourceKind.Runtime && !!dataSource.mapping.file;
+export function isRuntimeDataSourceV0_3_0(dataSource: AlgorandDataSource): dataSource is RuntimeDataSourceV0_2_0 {
+  return dataSource.kind === AlgorandDataSourceKind.Runtime && !!dataSource.mapping.file;
 }

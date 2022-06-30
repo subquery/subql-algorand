@@ -14,11 +14,17 @@ export function assign<TObject, TSource1, TSource2>(
 }
 
 export function camelCaseObjectKey(object: object) {
-  return Object.keys(object).reduce(
-    (result, key) => ({
-      ...result,
-      [camelCase(key)]: object[key],
-    }),
-    {},
-  );
+  if (Array.isArray(object)) {
+    return object.map((v) => camelCaseObjectKey(v));
+  } else if (object !== null && object.constructor === Object) {
+    return Object.keys(object).reduce(
+      (result, key) => ({
+        ...result,
+        [camelCase(key)]: camelCaseObjectKey(object[key]),
+      }),
+      {},
+    );
+  }
+
+  return object;
 }

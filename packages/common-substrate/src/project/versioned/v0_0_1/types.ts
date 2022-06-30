@@ -4,27 +4,27 @@
 import {RegisteredTypes} from '@polkadot/types/types';
 import {BaseMapping, IProjectManifest} from '@subql/common';
 import {
-  SubstrateRuntimeDatasource,
-  SubstrateNetworkFilter,
-  SubstrateRuntimeHandlerFilter,
-  SubstrateRuntimeHandler,
-  SubstrateDatasourceKind,
+  AlgorandRuntimeDataSource,
+  AlgorandNetworkFilter,
+  AlgorandRuntimeHandlerFilter,
+  AlgorandRuntimeHandler,
+  AlgorandDataSourceKind,
 } from '@subql/types';
-import {SubstrateProjectNetworkConfig} from '../../types';
+import {AlgorandProjectNetworkConfig} from '../../types';
 
-export type ProjectNetworkConfigV0_0_1 = SubstrateProjectNetworkConfig & RegisteredTypes;
+export type ProjectNetworkConfigV0_0_1 = AlgorandProjectNetworkConfig & RegisteredTypes;
 
-// export interface RuntimeDataSourceV0_0_1 extends SubstrateRuntimeDataSource {
+// export interface RuntimeDataSourceV0_0_1 extends AlgorandRuntimeDataSource {
 //   name: string;
-//   filter?: SubstrateNetworkFilter;
+//   filter?: AlgorandNetworkFilter;
 // }
 
-export type ManifestV0_0_1Mapping = Omit<BaseMapping<SubstrateRuntimeHandlerFilter, SubstrateRuntimeHandler>, 'file'>;
+export type ManifestV0_0_1Mapping = Omit<BaseMapping<AlgorandRuntimeHandlerFilter, AlgorandRuntimeHandler>, 'file'>;
 
-export interface RuntimeDataSourceV0_0_1 extends Omit<SubstrateRuntimeDatasource, 'mapping'> {
+export interface RuntimeDataSourceV0_0_1 extends Omit<AlgorandRuntimeDataSource, 'mapping'> {
   name: string;
-  filter?: SubstrateNetworkFilter;
-  kind: SubstrateDatasourceKind.Runtime;
+  filter?: AlgorandNetworkFilter;
+  kind: AlgorandDataSourceKind.Runtime;
   mapping: ManifestV0_0_1Mapping;
 }
 

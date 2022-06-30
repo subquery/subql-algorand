@@ -6,16 +6,16 @@ import path from 'path';
 import { Injectable } from '@nestjs/common';
 import {
   isCustomDs,
-  SubstrateCustomDataSource,
-  SubstrateDataSource,
-  SubstrateDatasourceProcessor,
-  SubstrateNetworkFilter,
+  AlgorandCustomDataSource as AlgorandCustomDs,
+  AlgorandDataSource,
+  AlgorandDataSourceProcessor,
+  AlgorandNetworkFilter,
 } from '@subql/common-substrate';
 import {
   SecondLayerHandlerProcessor_0_0_0,
   SecondLayerHandlerProcessor_1_0_0,
-  SubstrateCustomDatasource,
-  SubstrateHandlerKind,
+  AlgorandCustomDataSource,
+  AlgorandHandlerKind,
 } from '@subql/types';
 
 import { VMScript } from 'vm2';
@@ -32,10 +32,10 @@ export interface DsPluginSandboxOption {
 const logger = getLogger('ds-sandbox');
 
 export function isSecondLayerHandlerProcessor_0_0_0<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource,
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource,
 >(
   processor:
     | SecondLayerHandlerProcessor_0_0_0<K, F, E, DS>
@@ -46,10 +46,10 @@ export function isSecondLayerHandlerProcessor_0_0_0<
 }
 
 export function isSecondLayerHandlerProcessor_1_0_0<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource,
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource,
 >(
   processor:
     | SecondLayerHandlerProcessor_0_0_0<K, F, E, DS>
@@ -59,10 +59,10 @@ export function isSecondLayerHandlerProcessor_1_0_0<
 }
 
 export function asSecondLayerHandlerProcessor_1_0_0<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource,
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource,
 >(
   processor:
     | SecondLayerHandlerProcessor_0_0_0<K, F, E, DS>
@@ -102,8 +102,8 @@ export class DsPluginSandbox extends Sandbox {
 
   getDsPlugin<
     D extends string,
-    T extends SubstrateNetworkFilter,
-  >(): SubstrateDatasourceProcessor<D, T> {
+    T extends AlgorandNetworkFilter,
+  >(): AlgorandDataSourceProcessor<D, T> {
     return this.run(this.script);
   }
 }
@@ -111,16 +111,11 @@ export class DsPluginSandbox extends Sandbox {
 @Injectable()
 export class DsProcessorService {
   private processorCache: {
-    [entry: string]: SubstrateDatasourceProcessor<
-      string,
-      SubstrateNetworkFilter
-    >;
+    [entry: string]: AlgorandDataSourceProcessor<string, AlgorandNetworkFilter>;
   } = {};
   constructor(private project: SubqueryProject) {}
 
-  async validateCustomDs(
-    datasources: SubstrateCustomDataSource[],
-  ): Promise<void> {
+  async validateCustomDs(datasources: AlgorandCustomDs[]): Promise<void> {
     for (const ds of datasources) {
       const processor = this.getDsProcessor(ds);
       /* Standard validation applicable to all custom ds and processors */
@@ -151,15 +146,15 @@ export class DsProcessorService {
     }
   }
 
-  async validateProjectCustomDatasources(): Promise<void> {
+  async validateProjectCustomDataSources(): Promise<void> {
     await this.validateCustomDs(
-      (this.project.dataSources as SubstrateDataSource[]).filter(isCustomDs),
+      (this.project.dataSources as AlgorandDataSource[]).filter(isCustomDs),
     );
   }
 
-  getDsProcessor<D extends string, T extends SubstrateNetworkFilter>(
-    ds: SubstrateCustomDataSource<string, T>,
-  ): SubstrateDatasourceProcessor<D, T> {
+  getDsProcessor<D extends string, T extends AlgorandNetworkFilter>(
+    ds: AlgorandCustomDs<string, T>,
+  ): AlgorandDataSourceProcessor<D, T> {
     if (!isCustomDs(ds)) {
       throw new Error(`data source is not a custom data source`);
     }
@@ -178,13 +173,11 @@ export class DsProcessorService {
     }
     return this.processorCache[
       ds.processor.file
-    ] as unknown as SubstrateDatasourceProcessor<D, T>;
+    ] as unknown as AlgorandDataSourceProcessor<D, T>;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  async getAssets(
-    ds: SubstrateCustomDataSource,
-  ): Promise<Record<string, string>> {
+  async getAssets(ds: AlgorandCustomDs): Promise<Record<string, string>> {
     if (!isCustomDs(ds)) {
       throw new Error(`data source is not a custom data source`);
     }

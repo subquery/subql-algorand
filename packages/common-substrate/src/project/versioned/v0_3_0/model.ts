@@ -7,7 +7,7 @@ import {
   FileType,
   ProjectNetworkV0_2_0,
   ProjectNetworkDeploymentV0_2_0,
-  CustomDatasourceV0_2_0,
+  CustomDataSourceV0_2_0,
   RuntimeDataSourceV0_2_0,
   ProjectManifestV0_2_0Impl,
   SubstrateCustomDataSourceV0_2_0Impl,
@@ -31,7 +31,7 @@ export class DeploymentV0_3_0 {
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (RuntimeDataSourceV0_2_0 | CustomDatasourceV0_2_0)[];
+  dataSources: (RuntimeDataSourceV0_2_0 | CustomDataSourceV0_2_0)[];
   @ValidateNested()
   @Type(() => ProjectNetworkDeploymentV0_2_0)
   network: ProjectNetworkDeploymentV0_2_0;
@@ -63,7 +63,7 @@ export class ProjectManifestV0_3_0Impl
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (RuntimeDataSourceV0_2_0 | CustomDatasourceV0_2_0)[];
+  dataSources: (RuntimeDataSourceV0_2_0 | CustomDataSourceV0_2_0)[];
   protected _deployment: DeploymentV0_3_0;
 
   get deployment(): DeploymentV0_3_0 {

@@ -58,7 +58,7 @@ export class ProjectService {
   }
 
   async init(): Promise<void> {
-    await this.dsProcessorService.validateProjectCustomDatasources();
+    await this.dsProcessorService.validateProjectCustomDataSources();
 
     this._schema = await this.ensureProject();
     await this.initDbSchema();

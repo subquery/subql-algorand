@@ -9,19 +9,19 @@ import {
   ProjectManifestV0_2_0Impl,
   SubstrateRuntimeDataSourceV0_2_0Impl,
 } from '../v0_2_0';
-import {CustomDatasourceTemplate, SubstrateProjectManifestV0_2_1, RuntimeDatasourceTemplate} from './types';
+import {CustomDataSourceTemplate, SubstrateProjectManifestV0_2_1, RuntimeDataSourceTemplate} from './types';
 
-export class RuntimeDatasourceTemplateImpl
+export class RuntimeDataSourceTemplateImpl
   extends SubstrateRuntimeDataSourceV0_2_0Impl
-  implements RuntimeDatasourceTemplate
+  implements RuntimeDataSourceTemplate
 {
   @IsString()
   name: string;
 }
 
-export class CustomDatasourceTemplateImpl
+export class CustomDataSourceTemplateImpl
   extends SubstrateCustomDataSourceV0_2_0Impl
-  implements CustomDatasourceTemplate
+  implements CustomDataSourceTemplate
 {
   @IsString()
   name: string;
@@ -35,14 +35,14 @@ export class DeploymentV0_2_1 extends DeploymentV0_2_0 {
   @IsOptional()
   @IsArray()
   @ValidateNested()
-  @Type(() => CustomDatasourceTemplateImpl, {
+  @Type(() => CustomDataSourceTemplateImpl, {
     discriminator: {
       property: 'kind',
-      subTypes: [{value: RuntimeDatasourceTemplateImpl, name: 'substrate/Runtime'}],
+      subTypes: [{value: RuntimeDataSourceTemplateImpl, name: 'substrate/Runtime'}],
     },
     keepDiscriminatorProperty: true,
   })
-  templates?: (RuntimeDatasourceTemplate | CustomDatasourceTemplate)[];
+  templates?: (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[];
 }
 
 export class ProjectManifestV0_2_1Impl
@@ -52,14 +52,14 @@ export class ProjectManifestV0_2_1Impl
   @IsOptional()
   @IsArray()
   @ValidateNested()
-  @Type(() => CustomDatasourceTemplateImpl, {
+  @Type(() => CustomDataSourceTemplateImpl, {
     discriminator: {
       property: 'kind',
-      subTypes: [{value: RuntimeDatasourceTemplateImpl, name: 'substrate/Runtime'}],
+      subTypes: [{value: RuntimeDataSourceTemplateImpl, name: 'substrate/Runtime'}],
     },
     keepDiscriminatorProperty: true,
   })
-  templates?: (RuntimeDatasourceTemplate | CustomDatasourceTemplate)[];
+  templates?: (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[];
   protected _deployment: DeploymentV0_2_1;
 
   get deployment(): DeploymentV0_2_1 {

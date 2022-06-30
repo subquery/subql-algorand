@@ -1,7 +1,7 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {SubstrateDatasource} from '@subql/types';
+import {AlgorandDataSource} from '@subql/types';
 import {plainToClass} from 'class-transformer';
 import {ISubstrateProjectManifest} from '../types';
 import {ProjectManifestV0_0_1Impl, RuntimeDataSourceV0_0_1} from './v0_0_1';
@@ -106,7 +106,7 @@ export class SubstrateProjectManifestVersioned implements ISubstrateProjectManif
     return this._impl.validate();
   }
 
-  get dataSources(): (SubstrateDatasource | RuntimeDataSourceV0_0_1)[] {
+  get dataSources(): (AlgorandDataSource | RuntimeDataSourceV0_0_1)[] {
     return this._impl.dataSources;
   }
 

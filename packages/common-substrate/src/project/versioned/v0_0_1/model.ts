@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {ProjectManifestBaseImpl} from '@subql/common';
-import {
-  SubstrateDatasourceKind,
-  SubstrateHandlerKind,
-  SubstrateNetworkFilter,
-  SubstrateRuntimeHandler,
-} from '@subql/types';
+import {AlgorandDataSourceKind, AlgorandHandlerKind, AlgorandNetworkFilter, AlgorandRuntimeHandler} from '@subql/types';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {
   Equals,
@@ -20,11 +15,11 @@ import {
   ValidateNested,
   validateSync,
 } from 'class-validator';
-import {ChainTypes, SubqlNetworkFilterImpl, EventHandler, CallHandler, BlockHandler} from '../../models';
-import {SubstrateProjectNetworkConfig} from '../../types';
+import {ChainTypes, SubqlNetworkFilterImpl, BlockHandler} from '../../models';
+import {AlgorandProjectNetworkConfig} from '../../types';
 import {ManifestV0_0_1Mapping, ProjectManifestV0_0_1, RuntimeDataSourceV0_0_1} from './types';
 
-export class ProjectNetworkV0_0_1 extends ChainTypes implements SubstrateProjectNetworkConfig {
+export class ProjectNetworkV0_0_1 extends ChainTypes implements AlgorandProjectNetworkConfig {
   @IsString()
   endpoint: string;
   @IsString()
@@ -34,14 +29,10 @@ export class ProjectNetworkV0_0_1 extends ChainTypes implements SubstrateProject
 
 export class RuntimeMappingV0_0_1 implements ManifestV0_0_1Mapping {
   @Transform((params) => {
-    const handlers: SubstrateRuntimeHandler[] = params.value;
+    const handlers: AlgorandRuntimeHandler[] = params.value;
     return handlers.map((handler) => {
       switch (handler.kind) {
-        case SubstrateHandlerKind.Event:
-          return plainToClass(EventHandler, handler);
-        case SubstrateHandlerKind.Call:
-          return plainToClass(CallHandler, handler);
-        case SubstrateHandlerKind.Block:
+        case AlgorandHandlerKind.Block:
           return plainToClass(BlockHandler, handler);
         default:
           throw new Error(`handler ${(handler as any).kind} not supported`);
@@ -50,14 +41,14 @@ export class RuntimeMappingV0_0_1 implements ManifestV0_0_1Mapping {
   })
   @IsArray()
   @ValidateNested()
-  handlers: SubstrateRuntimeHandler[];
+  handlers: AlgorandRuntimeHandler[];
 }
 
 export class RuntimeDataSourceV0_0_1Impl implements RuntimeDataSourceV0_0_1 {
   @IsString()
   name: string;
-  @IsEnum(SubstrateDatasourceKind, {groups: [SubstrateDatasourceKind.Runtime]})
-  kind: SubstrateDatasourceKind.Runtime;
+  @IsEnum(AlgorandDataSourceKind, {groups: [AlgorandDataSourceKind.Runtime]})
+  kind: AlgorandDataSourceKind.Runtime;
   @Type(() => RuntimeMappingV0_0_1)
   @ValidateNested()
   mapping: RuntimeMappingV0_0_1;
@@ -67,7 +58,7 @@ export class RuntimeDataSourceV0_0_1Impl implements RuntimeDataSourceV0_0_1 {
   @IsOptional()
   @ValidateNested()
   @Type(() => SubqlNetworkFilterImpl)
-  filter?: SubstrateNetworkFilter;
+  filter?: AlgorandNetworkFilter;
 }
 
 export class ProjectManifestV0_0_1Impl extends ProjectManifestBaseImpl<null> implements ProjectManifestV0_0_1 {

@@ -9,7 +9,7 @@ import {
   RunnerSpecs,
   SemverVersionValidator,
 } from '@subql/common';
-import {SubstrateRuntimeDatasource} from '@subql/types';
+import {AlgorandRuntimeDataSource} from '@subql/types';
 import {plainToClass, Transform, TransformFnParams, Type} from 'class-transformer';
 import {
   Equals,
@@ -23,17 +23,17 @@ import {
   validateSync,
 } from 'class-validator';
 import {
-  CustomDatasourceV0_2_0,
+  CustomDataSourceV0_2_0,
   FileType,
   RuntimeDataSourceV0_2_0,
   SubstrateCustomDataSourceV0_2_0Impl,
   SubstrateRuntimeDataSourceV0_2_0Impl,
 } from '../v0_2_0';
 import {
-  CustomDatasourceTemplate,
-  CustomDatasourceTemplateImpl,
-  RuntimeDatasourceTemplate,
-  RuntimeDatasourceTemplateImpl,
+  CustomDataSourceTemplate,
+  CustomDataSourceTemplateImpl,
+  RuntimeDataSourceTemplate,
+  RuntimeDataSourceTemplateImpl,
 } from '../v0_2_1';
 import {SubstrateProjectManifestV1_0_0} from './types';
 
@@ -89,37 +89,42 @@ export class DeploymentV1_0_0 {
   @ValidateNested()
   @Type(() => ProjectNetworkDeploymentV1_0_0)
   network: ProjectNetworkDeploymentV1_0_0;
+
   @Equals('1.0.0')
   @IsString()
   specVersion: string;
+
   @IsObject()
   @ValidateNested()
   @Type(() => SubstrateRunnerSpecsImpl)
   runner: RunnerSpecs;
+
   @ValidateNested()
   @Type(() => FileType)
   schema: FileType;
-  @IsArray()
-  @ValidateNested()
-  @Type(() => SubstrateCustomDataSourceV0_2_0Impl, {
-    discriminator: {
-      property: 'kind',
-      subTypes: [{value: SubstrateRuntimeDataSourceV0_2_0Impl, name: 'substrate/Runtime'}],
-    },
-    keepDiscriminatorProperty: true,
-  })
-  dataSources: (RuntimeDataSourceV0_2_0 | CustomDatasourceV0_2_0)[];
+
+  // @IsArray()
+  // @ValidateNested()
+  // @Type(() => SubstrateCustomDataSourceV0_2_0Impl, {
+  //   discriminator: {
+  //     property: 'kind',
+  //     subTypes: [{value: SubstrateRuntimeDataSourceV0_2_0Impl, name: 'substrate/Runtime'}],
+  //   },
+  //   keepDiscriminatorProperty: true,
+  // })
+  // dataSo6urces: (RuntimeDataSourceV0_2_0 | CustomDataSourceV0_2_0)[];
+
   @IsOptional()
   @IsArray()
   @ValidateNested()
-  @Type(() => CustomDatasourceTemplateImpl, {
+  @Type(() => CustomDataSourceTemplateImpl, {
     discriminator: {
       property: 'kind',
-      subTypes: [{value: RuntimeDatasourceTemplateImpl, name: 'substrate/Runtime'}],
+      subTypes: [{value: RuntimeDataSourceTemplateImpl, name: 'substrate/Runtime'}],
     },
     keepDiscriminatorProperty: true,
   })
-  templates?: (RuntimeDatasourceTemplate | CustomDatasourceTemplate)[];
+  templates?: (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[];
 }
 
 export class ProjectManifestV1_0_0Impl<D extends object = DeploymentV1_0_0>
@@ -135,7 +140,7 @@ export class ProjectManifestV1_0_0Impl<D extends object = DeploymentV1_0_0>
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (SubstrateRuntimeDatasource | CustomDatasourceV0_2_0)[];
+  dataSources: (AlgorandRuntimeDataSource | CustomDataSourceV0_2_0)[];
   @Type(() => ProjectNetworkV1_0_0)
   network: ProjectNetworkV1_0_0;
   @IsString()
@@ -148,14 +153,14 @@ export class ProjectManifestV1_0_0Impl<D extends object = DeploymentV1_0_0>
   @IsOptional()
   @IsArray()
   @ValidateNested()
-  @Type(() => CustomDatasourceTemplateImpl, {
+  @Type(() => CustomDataSourceTemplateImpl, {
     discriminator: {
       property: 'kind',
-      subTypes: [{value: RuntimeDatasourceTemplateImpl, name: 'substrate/Runtime'}],
+      subTypes: [{value: RuntimeDataSourceTemplateImpl, name: 'substrate/Runtime'}],
     },
     keepDiscriminatorProperty: true,
   })
-  templates?: (RuntimeDatasourceTemplate | CustomDatasourceTemplate)[];
+  templates?: (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[];
   @IsObject()
   @ValidateNested()
   @Type(() => SubstrateRunnerSpecsImpl)

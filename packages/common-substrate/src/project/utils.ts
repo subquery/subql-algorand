@@ -1,49 +1,37 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {CustomDatasourceTemplate, RuntimeDatasourceTemplate} from '@subql/common-substrate/project/versioned';
+import {CustomDataSourceTemplate, RuntimeDataSourceTemplate} from '@subql/common-substrate/project/versioned';
 import {
   SecondLayerHandlerProcessor,
-  SubstrateCustomDatasource,
-  SubstrateDatasource,
-  SubstrateDatasourceKind,
-  SubstrateHandlerKind,
-  SubstrateNetworkFilter,
-  SubstrateRuntimeDatasource,
+  AlgorandCustomDataSource,
+  AlgorandDataSource,
+  AlgorandDataSourceKind,
+  AlgorandHandlerKind,
+  AlgorandNetworkFilter,
+  AlgorandRuntimeDataSource,
 } from '@subql/types';
 import {gte} from 'semver';
 
-export function isBlockHandlerProcessor<T extends SubstrateNetworkFilter, E>(
-  hp: SecondLayerHandlerProcessor<SubstrateHandlerKind, T, unknown>
-): hp is SecondLayerHandlerProcessor<SubstrateHandlerKind.Block, T, E> {
-  return hp.baseHandlerKind === SubstrateHandlerKind.Block;
+export function isBlockHandlerProcessor<T extends AlgorandNetworkFilter, E>(
+  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, T, unknown>
+): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, T, E> {
+  return hp.baseHandlerKind === AlgorandHandlerKind.Block;
 }
 
-export function isEventHandlerProcessor<T extends SubstrateNetworkFilter, E>(
-  hp: SecondLayerHandlerProcessor<SubstrateHandlerKind, T, unknown>
-): hp is SecondLayerHandlerProcessor<SubstrateHandlerKind.Event, T, E> {
-  return hp.baseHandlerKind === SubstrateHandlerKind.Event;
+export function isCustomDs<F extends AlgorandNetworkFilter>(
+  ds: AlgorandDataSource
+): ds is AlgorandCustomDataSource<string, F> {
+  return ds.kind !== AlgorandDataSourceKind.Runtime && !!(ds as AlgorandCustomDataSource<string, F>).processor;
 }
 
-export function isCallHandlerProcessor<T extends SubstrateNetworkFilter, E>(
-  hp: SecondLayerHandlerProcessor<SubstrateHandlerKind, T, unknown>
-): hp is SecondLayerHandlerProcessor<SubstrateHandlerKind.Call, T, E> {
-  return hp.baseHandlerKind === SubstrateHandlerKind.Call;
-}
-
-export function isCustomDs<F extends SubstrateNetworkFilter>(
-  ds: SubstrateDatasource
-): ds is SubstrateCustomDatasource<string, F> {
-  return ds.kind !== SubstrateDatasourceKind.Runtime && !!(ds as SubstrateCustomDatasource<string, F>).processor;
-}
-
-export function isRuntimeDs(ds: SubstrateDatasource): ds is SubstrateRuntimeDatasource {
-  return ds.kind === SubstrateDatasourceKind.Runtime;
+export function isRuntimeDs(ds: AlgorandDataSource): ds is AlgorandRuntimeDataSource {
+  return ds.kind === AlgorandDataSourceKind.Runtime;
 }
 
 export function isSubstrateTemplates(
   templatesData: any,
   specVersion: string
-): templatesData is (RuntimeDatasourceTemplate | CustomDatasourceTemplate)[] {
+): templatesData is (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[] {
   return (isRuntimeDs(templatesData[0]) || isCustomDs(templatesData[0])) && gte(specVersion, '0.2.1');
 }

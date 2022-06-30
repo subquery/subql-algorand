@@ -8,7 +8,7 @@ import {validateSync} from 'class-validator';
 import {ChainTypes} from './models';
 import {SubstrateProjectManifestVersioned, VersionedProjectManifest} from './versioned';
 
-export function parseSubstrateProjectManifest(raw: unknown): SubstrateProjectManifestVersioned {
+export function parseAlgorandProjectManifest(raw: unknown): SubstrateProjectManifestVersioned {
   const projectManifest = new SubstrateProjectManifestVersioned(raw as VersionedProjectManifest);
   projectManifest.validate();
   return projectManifest;

@@ -13,16 +13,16 @@ import {
 } from '@subql/common';
 import {
   ChainTypes,
-  CustomDatasourceV0_2_0,
+  CustomDataSourceV0_2_0,
   isCustomDs,
   // loadChainTypesFromJs,
   parseChainTypes,
   RuntimeDataSourceV0_0_1,
   RuntimeDataSourceV0_2_0,
-  SubstrateRuntimeHandler,
-  SubstrateCustomHandler,
-  SubstrateHandler,
-  SubstrateHandlerKind,
+  AlgorandRuntimeHandler,
+  AlgorandCustomHandler,
+  AlgorandHandler,
+  AlgorandHandlerKind,
 } from '@subql/common-substrate';
 import yaml from 'js-yaml';
 import tar from 'tar';
@@ -67,14 +67,14 @@ export function getProjectEntry(root: string): string {
 }
 
 export function isBaseHandler(
-  handler: SubstrateHandler,
-): handler is SubstrateRuntimeHandler {
-  return Object.values<string>(SubstrateHandlerKind).includes(handler.kind);
+  handler: AlgorandHandler,
+): handler is AlgorandRuntimeHandler {
+  return Object.values<string>(AlgorandHandlerKind).includes(handler.kind);
 }
 
 export function isCustomHandler(
-  handler: SubstrateHandler,
-): handler is SubstrateCustomHandler {
+  handler: AlgorandHandler,
+): handler is AlgorandCustomHandler {
   return !isBaseHandler(handler);
 }
 
@@ -93,7 +93,7 @@ export async function updateDataSourcesV0_0_1(
 }
 
 export async function updateDataSourcesV0_2_0(
-  _dataSources: (RuntimeDataSourceV0_2_0 | CustomDatasourceV0_2_0)[],
+  _dataSources: (RuntimeDataSourceV0_2_0 | CustomDataSourceV0_2_0)[],
   reader: Reader,
   root: string,
 ): Promise<SubqlProjectDs[]> {
