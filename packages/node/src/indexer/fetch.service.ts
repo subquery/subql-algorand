@@ -8,15 +8,13 @@ import { Interval } from '@nestjs/schedule';
 import { ApiPromise } from '@polkadot/api';
 import { RuntimeVersion } from '@polkadot/types/interfaces';
 import {
-  isRuntimeDataSourceV0_2_0,
-  RuntimeDataSourceV0_0_1,
   isCustomDs,
   isRuntimeDs,
-  isRuntimeDataSourceV0_3_0,
   AlgorandHandlerKind,
   AlgorandHandler,
   AlgorandDataSource,
   AlgorandRuntimeHandlerFilter,
+  isRuntimeDataSourceV0_0_1,
 } from '@subql/common-substrate';
 import {
   DictionaryQueryEntry,
@@ -137,15 +135,10 @@ export class FetchService implements OnApplicationShutdown {
   // TODO: if custom ds doesn't support dictionary, use baseFilter, if yes, let
   getDictionaryQueryEntries(): DictionaryQueryEntry[] {
     const queryEntries: DictionaryQueryEntry[] = [];
-
-    const dataSources = this.project.dataSources.filter(
-      (ds) =>
-        isRuntimeDataSourceV0_3_0(ds) ||
-        isRuntimeDataSourceV0_2_0(ds) ||
-        !(ds as RuntimeDataSourceV0_0_1).filter?.specName ||
-        (ds as RuntimeDataSourceV0_0_1).filter.specName ===
-          this.api.runtimeVersion.specName.toString(),
+    const dataSources = this.project.dataSources.filter((ds) =>
+      isRuntimeDataSourceV0_0_1(ds),
     );
+
     for (const ds of dataSources) {
       const plugin = isCustomDs(ds)
         ? this.dsProcessorService.getDsProcessor(ds)

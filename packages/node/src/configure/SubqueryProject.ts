@@ -7,24 +7,20 @@ import {
   ReaderOptions,
   Reader,
   RunnerSpecs,
-  validateSemver,
 } from '@subql/common';
 import {
   AlgorandProjectNetworkConfig,
   parseAlgorandProjectManifest,
-  ProjectManifestV0_2_0Impl,
-  ProjectManifestV0_2_1Impl,
-  ProjectManifestV0_3_0Impl,
   AlgorandDataSource,
   FileType,
-  ProjectManifestV1_0_0Impl,
+  ProjectManifestV0_0_1Impl,
 } from '@subql/common-substrate';
 import { buildSchemaFromString } from '@subql/utils';
 import { GraphQLSchema } from 'graphql';
 import {
   getChainTypes,
   getProjectRoot,
-  updateDataSourcesV0_2_0,
+  updateDataSourcesV0_0_1,
 } from '../utils/project';
 
 export type SubqlProjectDs = AlgorandDataSource & {
@@ -65,24 +61,8 @@ export class SubqueryProject {
     const manifest = parseAlgorandProjectManifest(projectSchema);
 
     if (manifest.isV0_0_1) {
-      NOT_SUPPORT('0.0.1');
-    } else if (manifest.isV0_2_0 || manifest.isV0_3_0) {
-      return loadProjectFromManifestBase(
-        manifest.asV0_2_0,
-        reader,
-        path,
-        networkOverrides,
-      );
-    } else if (manifest.isV0_2_1) {
-      return loadProjectFromManifest0_2_1(
-        manifest.asV0_2_1,
-        reader,
-        path,
-        networkOverrides,
-      );
-    } else if (manifest.isV1_0_0) {
-      return loadProjectFromManifest1_0_0(
-        manifest.asV1_0_0,
+      return loadProjectFromManifest0_1_0(
+        manifest.asV0_0_1,
         reader,
         path,
         networkOverrides,
@@ -108,116 +88,27 @@ function processChainId(network: any): SubqueryProjectNetwork {
   return network;
 }
 
-type SUPPORT_MANIFEST =
-  | ProjectManifestV0_2_0Impl
-  | ProjectManifestV0_2_1Impl
-  | ProjectManifestV0_3_0Impl
-  | ProjectManifestV1_0_0Impl;
-
-async function loadProjectFromManifestBase(
-  projectManifest: SUPPORT_MANIFEST,
+async function loadProjectFromManifest0_1_0(
+  projectManifest: ProjectManifestV0_0_1Impl,
   reader: Reader,
   path: string,
   networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
 ): Promise<SubqueryProject> {
-  const root = await getProjectRoot(reader);
-
-  const network = processChainId({
-    ...projectManifest.network,
-    ...networkOverrides,
-  });
-
-  if (!network.endpoint) {
-    throw new Error(
-      `Network endpoint must be provided for network. chainId="${network.chainId}"`,
-    );
-  }
-
-  let schemaString: string;
-  try {
-    schemaString = await reader.getFile(projectManifest.schema.file);
-  } catch (e) {
-    throw new Error(
-      `unable to fetch the schema from ${projectManifest.schema.file}`,
-    );
-  }
-  const schema = buildSchemaFromString(schemaString);
-
-  const chainTypes = projectManifest.network.chaintypes
-    ? await getChainTypes(reader, root, projectManifest.network.chaintypes.file)
-    : undefined;
-
-  const dataSources = await updateDataSourcesV0_2_0(
-    projectManifest.dataSources,
-    reader,
-    root,
-  );
   return {
-    id: reader.root ? reader.root : path, //TODO, need to method to get project_id
-    root,
-    network,
-    dataSources,
-    schema,
-    chainTypes,
+    id: path, //user project path as it id for now
+    root: await getProjectRoot(reader),
+    network: {
+      ...projectManifest.network,
+      ...networkOverrides,
+    },
+    dataSources: await updateDataSourcesV0_0_1(
+      projectManifest.dataSources,
+      reader,
+    ),
+    schema: buildSchemaFromString(
+      await reader.getFile(projectManifest.schema.file),
+    ),
+    chainTypes: undefined,
     templates: [],
   };
-}
-
-async function loadProjectFromManifest0_2_1(
-  projectManifest: ProjectManifestV0_2_1Impl,
-  reader: Reader,
-  path: string,
-  networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
-): Promise<SubqueryProject> {
-  const project = await loadProjectFromManifestBase(
-    projectManifest,
-    reader,
-    path,
-    networkOverrides,
-  );
-  project.templates = await loadProjectTemplates(projectManifest, reader);
-  return project;
-}
-
-const { version: packageVersion } = require('../../package.json');
-
-async function loadProjectFromManifest1_0_0(
-  projectManifest: ProjectManifestV1_0_0Impl,
-  reader: Reader,
-  path: string,
-  networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
-): Promise<SubqueryProject> {
-  const project = await loadProjectFromManifestBase(
-    projectManifest,
-    reader,
-    path,
-    networkOverrides,
-  );
-  project.templates = await loadProjectTemplates(projectManifest, reader);
-  project.runner = projectManifest.runner;
-  if (!validateSemver(packageVersion, project.runner.node.version)) {
-    throw new Error(
-      `Runner require node version ${project.runner.node.version}, current node ${packageVersion}`,
-    );
-  }
-  return project;
-}
-
-async function loadProjectTemplates(
-  projectManifest: ProjectManifestV0_2_1Impl | ProjectManifestV1_0_0Impl,
-  reader: Reader,
-): Promise<SubqlProjectDsTemplate[]> {
-  if (projectManifest.templates && projectManifest.templates.length !== 0) {
-    const root = await getProjectRoot(reader);
-
-    const dsTemplates = await updateDataSourcesV0_2_0(
-      projectManifest.templates,
-      reader,
-      root,
-    );
-    return dsTemplates.map((ds, index) => ({
-      ...ds,
-      name: projectManifest.templates[index].name,
-    }));
-  }
 }

@@ -3,10 +3,7 @@
 
 import path from 'path';
 import { Injectable } from '@nestjs/common';
-import {
-  isDataSourceV0_2_0,
-  AlgorandDataSource,
-} from '@subql/common-substrate';
+import { AlgorandDataSource } from '@subql/common-substrate';
 import { Store } from '@subql/types';
 import { levelFilter } from '@subql/utils';
 import { merge } from 'lodash';
@@ -142,10 +139,6 @@ export class SandboxService {
   }
 
   private getDataSourceEntry(ds: AlgorandDataSource): string {
-    if (isDataSourceV0_2_0(ds)) {
-      return ds.mapping.file;
-    } else {
-      return getProjectEntry(this.project.root);
-    }
+    return ds.mapping.file;
   }
 }

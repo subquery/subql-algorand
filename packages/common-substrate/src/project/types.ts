@@ -3,7 +3,6 @@
 
 import {IProjectManifest, ProjectNetworkConfig} from '@subql/common';
 import {AlgorandDataSource} from '@subql/types';
-import {RuntimeDataSourceV0_0_1} from '../project/versioned/v0_0_1';
 
 // All of these used to be redefined in this file, re-exporting for simplicity
 export {
@@ -21,8 +20,7 @@ export {
   RuntimeHandlerInputMap as AlgorandRuntimeHandlerInputMap,
 } from '@subql/types';
 
-//make exception for runtime datasource 0.0.1
-export type ISubstrateProjectManifest = IProjectManifest<AlgorandDataSource | RuntimeDataSourceV0_0_1>;
+export type IAlgorandProjectManifest = IProjectManifest<AlgorandDataSource>;
 
 export interface AlgorandProjectNetworkConfig extends ProjectNetworkConfig {
   genesisHash?: string;
