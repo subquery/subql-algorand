@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {Extrinsic, EventRecord, SignedBlock} from '@polkadot/types/interfaces';
+import {TransactionType} from 'algosdk';
 
 export interface Entity {
   id: string;
@@ -44,15 +45,6 @@ export interface SubstrateEvent extends EventRecord {
 }
 
 export type DynamicDataSourceCreator = (name: string, args: Record<string, unknown>) => Promise<void>;
-
-export enum ETransactionType {
-  pay = 'pay',
-  keyreg = 'keyreg',
-  acfg = 'acfg',
-  axfer = 'axfer',
-  afrz = 'afrz',
-  appl = 'appl',
-}
 
 export enum EOnCompletion {
   noop = 'noop',
@@ -195,7 +187,7 @@ export interface BlockUpgradeVote {
   upgradePropose?: string;
 }
 
-export interface AlgoTransaction {
+export interface AlgorandTransaction {
   applicationTransaction?: TransactionApplication;
   assetConfigTransaction?: TransactionAssetConfig;
   assetFreezeTransaction?: TransactionAssetFreeze;
@@ -213,7 +205,7 @@ export interface AlgoTransaction {
   globalStateDelta?: EvalDeltaKeyValue[];
   group?: string;
   id?: string;
-  innerTxns?: AlgoTransaction[];
+  innerTxns?: AlgorandTransaction[];
   intraRoundOffset?: number;
   keyregTransaction?: TransactionKeyreg;
   lastValid: number;
@@ -228,10 +220,10 @@ export interface AlgoTransaction {
   sender: string;
   senderRewards?: number;
   signature?: TransactionSignature;
-  txType: ETransactionType;
+  txType: TransactionType;
 }
 
-export interface AlgoBlock {
+export interface AlgorandBlock {
   genesisHash: string;
   genesisId: string;
   previousBlockHash: string;
@@ -239,9 +231,39 @@ export interface AlgoBlock {
   round: number;
   seed: string;
   timestamp: number;
-  transactions?: AlgoTransaction[];
+  transactions?: AlgorandTransaction[];
   transactionsRoot: string;
   txnCounter?: number;
   upgradeState?: BlockUpgradeState;
   upgradeVote?: BlockUpgradeVote;
+}
+
+interface BaseFilter {
+  txType?: string;
+}
+
+export interface AlgorandTxTypePayFilter extends BaseFilter {
+  sender?: string;
+  receiver?: string;
+}
+export interface AlgorandTxTypeKeyregFilter extends BaseFilter {
+  nonParticipant?: boolean;
+}
+export interface AlgorandTxTypeApplicationConfigFilter extends BaseFilter {
+  assetId?: number;
+}
+export interface AlgorandTxTypeAssetTransferFilter extends BaseFilter {
+  sender?: string;
+  receiver?: string;
+  assetId?: number;
+}
+export interface AlgorandTxTypeAssetFreezeFilter extends BaseFilter {
+  assetId?: number;
+  newFreezeStatus?: boolean;
+  address?: string;
+}
+export interface AlgorandTxTypeApplicationFilter extends BaseFilter {
+  sender?: string;
+  applicationId?: number;
+  onCompletion?: string;
 }

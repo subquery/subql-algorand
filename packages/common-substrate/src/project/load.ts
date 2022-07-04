@@ -6,17 +6,17 @@ import {plainToClass} from 'class-transformer';
 import {validateSync} from 'class-validator';
 // import {NodeVM, VMScript} from 'vm2';
 import {ChainTypes} from './models';
-import {SubstrateProjectManifestVersioned, VersionedProjectManifest} from './versioned';
+import {AlgorandProjectManifestVersioned, VersionedProjectManifest} from './versioned';
 
-export function parseAlgorandProjectManifest(raw: unknown): SubstrateProjectManifestVersioned {
-  const projectManifest = new SubstrateProjectManifestVersioned(raw as VersionedProjectManifest);
+export function parseAlgorandProjectManifest(raw: unknown): AlgorandProjectManifestVersioned {
+  const projectManifest = new AlgorandProjectManifestVersioned(raw as VersionedProjectManifest);
   projectManifest.validate();
   return projectManifest;
 }
 
-export function loadSubstrateProjectManifest(file: string): SubstrateProjectManifestVersioned {
+export function loadSubstrateProjectManifest(file: string): AlgorandProjectManifestVersioned {
   const doc = loadFromJsonOrYaml(getManifestPath(file));
-  const projectManifest = new SubstrateProjectManifestVersioned(doc as VersionedProjectManifest);
+  const projectManifest = new AlgorandProjectManifestVersioned(doc as VersionedProjectManifest);
   projectManifest.validate();
   return projectManifest;
 }

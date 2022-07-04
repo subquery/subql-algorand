@@ -83,6 +83,8 @@ export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandlerFilter,
       switch (handler.kind) {
         case AlgorandHandlerKind.Block:
           return plainToClass(BlockHandler, handler);
+        case AlgorandHandlerKind.Transaction:
+          return plainToClass(BlockHandler, handler);
         default:
           throw new Error(`handler ${(handler as any).kind} not supported`);
       }

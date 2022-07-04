@@ -2,12 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ApiPromise } from '@polkadot/api';
-import { Option, Vec } from '@polkadot/types';
 import '@polkadot/api-augment/substrate';
 import {
   BlockHash,
   EventRecord,
-  LastRuntimeUpgradeInfo,
   RuntimeVersion,
   SignedBlock,
 } from '@polkadot/types/interfaces';
@@ -17,11 +15,18 @@ import {
   SubstrateBlock,
   SubstrateEvent,
   SubstrateExtrinsic,
+  AlgorandBlock,
+  AlgorandTransaction,
+  AlgorandTransactionFilter,
+  AlgorandTxTypeApplicationConfigFilter,
+  AlgorandTxTypeApplicationFilter,
+  AlgorandTxTypeAssetFreezeFilter,
+  AlgorandTxTypeAssetTransferFilter,
+  AlgorandTxTypePayFilter,
+  AlgorandTxTypeKeyregFilter,
 } from '@subql/types';
-import { Indexer } from 'algosdk';
-import { last, merge, range } from 'lodash';
-import { AlgoBlock } from '../../../types/src/interfaces';
-import { BlockContent } from '../indexer/types';
+import { Indexer, TransactionType } from 'algosdk';
+import { merge, range } from 'lodash';
 import { getLogger } from './logger';
 import { camelCaseObjectKey } from './object';
 const logger = getLogger('fetch');
@@ -117,13 +122,146 @@ function checkSpecRange(
 export function filterBlock(
   block: SubstrateBlock,
   filter?: AlgorandBlockFilter,
-): SubstrateBlock | undefined {
-  if (!filter) return block;
-  return filter.specVersion === undefined ||
-    block.specVersion === undefined ||
-    checkSpecRange(filter.specVersion, block.specVersion)
-    ? block
-    : undefined;
+): boolean {
+  // no filters for block.s
+  return true;
+}
+export function filterTransaction(
+  txn: AlgorandTransaction,
+  filter?: AlgorandTransactionFilter,
+): boolean {
+  if (!filter) return true;
+
+  let validate = true;
+
+  if (filter.txType) {
+    switch (txn.txType) {
+      case TransactionType.pay:
+        validate = validate && checkTypePay(txn, filter);
+        break;
+      case TransactionType.keyreg:
+        validate = validate && checkTypeKeyreg(txn, filter);
+        break;
+      case TransactionType.afrz:
+        validate = validate && checkTypeAssetFreeze(txn, filter);
+        break;
+      case TransactionType.appl:
+        validate = validate && checkTypeApplication(txn, filter);
+        break;
+      case TransactionType.axfer:
+        validate = validate && checkTypeAssetTranfer(txn, filter);
+        break;
+      case TransactionType.acfg:
+        validate = validate && checkTypeApplicationConfig(txn, filter);
+        break;
+      default:
+        validate = false;
+        break;
+    }
+  }
+
+  return validate;
+}
+
+function checkTypePay(
+  txn: AlgorandTransaction,
+  filter?: AlgorandTxTypePayFilter,
+): boolean {
+  if (!filter) return true;
+  let validate = true;
+
+  if (filter.sender) validate = validate && filter.sender === txn.sender;
+
+  if (filter.receiver) {
+    validate = validate && filter.receiver === txn.paymentTransaction.receiver;
+  }
+  return validate;
+}
+
+function checkTypeKeyreg(
+  txn: AlgorandTransaction,
+  filter?: AlgorandTxTypeKeyregFilter,
+): boolean {
+  if (!filter) return true;
+  let validate = true;
+
+  if (filter.nonParticipant) {
+    validate =
+      validate &&
+      filter.nonParticipant === txn.keyregTransaction.nonParticipation;
+  }
+  return validate;
+}
+
+function checkTypeApplicationConfig(
+  txn: AlgorandTransaction,
+  filter?: AlgorandTxTypeApplicationConfigFilter,
+): boolean {
+  if (!filter) return true;
+  let validate = true;
+
+  if (filter.assetId) {
+    validate =
+      validate && filter.assetId === txn.assetConfigTransaction.assetId;
+  }
+  return validate;
+}
+
+function checkTypeAssetTranfer(
+  txn: AlgorandTransaction,
+  filter?: AlgorandTxTypeAssetTransferFilter,
+): boolean {
+  if (!filter) return true;
+  let validate = true;
+  if (filter.assetId) {
+    validate =
+      validate && filter.assetId === txn.assetTransferTransaction.assetId;
+  }
+  if (filter.sender) {
+    validate = validate && filter.sender === txn.sender;
+  }
+  if (filter.receiver) {
+    validate =
+      validate && filter.receiver === txn.assetTransferTransaction.receiver;
+  }
+
+  return validate;
+}
+
+function checkTypeAssetFreeze(
+  txn: AlgorandTransaction,
+  filter?: AlgorandTxTypeAssetFreezeFilter,
+): boolean {
+  if (!filter) return true;
+  let validate = true;
+  if (filter.assetId) {
+    validate =
+      validate && txn.assetFreezeTransaction.assetId === filter.assetId;
+  }
+  if (filter.newFreezeStatus) {
+    validate = validate && txn.assetFreezeTransaction.newFreezeStatus;
+  }
+  if (filter.address) validate = validate && txn.sender === filter.address;
+  return validate;
+}
+
+function checkTypeApplication(
+  txn: AlgorandTransaction,
+  filter?: AlgorandTxTypeApplicationFilter,
+): boolean {
+  if (!filter) return true;
+  let validate = true;
+  if (filter.applicationId) {
+    validate =
+      validate &&
+      filter.applicationId === txn.applicationTransaction.applicationId;
+  }
+  if (filter.onCompletion) {
+    validate =
+      validate &&
+      filter.onCompletion === txn.applicationTransaction.onCompletion;
+  }
+  return validate;
 }
 
 // TODO: prefetch all known runtime upgrades at once
@@ -213,7 +351,7 @@ export async function prefetchMetadata(
 async function getBlockByHeight(
   api: Indexer,
   height: number,
-): Promise<AlgoBlock> {
+): Promise<AlgorandBlock> {
   try {
     const blockInfo = await api.lookupBlock(height).do();
     return camelCaseObjectKey(blockInfo);

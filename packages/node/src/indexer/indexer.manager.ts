@@ -13,6 +13,7 @@ import {
   AlgorandHandlerKind,
   AlgorandNetworkFilter,
   AlgorandRuntimeHandlerInputMap,
+  isTransactionHandlerProcessor,
 } from '@subql/common-substrate';
 import {
   SubstrateBlock,
@@ -218,7 +219,11 @@ export class IndexerManager {
     getVM: (d: SubqlProjectDs) => IndexerSandbox,
   ): Promise<void> {
     await this.indexBlockContent(block, dataSources, getVM);
-
+    await this.indexBlockTransactionContent(
+      block.transactions,
+      dataSources,
+      getVM,
+    );
     // Run initialization events
     // const initEvents = events.filter((evt) => evt.phase.isInitialization);
     // for (const event of initEvents) {
@@ -254,6 +259,22 @@ export class IndexerManager {
       await this.indexData(AlgorandHandlerKind.Block, block, ds, getVM(ds));
     }
   }
+  private async indexBlockTransactionContent(
+    txns: any[],
+    dataSources: SubqlProjectDs[],
+    getVM: (d: SubqlProjectDs) => IndexerSandbox,
+  ) {
+    for (const ds of dataSources) {
+      for (const txn of txns) {
+        await this.indexData(
+          AlgorandHandlerKind.Transaction,
+          txn,
+          ds,
+          getVM(ds),
+        );
+      }
+    }
+  }
 
   private async indexData<K extends AlgorandHandlerKind>(
     kind: K,
@@ -269,108 +290,113 @@ export class IndexerManager {
       for (const handler of handlers) {
         await vm.securedExec(handler.handler, [data]);
       }
-    } else if (isCustomDs(ds)) {
-      const handlers = this.filterCustomDsHandlers<K>(
-        ds,
-        data,
-        ProcessorTypeMap[kind],
-        (data, baseFilter) => {
-          switch (kind) {
-            case AlgorandHandlerKind.Block:
-              return !!AlgorandUtil.filterBlock(
-                data as SubstrateBlock,
-                baseFilter,
-              );
-            default:
-              throw new Error('Unsuported handler kind');
-          }
-        },
-      );
-
-      for (const handler of handlers) {
-        await this.transformAndExecuteCustomDs(ds, vm, handler, data);
-      }
     }
+    // current algorand has no customDS.
+    // else if (isCustomDs(ds)) {
+    //   const handlers = this.filterCustomDsHandlers<K>(
+    //     ds,
+    //     data,
+    //     ProcessorTypeMap[kind],
+    //     (data, baseFilter) => {
+    //       switch (kind) {
+    //         case AlgorandHandlerKind.Block:
+    //           return !!AlgorandUtil.filterBlock(
+    //             data as SubstrateBlock,
+    //             baseFilter,
+    //           );
+    //         default:
+    //           throw new Error('Unsuported handler kind');
+    //       }
+    //     },
+    //   );
+
+    //   for (const handler of handlers) {
+    //     await this.transformAndExecuteCustomDs(ds, vm, handler, data);
+    //   }
+    // }
   }
 
-  private filterCustomDsHandlers<K extends AlgorandHandlerKind>(
-    ds: AlgorandCustomDataSource<string, AlgorandNetworkFilter>,
-    data: AlgorandRuntimeHandlerInputMap[K],
-    baseHandlerCheck: ProcessorTypeMap[K],
-    baseFilter: (
-      data: AlgorandRuntimeHandlerInputMap[K],
-      baseFilter: any,
-    ) => boolean,
-  ): AlgorandCustomHandler[] {
-    const plugin = this.dsProcessorService.getDsProcessor(ds);
+  // private filterCustomDsHandlers<K extends AlgorandHandlerKind>(
+  //   ds: AlgorandCustomDataSource<string, AlgorandNetworkFilter>,
+  //   data: AlgorandRuntimeHandlerInputMap[K],
+  //   baseHandlerCheck: ProcessorTypeMap[K],
+  //   baseFilter: (
+  //     data: AlgorandRuntimeHandlerInputMap[K],
+  //     baseFilter: any,
+  //   ) => boolean,
+  // ): AlgorandCustomHandler[] {
+  //   const plugin = this.dsProcessorService.getDsProcessor(ds);
 
-    return ds.mapping.handlers
-      .filter((handler) => {
-        const processor = plugin.handlerProcessors[handler.kind];
-        if (baseHandlerCheck(processor)) {
-          processor.baseFilter;
-          return baseFilter(data, processor.baseFilter);
-        }
-        return false;
-      })
-      .filter((handler) => {
-        const processor = asSecondLayerHandlerProcessor_1_0_0(
-          plugin.handlerProcessors[handler.kind],
-        );
+  //   return ds.mapping.handlers
+  //     .filter((handler) => {
+  //       const processor = plugin.handlerProcessors[handler.kind];
+  //       if (baseHandlerCheck(processor)) {
+  //         processor.baseFilter;
+  //         return baseFilter(data, processor.baseFilter);
+  //       }
+  //       return false;
+  //     })
+  //     .filter((handler) => {
+  //       const processor = asSecondLayerHandlerProcessor_1_0_0(
+  //         plugin.handlerProcessors[handler.kind],
+  //       );
 
-        try {
-          return processor.filterProcessor({
-            filter: handler.filter,
-            input: data,
-            ds,
-          });
-        } catch (e) {
-          logger.error(e, 'Failed to run ds processer filter.');
-          throw e;
-        }
-      });
-  }
+  //       try {
+  //         return processor.filterProcessor({
+  //           filter: handler.filter,
+  //           input: data,
+  //           ds,
+  //         });
+  //       } catch (e) {
+  //         logger.error(e, 'Failed to run ds processer filter.');
+  //         throw e;
+  //       }
+  //     });
+  // }
 
-  private async transformAndExecuteCustomDs<K extends AlgorandHandlerKind>(
-    ds: AlgorandCustomDataSource<string, AlgorandNetworkFilter>,
-    vm: IndexerSandbox,
-    handler: AlgorandCustomHandler,
-    data: AlgorandRuntimeHandlerInputMap[K],
-  ): Promise<void> {
-    const plugin = this.dsProcessorService.getDsProcessor(ds);
-    const assets = await this.dsProcessorService.getAssets(ds);
+  // private async transformAndExecuteCustomDs<K extends AlgorandHandlerKind>(
+  //   ds: AlgorandCustomDataSource<string, AlgorandNetworkFilter>,
+  //   vm: IndexerSandbox,
+  //   handler: AlgorandCustomHandler,
+  //   data: AlgorandRuntimeHandlerInputMap[K],
+  // ): Promise<void> {
+  //   const plugin = this.dsProcessorService.getDsProcessor(ds);
+  //   const assets = await this.dsProcessorService.getAssets(ds);
 
-    const processor = asSecondLayerHandlerProcessor_1_0_0(
-      plugin.handlerProcessors[handler.kind],
-    );
+  //   const processor = asSecondLayerHandlerProcessor_1_0_0(
+  //     plugin.handlerProcessors[handler.kind],
+  //   );
 
-    const transformedData = await processor
-      .transformer({
-        input: data,
-        ds,
-        filter: handler.filter,
-        api: null,
-        assets,
-      })
-      .catch((e) => {
-        logger.error(e, 'Failed to transform data with ds processor.');
-        throw e;
-      });
+  //   const transformedData = await processor
+  //     .transformer({
+  //       input: data,
+  //       ds,
+  //       filter: handler.filter,
+  //       api: null,
+  //       assets,
+  //     })
+  //     .catch((e) => {
+  //       logger.error(e, 'Failed to transform data with ds processor.');
+  //       throw e;
+  //     });
 
-    await Promise.all(
-      transformedData.map((data) => vm.securedExec(handler.handler, [data])),
-    );
-  }
+  //   await Promise.all(
+  //     transformedData.map((data) => vm.securedExec(handler.handler, [data])),
+  //   );
+  // }
 }
 
 type ProcessorTypeMap = {
   [AlgorandHandlerKind.Block]: typeof isBlockHandlerProcessor;
+  [AlgorandHandlerKind.Transaction]: typeof isTransactionHandlerProcessor;
 };
 
 const ProcessorTypeMap = {
   [AlgorandHandlerKind.Block]: isBlockHandlerProcessor,
+  [AlgorandHandlerKind.Transaction]: isTransactionHandlerProcessor,
 };
 
 const FilterTypeMap = {
   [AlgorandHandlerKind.Block]: AlgorandUtil.filterBlock,
+  [AlgorandHandlerKind.Transaction]: AlgorandUtil.filterTransaction,
 };
