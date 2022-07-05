@@ -19,7 +19,7 @@ export function manifestIsV0_0_1(manifest: IAlgorandProjectManifest): manifest i
   return manifest.specVersion === '0.0.1';
 }
 
-export class SubstrateProjectManifestVersioned implements IAlgorandProjectManifest {
+export class AlgorandProjectManifestVersioned implements IAlgorandProjectManifest {
   private _impl: ProjectManifestImpls;
 
   constructor(projectManifest: VersionedProjectManifest) {

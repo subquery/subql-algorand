@@ -4,7 +4,15 @@
 import {ApiPromise} from '@polkadot/api';
 import {RegistryTypes} from '@polkadot/types/types';
 import {Indexer} from 'algosdk';
-import {SubstrateBlock} from './interfaces';
+import {
+  AlgorandTxTypeApplicationConfigFilter,
+  AlgorandTxTypeApplicationFilter,
+  AlgorandTxTypeAssetFreezeFilter,
+  AlgorandTxTypeAssetTransferFilter,
+  AlgorandTxTypePayFilter,
+  AlgorandTxTypeKeyregFilter,
+  SubstrateBlock,
+} from './interfaces';
 
 export enum AlgorandDataSourceKind {
   Runtime = 'algorand/Runtime',
@@ -12,14 +20,17 @@ export enum AlgorandDataSourceKind {
 
 export enum AlgorandHandlerKind {
   Block = 'algorand/BlockHandler',
+  Transaction = 'algorand/TransactionHandler',
 }
 
 export type RuntimeHandlerInputMap = {
   [AlgorandHandlerKind.Block]: SubstrateBlock;
+  [AlgorandHandlerKind.Transaction]: any;
 };
 
 type RuntimeFilterMap = {
   [AlgorandHandlerKind.Block]: AlgorandNetworkFilter;
+  [AlgorandHandlerKind.Transaction]: any;
 };
 
 export interface ProjectManifest {
@@ -45,8 +56,16 @@ interface AlgorandBaseHandlerFilter {
 }
 
 export type AlgorandBlockFilter = AlgorandBaseHandlerFilter;
+export type AlgorandTransactionFilter =
+  | AlgorandTxTypePayFilter
+  | AlgorandTxTypeKeyregFilter
+  | AlgorandTxTypeApplicationConfigFilter
+  | AlgorandTxTypeAssetTransferFilter
+  | AlgorandTxTypeAssetFreezeFilter
+  | AlgorandTxTypeApplicationFilter;
 
 export type AlgorandBlockHandler = AlgorandCustomHandler<AlgorandHandlerKind.Block, AlgorandBlockFilter>;
+export type AlgorandTransactionHandler = AlgorandCustomHandler<AlgorandHandlerKind.Transaction, AlgorandBlockFilter>;
 
 export interface AlgorandCustomHandler<K extends string = string, F = Record<string, unknown>> {
   handler: string;
@@ -54,7 +73,7 @@ export interface AlgorandCustomHandler<K extends string = string, F = Record<str
   filter?: F;
 }
 
-export type AlgorandRuntimeHandler = AlgorandBlockHandler;
+export type AlgorandRuntimeHandler = AlgorandBlockHandler | AlgorandTransactionHandler;
 export type AlgorandHandler = AlgorandRuntimeHandler | AlgorandCustomHandler<string, unknown>;
 export type AlgorandRuntimeHandlerFilter = AlgorandBlockFilter;
 
