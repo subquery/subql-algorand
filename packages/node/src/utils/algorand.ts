@@ -24,9 +24,10 @@ import {
   AlgorandTxTypeAssetTransferFilter,
   AlgorandTxTypePayFilter,
   AlgorandTxTypeKeyregFilter,
+  mappingFilterTransaction,
 } from '@subql/types';
 import { Indexer, TransactionType } from 'algosdk';
-import { merge, range } from 'lodash';
+import { get, merge, range } from 'lodash';
 import { getLogger } from './logger';
 import { camelCaseObjectKey } from './object';
 const logger = getLogger('fetch');
@@ -130,137 +131,16 @@ export function filterTransaction(
   txn: AlgorandTransaction,
   filter?: AlgorandTransactionFilter,
 ): boolean {
-  if (!filter) return true;
-
+  const { txType, ...filterByKey } = filter;
   let validate = true;
+  validate = validate && txn.txType === txType;
 
-  if (filter.txType) {
-    switch (txn.txType) {
-      case TransactionType.pay:
-        validate = validate && checkTypePay(txn, filter);
-        break;
-      case TransactionType.keyreg:
-        validate = validate && checkTypeKeyreg(txn, filter);
-        break;
-      case TransactionType.afrz:
-        validate = validate && checkTypeAssetFreeze(txn, filter);
-        break;
-      case TransactionType.appl:
-        validate = validate && checkTypeApplication(txn, filter);
-        break;
-      case TransactionType.axfer:
-        validate = validate && checkTypeAssetTranfer(txn, filter);
-        break;
-      case TransactionType.acfg:
-        validate = validate && checkTypeApplicationConfig(txn, filter);
-        break;
-      default:
-        validate = false;
-        break;
-    }
-  }
-
-  return validate;
-}
-
-function checkTypePay(
-  txn: AlgorandTransaction,
-  filter?: AlgorandTxTypePayFilter,
-): boolean {
-  if (!filter) return true;
-  let validate = true;
-
-  if (filter.sender) validate = validate && filter.sender === txn.sender;
-
-  if (filter.receiver) {
-    validate = validate && filter.receiver === txn.paymentTransaction.receiver;
-  }
-  return validate;
-}
-
-function checkTypeKeyreg(
-  txn: AlgorandTransaction,
-  filter?: AlgorandTxTypeKeyregFilter,
-): boolean {
-  if (!filter) return true;
-  let validate = true;
-
-  if (filter.nonParticipant) {
+  for (const key in filterByKey) {
     validate =
       validate &&
-      filter.nonParticipant === txn.keyregTransaction.nonParticipation;
-  }
-  return validate;
-}
-
-function checkTypeApplicationConfig(
-  txn: AlgorandTransaction,
-  filter?: AlgorandTxTypeApplicationConfigFilter,
-): boolean {
-  if (!filter) return true;
-  let validate = true;
-
-  if (filter.assetId) {
-    validate =
-      validate && filter.assetId === txn.assetConfigTransaction.assetId;
-  }
-  return validate;
-}
-
-function checkTypeAssetTranfer(
-  txn: AlgorandTransaction,
-  filter?: AlgorandTxTypeAssetTransferFilter,
-): boolean {
-  if (!filter) return true;
-  let validate = true;
-  if (filter.assetId) {
-    validate =
-      validate && filter.assetId === txn.assetTransferTransaction.assetId;
-  }
-  if (filter.sender) {
-    validate = validate && filter.sender === txn.sender;
-  }
-  if (filter.receiver) {
-    validate =
-      validate && filter.receiver === txn.assetTransferTransaction.receiver;
+      filterByKey[key] === get(txn, mappingFilterTransaction[txType][key]);
   }
 
-  return validate;
-}
-
-function checkTypeAssetFreeze(
-  txn: AlgorandTransaction,
-  filter?: AlgorandTxTypeAssetFreezeFilter,
-): boolean {
-  if (!filter) return true;
-  let validate = true;
-  if (filter.assetId) {
-    validate =
-      validate && txn.assetFreezeTransaction.assetId === filter.assetId;
-  }
-  if (filter.newFreezeStatus) {
-    validate = validate && txn.assetFreezeTransaction.newFreezeStatus;
-  }
-  if (filter.address) validate = validate && txn.sender === filter.address;
-  return validate;
-}
-
-function checkTypeApplication(
-  txn: AlgorandTransaction,
-  filter?: AlgorandTxTypeApplicationFilter,
-): boolean {
-  if (!filter) return true;
-  let validate = true;
-  if (filter.applicationId) {
-    validate =
-      validate &&
-      filter.applicationId === txn.applicationTransaction.applicationId;
-  }
-  if (filter.onCompletion) {
-    validate =
-      validate &&
-      filter.onCompletion === txn.applicationTransaction.onCompletion;
-  }
   return validate;
 }
 
@@ -271,82 +151,6 @@ export async function prefetchMetadata(
 ): Promise<void> {
   await api.getBlockRegistry(hash);
 }
-
-/**
- *
- * @param api
- * @param startHeight
- * @param endHeight
- * @param overallSpecVer exists if all blocks in the range have same parant specVersion
- */
-//Deprecated
-// export async function fetchBlocks(
-//   api: ApiPromise,
-//   startHeight: number,
-//   endHeight: number,
-//   overallSpecVer?: number,
-// ): Promise<BlockContent[]> {
-//   const blocks = await fetchBlocksRange(api, startHeight, endHeight);
-//   const blockHashs = blocks.map((b) => b.block.header.hash);
-//   const parentBlockHashs = blocks.map((b) => b.block.header.parentHash);
-//   const [blockEvents, runtimeVersions] = await Promise.all([
-//     fetchEventsRange(api, blockHashs),
-//     overallSpecVer
-//       ? undefined
-//       : fetchRuntimeVersionRange(api, parentBlockHashs),
-//   ]);
-//   return blocks.map((block, idx) => {
-//     const events = blockEvents[idx];
-//     const parentSpecVersion = overallSpecVer
-//       ? overallSpecVer
-//       : runtimeVersions[idx].specVersion.toNumber();
-
-//     const wrappedBlock = wrapBlock(block, events.toArray(), parentSpecVersion);
-//     const wrappedExtrinsics = wrapExtrinsics(wrappedBlock, events);
-//     const wrappedEvents = wrapEvents(wrappedExtrinsics, events, wrappedBlock);
-//     return {
-//       block: wrappedBlock,
-//       extrinsics: wrappedExtrinsics,
-//       events: wrappedEvents,
-//     };
-//   });
-// }
-
-// export async function fetchBlocksViaRangeQuery(
-//   api: ApiPromise,
-//   startHeight: number,
-//   endHeight: number,
-// ): Promise<BlockContent[]> {
-//   const blocks = await fetchBlocksRange(api, startHeight, endHeight);
-//   const firstBlockHash = blocks[0].block.header.hash;
-//   const endBlockHash = last(blocks).block.header.hash;
-//   const [blockEvents, runtimeUpgrades] = await Promise.all([
-//     api.query.system.events.range([firstBlockHash, endBlockHash]),
-//     api.query.system.lastRuntimeUpgrade.range([firstBlockHash, endBlockHash]),
-//   ]);
-
-//   let lastEvents: Vec<EventRecord>;
-//   let lastRuntimeUpgrade: Option<LastRuntimeUpgradeInfo>;
-//   return blocks.map((block, idx) => {
-//     const [, events = lastEvents] = blockEvents[idx] ?? [];
-//     const [, runtimeUpgrade = lastRuntimeUpgrade] = runtimeUpgrades[idx] ?? [];
-//     lastEvents = events;
-//     lastRuntimeUpgrade = runtimeUpgrade;
-
-//     const wrappedBlock = wrapBlock(
-//       block,
-//       events,
-//       runtimeUpgrade.unwrap()?.specVersion.toNumber(),
-//     );
-//     const wrappedExtrinsics = wrapExtrinsics(wrappedBlock, events);
-//     const wrappedEvents = wrapEvents(wrappedExtrinsics, events, wrappedBlock);
-//     return {
-//       block: wrappedBlock,
-//       extrinsics: wrappedExtrinsics,
-//       events: wrappedEvents,
-//     };
-//   });
-// }
 
 async function getBlockByHeight(
   api: Indexer,
@@ -381,20 +185,6 @@ export async function fetchBlocksArray(
     blockArray.map(async (height) => getBlockByHeight(api, height)),
   );
 }
-
-// export async function fetchEventsRange(
-//   api: ApiPromise,
-//   hashs: BlockHash[],
-// ): Promise<Vec<EventRecord>[]> {
-//   return Promise.all(
-//     hashs.map((hash) =>
-//       api.query.system.events.at(hash).catch((e) => {
-//         logger.error(`failed to fetch events at block ${hash}`);
-//         throw e;
-//       }),
-//     ),
-//   );
-// }
 
 export async function fetchRuntimeVersionRange(
   api: ApiPromise,
