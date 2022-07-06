@@ -3,7 +3,7 @@
 
 import {ApiPromise} from '@polkadot/api';
 import {RegistryTypes} from '@polkadot/types/types';
-import {Indexer} from 'algosdk';
+import {Indexer, TransactionType} from 'algosdk';
 import {
   AlgorandTxTypeApplicationConfigFilter,
   AlgorandTxTypeApplicationFilter,
@@ -217,3 +217,29 @@ export type SecondLayerHandlerProcessor<
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > = SecondLayerHandlerProcessor_0_0_0<K, F, E, DS> | SecondLayerHandlerProcessor_1_0_0<K, F, E, DS>;
+
+export const mappingFilterTransaction = {
+  [TransactionType.pay]: {
+    sender: 'sender',
+    receiver: 'paymentTransaction.receiver',
+  },
+  [TransactionType.keyreg]: {
+    nonParticipant: 'keyregTransaction.nonParticipation',
+  },
+  [TransactionType.acfg]: {
+    assetId: 'assetConfigTransaction.assetId',
+  },
+  [TransactionType.axfer]: {
+    assetId: 'assetTransferTransaction.assetId',
+    sender: 'sender',
+    receiver: 'assetTransferTransaction.receiver',
+  },
+  [TransactionType.afrz]: {
+    assetId: 'assetFreezeTransaction.assetId',
+    newFreezeStatus: 'assetFreezeTransaction.newFreezeStatus',
+    address: 'sender',
+  },
+  [TransactionType.appl]: {
+    applicationId: 'applicationTransaction.applicationId',
+  },
+};
