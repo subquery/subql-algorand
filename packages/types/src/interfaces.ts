@@ -237,33 +237,3 @@ export interface AlgorandBlock {
   upgradeState?: BlockUpgradeState;
   upgradeVote?: BlockUpgradeVote;
 }
-
-interface BaseFilter {
-  txType?: string;
-}
-
-export interface AlgorandTxTypePayFilter extends BaseFilter {
-  sender?: string;
-  receiver?: string;
-}
-export interface AlgorandTxTypeKeyregFilter extends BaseFilter {
-  nonParticipant?: boolean;
-}
-export interface AlgorandTxTypeApplicationConfigFilter extends BaseFilter {
-  assetId?: number;
-}
-export interface AlgorandTxTypeAssetTransferFilter extends BaseFilter {
-  sender?: string;
-  receiver?: string;
-  assetId?: number;
-}
-export interface AlgorandTxTypeAssetFreezeFilter extends BaseFilter {
-  assetId?: number;
-  newFreezeStatus?: boolean;
-  address?: string;
-}
-export interface AlgorandTxTypeApplicationFilter extends BaseFilter {
-  sender?: string;
-  applicationId?: number;
-  onCompletion?: string;
-}
