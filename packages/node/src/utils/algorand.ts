@@ -18,15 +18,9 @@ import {
   AlgorandBlock,
   AlgorandTransaction,
   AlgorandTransactionFilter,
-  AlgorandTxTypeApplicationConfigFilter,
-  AlgorandTxTypeApplicationFilter,
-  AlgorandTxTypeAssetFreezeFilter,
-  AlgorandTxTypeAssetTransferFilter,
-  AlgorandTxTypePayFilter,
-  AlgorandTxTypeKeyregFilter,
   mappingFilterTransaction,
 } from '@subql/types';
-import { Indexer, TransactionType } from 'algosdk';
+import { Indexer } from 'algosdk';
 import { get, merge, range } from 'lodash';
 import { getLogger } from './logger';
 import { camelCaseObjectKey } from './object';
@@ -127,10 +121,13 @@ export function filterBlock(
   // no filters for block.s
   return true;
 }
+
 export function filterTransaction(
   txn: AlgorandTransaction,
   filter?: AlgorandTransactionFilter,
 ): boolean {
+  if (!filter.txType) return true;
+
   const { txType, ...filterByKey } = filter;
   let validate = true;
   validate = validate && txn.txType === txType;
