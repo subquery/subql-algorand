@@ -94,7 +94,7 @@ export class IndexerManager {
       this.filteredDataSources = this.filterDataSources(block.round);
 
       const datasources = this.filteredDataSources.concat(
-        ...(await this.dynamicDsService.getDynamicDataSources()),
+        ...(await this.dynamicDsService.getDynamicDatasources()),
       );
 
       await this.indexBlockData(
@@ -106,7 +106,7 @@ export class IndexerManager {
           // Inject function to create ds into vm
           vm.freeze(
             async (templateName: string, args?: Record<string, unknown>) => {
-              const newDs = await this.dynamicDsService.createDynamicDataSource(
+              const newDs = await this.dynamicDsService.createDynamicDatasource(
                 {
                   templateName,
                   args,
