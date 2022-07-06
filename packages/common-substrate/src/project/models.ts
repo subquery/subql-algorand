@@ -16,6 +16,8 @@ import {
   AlgorandRuntimeHandler,
   AlgorandRuntimeHandlerFilter,
   AlgorandCustomDataSource,
+  AlgorandTransactionHandler,
+  AlgorandTransactionFilter,
 } from '@subql/types';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {
@@ -37,19 +39,58 @@ export class BlockFilter implements AlgorandBlockFilter {
   specVersion?: [number, number];
 }
 
+export class TransactionFilter implements AlgorandTransactionFilter {
+  @IsString()
+  @IsOptional()
+  txType?: string;
+
+  @IsString()
+  @IsOptional()
+  sender?: string;
+
+  @IsString()
+  @IsOptional()
+  receiver?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  nonParticipant?: boolean;
+
+  @IsString()
+  @IsOptional()
+  assetId?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  newFreezeStatus?: boolean;
+
+  @IsString()
+  @IsOptional()
+  address?: string;
+
+  @IsString()
+  @Type(() => Number)
+  @IsOptional()
+  applicationId?: number;
+}
+
 export class ChainTypes implements RegisteredTypes {
   @IsObject()
   @IsOptional()
   types?: RegistryTypes;
+
   @IsObject()
   @IsOptional()
   typesAlias?: Record<string, OverrideModuleType>;
+
   @IsObject()
   @IsOptional()
   typesBundle?: OverrideBundleType;
+
   @IsObject()
   @IsOptional()
   typesChain?: Record<string, RegistryTypes>;
+
   @IsObject()
   @IsOptional()
   typesSpec?: Record<string, RegistryTypes>;
@@ -60,8 +101,23 @@ export class BlockHandler implements AlgorandBlockHandler {
   @ValidateNested()
   @Type(() => BlockFilter)
   filter?: AlgorandBlockFilter;
+
   @IsEnum(AlgorandHandlerKind, {groups: [AlgorandHandlerKind.Block]})
   kind: AlgorandHandlerKind.Block;
+
+  @IsString()
+  handler: string;
+}
+
+export class TransactionHandler implements AlgorandTransactionHandler {
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TransactionFilter)
+  filter?: TransactionFilter;
+
+  @IsEnum(AlgorandHandlerKind, {groups: [AlgorandHandlerKind.Block]})
+  kind: AlgorandHandlerKind.Transaction;
+
   @IsString()
   handler: string;
 }
@@ -69,8 +125,10 @@ export class BlockHandler implements AlgorandBlockHandler {
 export class CustomHandler implements AlgorandCustomHandler {
   @IsString()
   kind: string;
+
   @IsString()
   handler: string;
+
   @IsObject()
   @IsOptional()
   filter?: Record<string, unknown>;
@@ -84,7 +142,7 @@ export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandlerFilter,
         case AlgorandHandlerKind.Block:
           return plainToClass(BlockHandler, handler);
         case AlgorandHandlerKind.Transaction:
-          return plainToClass(BlockHandler, handler);
+          return plainToClass(TransactionHandler, handler);
         default:
           throw new Error(`handler ${(handler as any).kind} not supported`);
       }
@@ -93,6 +151,7 @@ export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandlerFilter,
   @IsArray()
   @ValidateNested()
   handlers: AlgorandRuntimeHandler[];
+
   @IsString()
   file: string;
 }
@@ -102,6 +161,7 @@ export class CustomMapping implements BaseMapping<Record<string, unknown>, Algor
   @Type(() => CustomHandler)
   @ValidateNested()
   handlers: CustomHandler[];
+
   @IsString()
   file: string;
 }
@@ -115,12 +175,15 @@ export class SubqlNetworkFilterImpl implements AlgorandNetworkFilter {
 export class RuntimeDataSourceBase implements AlgorandRuntimeDataSource {
   @IsEnum(AlgorandDataSourceKind, {groups: [AlgorandDataSourceKind.Runtime]})
   kind: AlgorandDataSourceKind.Runtime;
+
   @Type(() => RuntimeMapping)
   @ValidateNested()
   mapping: RuntimeMapping;
+
   @IsOptional()
   @IsInt()
   startBlock?: number;
+
   @IsOptional()
   @ValidateNested()
   @Type(() => SubqlNetworkFilterImpl)
@@ -137,18 +200,23 @@ export class CustomDataSourceBase<K extends string, T extends AlgorandNetworkFil
 {
   @IsString()
   kind: K;
+
   @Type(() => CustomMapping)
   @ValidateNested()
   mapping: M;
+
   @IsOptional()
   @IsInt()
   startBlock?: number;
+
   @Type(() => FileReferenceImpl)
   @ValidateNested({each: true})
   assets: Map<string, AlgorandCustomDataSourceAsset>;
+
   @Type(() => FileReferenceImpl)
   @IsObject()
   processor: FileReference;
+
   @IsOptional()
   @IsObject()
   filter?: T;

@@ -4,15 +4,7 @@
 import {ApiPromise} from '@polkadot/api';
 import {RegistryTypes} from '@polkadot/types/types';
 import {Indexer, TransactionType} from 'algosdk';
-import {
-  AlgorandTxTypeApplicationConfigFilter,
-  AlgorandTxTypeApplicationFilter,
-  AlgorandTxTypeAssetFreezeFilter,
-  AlgorandTxTypeAssetTransferFilter,
-  AlgorandTxTypePayFilter,
-  AlgorandTxTypeKeyregFilter,
-  SubstrateBlock,
-} from './interfaces';
+import {SubstrateBlock} from './interfaces';
 
 export enum AlgorandDataSourceKind {
   Runtime = 'algorand/Runtime',
@@ -56,16 +48,23 @@ interface AlgorandBaseHandlerFilter {
 }
 
 export type AlgorandBlockFilter = AlgorandBaseHandlerFilter;
-export type AlgorandTransactionFilter =
-  | AlgorandTxTypePayFilter
-  | AlgorandTxTypeKeyregFilter
-  | AlgorandTxTypeApplicationConfigFilter
-  | AlgorandTxTypeAssetTransferFilter
-  | AlgorandTxTypeAssetFreezeFilter
-  | AlgorandTxTypeApplicationFilter;
+
+export interface AlgorandTransactionFilter {
+  txType?: string;
+  sender?: string;
+  receiver?: string;
+  nonParticipant?: boolean;
+  assetId?: number;
+  newFreezeStatus?: boolean;
+  address?: string;
+  applicationId?: number;
+}
 
 export type AlgorandBlockHandler = AlgorandCustomHandler<AlgorandHandlerKind.Block, AlgorandBlockFilter>;
-export type AlgorandTransactionHandler = AlgorandCustomHandler<AlgorandHandlerKind.Transaction, AlgorandBlockFilter>;
+export type AlgorandTransactionHandler = AlgorandCustomHandler<
+  AlgorandHandlerKind.Transaction,
+  AlgorandTransactionFilter
+>;
 
 export interface AlgorandCustomHandler<K extends string = string, F = Record<string, unknown>> {
   handler: string;
@@ -75,7 +74,7 @@ export interface AlgorandCustomHandler<K extends string = string, F = Record<str
 
 export type AlgorandRuntimeHandler = AlgorandBlockHandler | AlgorandTransactionHandler;
 export type AlgorandHandler = AlgorandRuntimeHandler | AlgorandCustomHandler<string, unknown>;
-export type AlgorandRuntimeHandlerFilter = AlgorandBlockFilter;
+export type AlgorandRuntimeHandlerFilter = AlgorandBlockFilter | AlgorandTransactionFilter;
 
 export interface AlgorandMapping<T extends AlgorandHandler = AlgorandHandler> extends FileReference {
   handlers: T[];
