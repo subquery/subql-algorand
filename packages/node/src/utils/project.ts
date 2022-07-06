@@ -20,8 +20,8 @@ import {
   AlgorandCustomHandler,
   AlgorandHandler,
   AlgorandHandlerKind,
-  RuntimeDataSourceV0_0_1,
-  CustomDataSourceV0_0_1,
+  RuntimeDataSourceV1_0_0,
+  CustomDataSourceV1_0_0,
 } from '@subql/common-substrate';
 import yaml from 'js-yaml';
 import tar from 'tar';
@@ -77,8 +77,8 @@ export function isCustomHandler(
   return !isBaseHandler(handler);
 }
 
-export async function updateDataSourcesV0_0_1(
-  _dataSources: (RuntimeDataSourceV0_0_1 | CustomDataSourceV0_0_1)[],
+export async function updateDataSourcesV1_0_0(
+  _dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[],
   reader: Reader,
 ): Promise<SubqlProjectDs[]> {
   // force convert to updated ds
@@ -127,7 +127,7 @@ export async function loadDataSourceScript(
   file?: string,
 ): Promise<string> {
   let entry: string;
-  //For RuntimeDataSourceV0_0_1
+  //For RuntimeDataSourceV1_0_0
   if (!file) {
     const pkg = await reader.getPkg();
     if (pkg === undefined) throw new Error('Project package.json is not found');

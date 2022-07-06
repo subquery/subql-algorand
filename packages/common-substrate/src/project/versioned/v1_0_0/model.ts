@@ -8,19 +8,19 @@ import {plainToClass, Type} from 'class-transformer';
 import {Equals, IsArray, IsObject, IsOptional, IsString, ValidateNested, validateSync} from 'class-validator';
 import yaml from 'js-yaml';
 import {CustomDataSourceBase, RuntimeDataSourceBase} from '../../models';
-import {CustomDataSourceV0_0_1, ProjectManifestV0_0_1, RuntimeDataSourceV0_0_1} from './types';
+import {CustomDataSourceV1_0_0, ProjectManifestV1_0_0, RuntimeDataSourceV1_0_0} from './types';
 
 export class FileType {
   @IsString()
   file: string;
 }
 
-export class ProjectNetworkDeploymentV0_0_1 {
+export class ProjectNetworkDeploymentV1_0_0 {
   @IsString()
   chainId: string;
 }
 
-export class ProjectNetworkV0_0_1 extends ProjectNetworkDeploymentV0_0_1 {
+export class ProjectNetworkV1_0_0 extends ProjectNetworkDeploymentV1_0_0 {
   @IsString()
   endpoint: string;
   @IsString()
@@ -40,13 +40,13 @@ function validateObject(object: any, errorMessage = 'failed to validate object.'
   }
 }
 
-export class AlgorandRuntimeDataSourceV0_0_1Impl extends RuntimeDataSourceBase implements RuntimeDataSourceV0_0_1 {
+export class AlgorandRuntimeDataSourceV1_0_0Impl extends RuntimeDataSourceBase implements RuntimeDataSourceV1_0_0 {
   validate(): void {
     return validateObject(this, 'failed to validate runtime datasource.');
   }
 }
 
-export class AlgorandCustomDataSourceV0_0_1Impl<
+export class AlgorandCustomDataSourceV1_0_0Impl<
     K extends string = string,
     T extends AlgorandNetworkFilter = AlgorandNetworkFilter,
     M extends BaseMapping<any, any> = BaseMapping<Record<string, unknown>, any>
@@ -59,8 +59,8 @@ export class AlgorandCustomDataSourceV0_0_1Impl<
   }
 }
 
-export class DeploymentV0_0_1 {
-  @Equals('0.0.1')
+export class DeploymentV1_0_0 {
+  @Equals('1.0.0')
   @IsString()
   specVersion: string;
   @ValidateNested()
@@ -68,24 +68,24 @@ export class DeploymentV0_0_1 {
   schema: FileType;
   @IsArray()
   @ValidateNested()
-  @Type(() => AlgorandCustomDataSourceV0_0_1Impl, {
+  @Type(() => AlgorandCustomDataSourceV1_0_0Impl, {
     discriminator: {
       property: 'kind',
-      subTypes: [{value: AlgorandRuntimeDataSourceV0_0_1Impl, name: 'algorand/Runtime'}],
+      subTypes: [{value: AlgorandRuntimeDataSourceV1_0_0Impl, name: 'algorand/Runtime'}],
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (RuntimeDataSourceV0_0_1 | CustomDataSourceV0_0_1)[];
+  dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[];
   @ValidateNested()
-  @Type(() => ProjectNetworkDeploymentV0_0_1)
-  network: ProjectNetworkDeploymentV0_0_1;
+  @Type(() => ProjectNetworkDeploymentV1_0_0)
+  network: ProjectNetworkDeploymentV1_0_0;
 }
 
-export class ProjectManifestV0_0_1Impl
-  extends ProjectManifestBaseImpl<DeploymentV0_0_1>
-  implements ProjectManifestV0_0_1
+export class ProjectManifestV1_0_0Impl
+  extends ProjectManifestBaseImpl<DeploymentV1_0_0>
+  implements ProjectManifestV1_0_0
 {
-  @Equals('0.0.1')
+  @Equals('1.0.0')
   specVersion: string;
   @IsString()
   name: string;
@@ -93,20 +93,20 @@ export class ProjectManifestV0_0_1Impl
   version: string;
   @IsObject()
   @ValidateNested()
-  @Type(() => ProjectNetworkV0_0_1)
-  network: ProjectNetworkV0_0_1;
+  @Type(() => ProjectNetworkV1_0_0)
+  network: ProjectNetworkV1_0_0;
   schema: FileType;
   @IsArray()
   @ValidateNested()
-  @Type(() => AlgorandCustomDataSourceV0_0_1Impl, {
+  @Type(() => AlgorandCustomDataSourceV1_0_0Impl, {
     discriminator: {
       property: 'kind',
-      subTypes: [{value: AlgorandRuntimeDataSourceV0_0_1Impl, name: 'algorand/Runtime'}],
+      subTypes: [{value: AlgorandRuntimeDataSourceV1_0_0Impl, name: 'algorand/Runtime'}],
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (RuntimeDataSourceV0_0_1 | CustomDataSourceV0_0_1)[];
-  private _deployment: DeploymentV0_0_1;
+  dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[];
+  private _deployment: DeploymentV1_0_0;
 
   toDeployment(): string {
     return yaml.dump(this._deployment, {
@@ -115,9 +115,9 @@ export class ProjectManifestV0_0_1Impl
     });
   }
 
-  get deployment(): DeploymentV0_0_1 {
+  get deployment(): DeploymentV1_0_0 {
     if (!this._deployment) {
-      this._deployment = plainToClass(DeploymentV0_0_1, this);
+      this._deployment = plainToClass(DeploymentV1_0_0, this);
       validateSync(this._deployment, {whitelist: true});
     }
     return this._deployment;

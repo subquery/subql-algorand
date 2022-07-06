@@ -14,7 +14,7 @@ import {
   AlgorandHandler,
   AlgorandDataSource,
   AlgorandRuntimeHandlerFilter,
-  isRuntimeDataSourceV0_0_1,
+  isRuntimeDataSourceV1_0_0,
 } from '@subql/common-substrate';
 import {
   DictionaryQueryEntry,
@@ -136,7 +136,7 @@ export class FetchService implements OnApplicationShutdown {
   getDictionaryQueryEntries(): DictionaryQueryEntry[] {
     const queryEntries: DictionaryQueryEntry[] = [];
     const dataSources = this.project.dataSources.filter((ds) =>
-      isRuntimeDataSourceV0_0_1(ds),
+      isRuntimeDataSourceV1_0_0(ds),
     );
 
     for (const ds of dataSources) {

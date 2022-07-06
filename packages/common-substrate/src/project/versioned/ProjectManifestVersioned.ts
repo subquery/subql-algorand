@@ -4,19 +4,19 @@
 import {AlgorandDataSource} from '@subql/types';
 import {plainToClass} from 'class-transformer';
 import {IAlgorandProjectManifest} from '../types';
-import {ProjectManifestV0_0_1Impl} from './v0_0_1';
+import {ProjectManifestV1_0_0Impl} from './v1_0_0';
 export type VersionedProjectManifest = {specVersion: string};
 
 const ALGORAND_SUPPORTED_VERSIONS = {
-  '0.0.1': ProjectManifestV0_0_1Impl,
+  '1.0.0': ProjectManifestV1_0_0Impl,
 };
 
 type Versions = keyof typeof ALGORAND_SUPPORTED_VERSIONS;
 
 type ProjectManifestImpls = InstanceType<typeof ALGORAND_SUPPORTED_VERSIONS[Versions]>;
 
-export function manifestIsV0_0_1(manifest: IAlgorandProjectManifest): manifest is ProjectManifestV0_0_1Impl {
-  return manifest.specVersion === '0.0.1';
+export function manifestIsV1_0_0(manifest: IAlgorandProjectManifest): manifest is ProjectManifestV1_0_0Impl {
+  return manifest.specVersion === '1.0.0';
 }
 
 export class AlgorandProjectManifestVersioned implements IAlgorandProjectManifest {
@@ -34,12 +34,12 @@ export class AlgorandProjectManifestVersioned implements IAlgorandProjectManifes
     return this._impl;
   }
 
-  get isV0_0_1(): boolean {
-    return this.specVersion === '0.0.1';
+  get isV1_0_0(): boolean {
+    return this.specVersion === '1.0.0';
   }
 
-  get asV0_0_1(): ProjectManifestV0_0_1Impl {
-    return this._impl as ProjectManifestV0_0_1Impl;
+  get asV1_0_0(): ProjectManifestV1_0_0Impl {
+    return this._impl as ProjectManifestV1_0_0Impl;
   }
 
   toDeployment(): string | undefined {

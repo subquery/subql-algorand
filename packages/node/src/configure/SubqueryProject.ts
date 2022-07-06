@@ -13,14 +13,14 @@ import {
   parseAlgorandProjectManifest,
   AlgorandDataSource,
   FileType,
-  ProjectManifestV0_0_1Impl,
+  ProjectManifestV1_0_0Impl,
 } from '@subql/common-substrate';
 import { buildSchemaFromString } from '@subql/utils';
 import { GraphQLSchema } from 'graphql';
 import {
   getChainTypes,
   getProjectRoot,
-  updateDataSourcesV0_0_1,
+  updateDataSourcesV1_0_0,
 } from '../utils/project';
 
 export type SubqlProjectDs = AlgorandDataSource & {
@@ -60,9 +60,9 @@ export class SubqueryProject {
 
     const manifest = parseAlgorandProjectManifest(projectSchema);
 
-    if (manifest.isV0_0_1) {
+    if (manifest.isV1_0_0) {
       return loadProjectFromManifest0_1_0(
-        manifest.asV0_0_1,
+        manifest.asV1_0_0,
         reader,
         path,
         networkOverrides,
@@ -89,7 +89,7 @@ function processChainId(network: any): SubqueryProjectNetwork {
 }
 
 async function loadProjectFromManifest0_1_0(
-  projectManifest: ProjectManifestV0_0_1Impl,
+  projectManifest: ProjectManifestV1_0_0Impl,
   reader: Reader,
   path: string,
   networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
@@ -101,7 +101,7 @@ async function loadProjectFromManifest0_1_0(
       ...projectManifest.network,
       ...networkOverrides,
     },
-    dataSources: await updateDataSourcesV0_0_1(
+    dataSources: await updateDataSourcesV1_0_0(
       projectManifest.dataSources,
       reader,
     ),
