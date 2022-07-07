@@ -44,7 +44,7 @@ export interface ProjectManifest {
 export type SpecVersionRange = [number, number];
 
 interface AlgorandBaseHandlerFilter {
-  specVersion?: SpecVersionRange;
+  Proposer?: string;
 }
 
 export type AlgorandBlockFilter = AlgorandBaseHandlerFilter;
@@ -74,7 +74,7 @@ export interface AlgorandCustomHandler<K extends string = string, F = Record<str
 
 export type AlgorandRuntimeHandler = AlgorandBlockHandler | AlgorandTransactionHandler;
 export type AlgorandHandler = AlgorandRuntimeHandler | AlgorandCustomHandler<string, unknown>;
-export type AlgorandRuntimeHandlerFilter = AlgorandBlockFilter | AlgorandTransactionFilter;
+export type AlgorandRuntimeHandlerFilter = AlgorandTransactionFilter;
 
 export interface AlgorandMapping<T extends AlgorandHandler = AlgorandHandler> extends FileReference {
   handlers: T[];

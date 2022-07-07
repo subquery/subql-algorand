@@ -147,6 +147,7 @@ export class DictionaryService implements OnApplicationShutdown {
       batchSize,
       conditions,
     );
+    console.log(query, variables);
 
     try {
       const resp = await this.client.query({
@@ -215,15 +216,15 @@ export class DictionaryService implements OnApplicationShutdown {
         entity: '_metadata',
         project: ['lastProcessedHeight', 'genesisHash'],
       },
-      {
-        entity: 'specVersions',
-        project: [
-          {
-            entity: 'nodes',
-            project: ['id', 'blockHeight'],
-          },
-        ],
-      },
+      // {
+      //   entity: 'specVersions',
+      //   project: [
+      //     {
+      //       entity: 'nodes',
+      //       project: ['id', 'blockHeight'],
+      //     },
+      //   ],
+      // },
     ];
     for (const entity of Object.keys(mapped)) {
       const [pVars, node] = buildDictQueryFragment(
