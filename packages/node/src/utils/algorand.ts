@@ -126,8 +126,7 @@ export function filterTransaction(
   txn: AlgorandTransaction,
   filter?: AlgorandTransactionFilter,
 ): boolean {
-  if (!filter.txType) return true;
-
+  if (!filter || !filter.txType) return true;
   const { txType, ...filterByKey } = filter;
   let validate = true;
   validate = validate && txn.txType === txType;

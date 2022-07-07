@@ -44,7 +44,7 @@ export interface ProjectManifest {
 export type SpecVersionRange = [number, number];
 
 interface AlgorandBaseHandlerFilter {
-  Proposer?: string;
+  specVersion?: string;
 }
 
 export type AlgorandBlockFilter = AlgorandBaseHandlerFilter;
