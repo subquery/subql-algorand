@@ -30,6 +30,7 @@ import {
   IsString,
   IsObject,
   ValidateNested,
+  IsNumber,
 } from 'class-validator';
 
 export class BlockFilter implements AlgorandBlockFilter {
@@ -68,8 +69,7 @@ export class TransactionFilter implements AlgorandTransactionFilter {
   @IsOptional()
   address?: string;
 
-  @IsString()
-  @Type(() => Number)
+  @IsNumber()
   @IsOptional()
   applicationId?: number;
 }
