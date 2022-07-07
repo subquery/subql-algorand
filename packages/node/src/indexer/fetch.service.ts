@@ -19,7 +19,7 @@ import {
 import {
   DictionaryQueryEntry,
   SubstrateBlock,
-  AlgorandCustomHandler,
+  AlgorandBlock,
 } from '@subql/types';
 
 import { Indexer } from 'algosdk';
@@ -94,7 +94,7 @@ export class FetchService implements OnApplicationShutdown {
   private latestProcessedHeight: number;
   private latestBufferedHeight: number;
   // changed this to block inteface
-  private blockBuffer: BlockedQueue<any>;
+  private blockBuffer: BlockedQueue<AlgorandBlock>;
   private blockNumberBuffer: BlockedQueue<number>;
   private isShutdown = false;
   private parentSpecVersion: number;
@@ -112,7 +112,7 @@ export class FetchService implements OnApplicationShutdown {
     private dsProcessorService: DsProcessorService,
     private eventEmitter: EventEmitter2,
   ) {
-    this.blockBuffer = new BlockedQueue<BlockContent>(
+    this.blockBuffer = new BlockedQueue<AlgorandBlock>(
       this.nodeConfig.batchSize * 3,
     );
     this.blockNumberBuffer = new BlockedQueue<number>(
@@ -177,7 +177,7 @@ export class FetchService implements OnApplicationShutdown {
     );
   }
 
-  register(next: (value: BlockContent) => Promise<void>): () => void {
+  register(next: (value: AlgorandBlock) => Promise<void>): () => void {
     let stopper = false;
     void (async () => {
       while (!stopper && !this.isShutdown) {
