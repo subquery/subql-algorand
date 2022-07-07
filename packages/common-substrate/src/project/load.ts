@@ -20,6 +20,7 @@ export function loadSubstrateProjectManifest(file: string): AlgorandProjectManif
   projectManifest.validate();
   return projectManifest;
 }
+
 export function parseChainTypes(raw: unknown): ChainTypes {
   const chainTypes = plainToClass(ChainTypes, raw);
   if (

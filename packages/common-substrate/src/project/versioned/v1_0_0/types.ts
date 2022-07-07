@@ -3,13 +3,11 @@
 
 import {
   AlgorandCustomDataSource,
-  AlgorandCustomHandler,
   AlgorandDataSource,
   AlgorandDataSourceKind,
   AlgorandHandler,
   AlgorandMapping,
   AlgorandRuntimeDataSource,
-  AlgorandRuntimeHandler,
 } from '@subql/types';
 import {IAlgorandProjectManifest} from '../../types';
 

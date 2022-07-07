@@ -1,13 +1,23 @@
-// Copyright 2020-2021 OnFinality Limited authors & contributors
+// Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import {BaseMapping, ProjectManifestBaseImpl} from '@subql/common';
-import {AlgorandNetworkFilter} from '@subql/common-substrate';
+import {AlgorandNetworkFilter, TokenHeader} from '@subql/common-substrate';
 import {AlgorandCustomDataSource} from '@subql/types';
 import {plainToClass, Type} from 'class-transformer';
-import {Equals, IsArray, IsObject, IsOptional, IsString, ValidateNested, validateSync} from 'class-validator';
+import {
+  Equals,
+  IsArray,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+  validateSync,
+} from 'class-validator';
 import yaml from 'js-yaml';
 import {CustomDataSourceBase, RuntimeDataSourceBase} from '../../models';
+import {IsStringOrObject} from '../../validation/is-string-or-object.validation';
 import {CustomDataSourceV1_0_0, ProjectManifestV1_0_0, RuntimeDataSourceV1_0_0} from './types';
 
 export class FileType {
@@ -22,13 +32,20 @@ export class ProjectNetworkDeploymentV1_0_0 {
 
 export class ProjectNetworkV1_0_0 extends ProjectNetworkDeploymentV1_0_0 {
   @IsString()
+  @IsNotEmpty()
   endpoint: string;
+
   @IsString()
   @IsOptional()
   dictionary?: string;
+
   @IsString()
   @IsOptional()
   genesisHash?: string;
+
+  @IsStringOrObject()
+  @IsOptional()
+  apiKey: string | TokenHeader;
 }
 
 function validateObject(object: any, errorMessage = 'failed to validate object.'): void {
@@ -63,9 +80,11 @@ export class DeploymentV1_0_0 {
   @Equals('1.0.0')
   @IsString()
   specVersion: string;
+
   @ValidateNested()
   @Type(() => FileType)
   schema: FileType;
+
   @IsArray()
   @ValidateNested()
   @Type(() => AlgorandCustomDataSourceV1_0_0Impl, {
@@ -76,9 +95,10 @@ export class DeploymentV1_0_0 {
     keepDiscriminatorProperty: true,
   })
   dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[];
+
   @ValidateNested()
-  @Type(() => ProjectNetworkDeploymentV1_0_0)
-  network: ProjectNetworkDeploymentV1_0_0;
+  @Type(() => ProjectNetworkV1_0_0)
+  network: ProjectNetworkV1_0_0;
 }
 
 export class ProjectManifestV1_0_0Impl
@@ -87,15 +107,22 @@ export class ProjectManifestV1_0_0Impl
 {
   @Equals('1.0.0')
   specVersion: string;
+
   @IsString()
   name: string;
+
   @IsString()
   version: string;
+
   @IsObject()
   @ValidateNested()
   @Type(() => ProjectNetworkV1_0_0)
   network: ProjectNetworkV1_0_0;
+
+  @ValidateNested()
+  @Type(() => FileType)
   schema: FileType;
+
   @IsArray()
   @ValidateNested()
   @Type(() => AlgorandCustomDataSourceV1_0_0Impl, {
@@ -106,6 +133,7 @@ export class ProjectManifestV1_0_0Impl
     keepDiscriminatorProperty: true,
   })
   dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[];
+
   private _deployment: DeploymentV1_0_0;
 
   toDeployment(): string {
