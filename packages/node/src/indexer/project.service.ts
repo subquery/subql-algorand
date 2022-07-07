@@ -8,7 +8,7 @@ import { getAllEntitiesRelations } from '@subql/utils';
 import { EventEmitter2 } from 'eventemitter2';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 import { NodeConfig } from '../configure/NodeConfig';
-import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import { SubqueryProject } from '../configure/SubqueryProject';
 import { SubqueryRepo } from '../entities';
 import { getLogger } from '../utils/logger';
 import { getYargsOption } from '../yargs';
@@ -207,28 +207,8 @@ export class ProjectService {
       return arr;
     }, {} as { [key in typeof keys[number]]: string | boolean | number });
 
-    const { chain, genesisHash, specName } = this.apiService.networkMeta;
+    const { genesisHash } = this.apiService.networkMeta;
 
-    if (this.project.runner) {
-      await Promise.all([
-        metadataRepo.upsert({
-          key: 'runnerNode',
-          value: this.project.runner.node.name,
-        }),
-        metadataRepo.upsert({
-          key: 'runnerNodeVersion',
-          value: this.project.runner.node.version,
-        }),
-        metadataRepo.upsert({
-          key: 'runnerQuery',
-          value: this.project.runner.query.name,
-        }),
-        metadataRepo.upsert({
-          key: 'runnerQueryVersion',
-          value: this.project.runner.query.version,
-        }),
-      ]);
-    }
     if (!keyValue.genesisHash) {
       if (project) {
         await metadataRepo.upsert({
@@ -245,14 +225,6 @@ export class ProjectService {
         (this.project.network.chainId ?? genesisHash) === keyValue.genesisHash,
         'Specified project manifest chain id / genesis hash does not match database stored genesis hash, consider cleaning project schema using --force-clean',
       );
-    }
-
-    if (keyValue.chain !== chain) {
-      await metadataRepo.upsert({ key: 'chain', value: chain });
-    }
-
-    if (keyValue.specName !== specName) {
-      await metadataRepo.upsert({ key: 'specName', value: specName });
     }
 
     if (keyValue.indexerNodeVersion !== packageVersion) {
@@ -297,6 +269,7 @@ export class ProjectService {
   private async getStartHeight(): Promise<number> {
     let startHeight: number;
     const lastProcessedHeight = await this.getLastProcessedHeight();
+
     if (lastProcessedHeight !== null && lastProcessedHeight !== undefined) {
       startHeight = Number(lastProcessedHeight) + 1;
     } else {
@@ -325,7 +298,7 @@ export class ProjectService {
   }
 
   private getStartBlockFromDataSources() {
-    const startBlocksList = this.getDataSourcesForSpecName().map(
+    const startBlocksList = this.project.dataSources.map(
       (item) => item.startBlock ?? 1,
     );
     if (startBlocksList.length === 0) {
@@ -336,14 +309,5 @@ export class ProjectService {
     } else {
       return Math.min(...startBlocksList);
     }
-  }
-
-  private getDataSourcesForSpecName(): SubqlProjectDs[] {
-    return this.project.dataSources.filter(
-      (ds) =>
-        !ds.filter?.specName ||
-        ds.filter.specName ===
-          this.apiService.getApi().runtimeVersion.specName.toString(),
-    );
   }
 }

@@ -16,11 +16,13 @@ export function isBlockHandlerProcessor<T extends AlgorandNetworkFilter, E>(
 ): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, T, E> {
   return hp.baseHandlerKind === AlgorandHandlerKind.Block;
 }
+
 export function isTransactionHandlerProcessor<T extends AlgorandNetworkFilter, E>(
   hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, T, unknown>
 ): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, T, E> {
   return hp.baseHandlerKind === AlgorandHandlerKind.Transaction;
 }
+
 export function isCustomDs<F extends AlgorandNetworkFilter>(
   ds: AlgorandDataSource
 ): ds is AlgorandCustomDataSource<string, F> {

@@ -21,11 +21,10 @@ export {
 } from '@subql/types';
 
 export type IAlgorandProjectManifest = IProjectManifest<AlgorandDataSource>;
+export type TokenHeader = Record<string, string>;
 
 export interface AlgorandProjectNetworkConfig extends ProjectNetworkConfig {
   genesisHash?: string;
   chainId?: string;
-  apiKey?: string;
-  algorandRpc?: string;
-  port?: number;
+  apiKey?: string | TokenHeader;
 }
