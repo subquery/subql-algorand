@@ -19,7 +19,7 @@ import {
 import {
   DictionaryQueryEntry,
   SubstrateBlock,
-  AlgorandCustomHandler,
+  AlgorandBlock,
 } from '@subql/types';
 
 import { Indexer } from 'algosdk';
@@ -94,7 +94,7 @@ export class FetchService implements OnApplicationShutdown {
   private latestProcessedHeight: number;
   private latestBufferedHeight: number;
   // changed this to block inteface
-  private blockBuffer: BlockedQueue<any>;
+  private blockBuffer: BlockedQueue<AlgorandBlock>;
   private blockNumberBuffer: BlockedQueue<number>;
   private isShutdown = false;
   private parentSpecVersion: number;
@@ -112,7 +112,7 @@ export class FetchService implements OnApplicationShutdown {
     private dsProcessorService: DsProcessorService,
     private eventEmitter: EventEmitter2,
   ) {
-    this.blockBuffer = new BlockedQueue<BlockContent>(
+    this.blockBuffer = new BlockedQueue<AlgorandBlock>(
       this.nodeConfig.batchSize * 3,
     );
     this.blockNumberBuffer = new BlockedQueue<number>(
@@ -140,38 +140,31 @@ export class FetchService implements OnApplicationShutdown {
     );
 
     for (const ds of dataSources) {
-      const plugin = isCustomDs(ds)
-        ? this.dsProcessorService.getDsProcessor(ds)
-        : undefined;
       for (const handler of ds.mapping.handlers) {
         const baseHandlerKind = this.getBaseHandlerKind(ds, handler);
         let filterList: AlgorandRuntimeHandlerFilter[];
-        if (isCustomDs(ds)) {
-          const processor = plugin.handlerProcessors[handler.kind];
-          if (processor.dictionaryQuery) {
-            const queryEntry = processor.dictionaryQuery(
-              (handler as AlgorandCustomHandler).filter,
-              ds,
-            );
-            if (queryEntry) {
-              queryEntries.push(queryEntry);
-              continue;
-            }
-          }
-          filterList = this.getBaseHandlerFilters<AlgorandRuntimeHandlerFilter>(
-            ds,
-            handler.kind,
-          );
-        } else {
-          filterList = [handler.filter];
-        }
+
+        filterList = [handler.filter];
+
         filterList = filterList.filter((f) => f);
+
         if (!filterList.length) return [];
         switch (baseHandlerKind) {
           case AlgorandHandlerKind.Block:
             return [];
           default:
         }
+
+        filterList.forEach((f) => {
+          const conditions = Object.entries(f).map(([field, value]) => ({
+            field,
+            value,
+          }));
+          queryEntries.push({
+            entity: 'transactions',
+            conditions,
+          });
+        });
       }
     }
 
@@ -184,7 +177,7 @@ export class FetchService implements OnApplicationShutdown {
     );
   }
 
-  register(next: (value: BlockContent) => Promise<void>): () => void {
+  register(next: (value: AlgorandBlock) => Promise<void>): () => void {
     let stopper = false;
     void (async () => {
       while (!stopper && !this.isShutdown) {
@@ -324,6 +317,7 @@ export class FetchService implements OnApplicationShutdown {
         await delay(1);
         continue;
       }
+
       // disable dictionary
       if (this.useDictionary || false) {
         const queryEndBlock = startBlockHeight + DICTIONARY_MAX_QUERY_SIZE;
@@ -549,16 +543,8 @@ export class FetchService implements OnApplicationShutdown {
   ): AlgorandHandlerKind {
     if (isRuntimeDs(ds) && isBaseHandler(handler)) {
       return handler.kind;
-    } else if (isCustomDs(ds) && isCustomHandler(handler)) {
-      const plugin = this.dsProcessorService.getDsProcessor(ds);
-      const baseHandler =
-        plugin.handlerProcessors[handler.kind]?.baseHandlerKind;
-      if (!baseHandler) {
-        throw new Error(
-          `handler type ${handler.kind} not found in processor for ${ds.kind}`,
-        );
-      }
-      return baseHandler;
+    } else {
+      throw new Error('unknown base handler kind');
     }
   }
 
