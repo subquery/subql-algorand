@@ -60,38 +60,12 @@ async function getBlockByHeight(
   }
 }
 
-export async function fetchBlocksRange(
-  api: Indexer,
-  startHeight: number,
-  endHeight: number,
-): Promise<any[]> {
-  return Promise.all(
-    range(startHeight, endHeight + 1).map(async (height) =>
-      getBlockByHeight(api, height),
-    ),
-  );
-}
-
 export async function fetchBlocksArray(
   api: Indexer,
   blockArray: number[],
 ): Promise<any[]> {
   return Promise.all(
     blockArray.map(async (height) => getBlockByHeight(api, height)),
-  );
-}
-
-export async function fetchRuntimeVersionRange(
-  api: ApiPromise,
-  hashs: BlockHash[],
-): Promise<RuntimeVersion[]> {
-  return Promise.all(
-    hashs.map((hash) =>
-      api.rpc.state.getRuntimeVersion(hash).catch((e) => {
-        logger.error(`failed to fetch RuntimeVersion at block ${hash}`);
-        throw e;
-      }),
-    ),
   );
 }
 
