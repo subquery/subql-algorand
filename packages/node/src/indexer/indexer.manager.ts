@@ -4,7 +4,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { hexToU8a, u8aEq } from '@polkadot/util';
-import { isRuntimeDs, AlgorandHandlerKind } from '@subql/common-substrate';
+import {
+  isRuntimeDs,
+  AlgorandHandlerKind,
+  AlgorandRuntimeHandlerInputMap,
+} from '@subql/common-substrate';
+import { AlgorandBlock, AlgorandTransaction } from '@subql/types';
 import { Indexer } from 'algosdk';
 import { Sequelize } from 'sequelize';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
@@ -21,7 +26,6 @@ import { MmrService } from './mmr.service';
 import { ProjectService } from './project.service';
 import { IndexerSandbox, SandboxService } from './sandbox.service';
 import { StoreService } from './store.service';
-import { BlockContent } from './types';
 
 const NULL_MERKEL_ROOT = hexToU8a('0x00');
 
@@ -49,9 +53,8 @@ export class IndexerManager {
   ) {}
 
   @profiler(argv.profiler)
-  async indexBlock(blockContent: any): Promise<void> {
-    const block = blockContent;
-    const blockHeight = block.round;
+  async indexBlock(blockContent: AlgorandBlock): Promise<void> {
+    const blockHeight = blockContent.round;
     this.eventEmitter.emit(IndexerEvent.BlockProcessing, {
       height: blockHeight,
       timestamp: Date.now(),
@@ -66,7 +69,7 @@ export class IndexerManager {
       // const runtimeVersion = await this.fetchService.getRuntimeVersion(block);
       // const apiAt = await this.apiService.getPatchedApi(block, runtimeVersion);
 
-      this.filteredDataSources = this.filterDataSources(block.round);
+      this.filteredDataSources = this.filterDataSources(blockContent.round);
 
       const datasources = this.filteredDataSources.concat(
         ...(await this.dynamicDsService.getDynamicDatasources()),
@@ -124,7 +127,7 @@ export class IndexerManager {
       throw e;
     }
     await tx.commit();
-    this.fetchService.latestProcessed(block.round);
+    this.fetchService.latestProcessed(blockContent.round);
   }
 
   async start(): Promise<void> {
@@ -159,7 +162,7 @@ export class IndexerManager {
   }
 
   private async indexBlockData(
-    block: BlockContent,
+    block: AlgorandBlock,
     dataSources: SubqlProjectDs[],
     getVM: (d: SubqlProjectDs) => IndexerSandbox,
   ): Promise<void> {
@@ -172,7 +175,7 @@ export class IndexerManager {
   }
 
   private async indexBlockContent(
-    block: any,
+    block: AlgorandBlock,
     dataSources: SubqlProjectDs[],
     getVM: (d: SubqlProjectDs) => IndexerSandbox,
   ): Promise<void> {
@@ -181,7 +184,7 @@ export class IndexerManager {
     }
   }
   private async indexBlockTransactionContent(
-    txns: any[],
+    txns: AlgorandTransaction[],
     dataSources: SubqlProjectDs[],
     getVM: (d: SubqlProjectDs) => IndexerSandbox,
   ) {
@@ -199,7 +202,7 @@ export class IndexerManager {
 
   private async indexData<K extends AlgorandHandlerKind>(
     kind: K,
-    data: any,
+    data: AlgorandRuntimeHandlerInputMap[K],
     ds: SubqlProjectDs,
     vm: IndexerSandbox,
   ): Promise<void> {
