@@ -117,7 +117,6 @@ export class FetchService implements OnApplicationShutdown {
     return this.apiService.getApi();
   }
 
-  // TODO: if custom ds doesn't support dictionary, use baseFilter, if yes, let
   getDictionaryQueryEntries(): DictionaryQueryEntry[] {
     const queryEntries: DictionaryQueryEntry[] = [];
     const dataSources = this.project.dataSources.filter((ds) =>
@@ -178,7 +177,7 @@ export class FetchService implements OnApplicationShutdown {
           } catch (e) {
             logger.error(
               e,
-              `failed to index block at height ${0} ${
+              `failed to index block at height ${block.round} ${
                 e.handler ? `${e.handler}(${e.handlerArgs ?? ''})` : ''
               }`,
             );
@@ -272,8 +271,7 @@ export class FetchService implements OnApplicationShutdown {
         continue;
       }
 
-      // disable dictionary
-      if (this.useDictionary || false) {
+      if (this.useDictionary) {
         const queryEndBlock = startBlockHeight + DICTIONARY_MAX_QUERY_SIZE;
         try {
           const dictionary = await this.dictionaryService.getDictionary(

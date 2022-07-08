@@ -4,7 +4,7 @@
 import {ApiPromise} from '@polkadot/api';
 import {RegistryTypes} from '@polkadot/types/types';
 import {Indexer, TransactionType} from 'algosdk';
-import {SubstrateBlock} from './interfaces';
+import {AlgorandBlock, AlgorandTransaction} from './interfaces';
 
 export enum AlgorandDataSourceKind {
   Runtime = 'algorand/Runtime',
@@ -16,8 +16,8 @@ export enum AlgorandHandlerKind {
 }
 
 export type RuntimeHandlerInputMap = {
-  [AlgorandHandlerKind.Block]: SubstrateBlock;
-  [AlgorandHandlerKind.Transaction]: any;
+  [AlgorandHandlerKind.Block]: AlgorandBlock;
+  [AlgorandHandlerKind.Transaction]: AlgorandTransaction;
 };
 
 type RuntimeFilterMap = {
