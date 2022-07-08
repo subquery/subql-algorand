@@ -271,8 +271,7 @@ export class FetchService implements OnApplicationShutdown {
         continue;
       }
 
-      // disable dictionary
-      if (this.useDictionary || false) {
+      if (this.useDictionary) {
         const queryEndBlock = startBlockHeight + DICTIONARY_MAX_QUERY_SIZE;
         try {
           const dictionary = await this.dictionaryService.getDictionary(
