@@ -207,7 +207,28 @@ export class ProjectService {
       return arr;
     }, {} as { [key in typeof keys[number]]: string | boolean | number });
 
-    const { genesisHash } = this.apiService.networkMeta;
+    const { chain, genesisHash } = this.apiService.networkMeta;
+
+    if (this.project.runner) {
+      await Promise.all([
+        metadataRepo.upsert({
+          key: 'runnerNode',
+          value: this.project.runner.node.name,
+        }),
+        metadataRepo.upsert({
+          key: 'runnerNodeVersion',
+          value: this.project.runner.node.version,
+        }),
+        metadataRepo.upsert({
+          key: 'runnerQuery',
+          value: this.project.runner.query.name,
+        }),
+        metadataRepo.upsert({
+          key: 'runnerQueryVersion',
+          value: this.project.runner.query.version,
+        }),
+      ]);
+    }
 
     if (!keyValue.genesisHash) {
       if (project) {
@@ -225,6 +246,10 @@ export class ProjectService {
         (this.project.network.chainId ?? genesisHash) === keyValue.genesisHash,
         'Specified project manifest chain id / genesis hash does not match database stored genesis hash, consider cleaning project schema using --force-clean',
       );
+    }
+
+    if (keyValue.chain !== chain) {
+      await metadataRepo.upsert({ key: 'chain', value: chain });
     }
 
     if (keyValue.indexerNodeVersion !== packageVersion) {

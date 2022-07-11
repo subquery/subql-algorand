@@ -21,6 +21,7 @@ export class ApiService {
     let token: string | TokenHeader;
     let baseServer: string;
     let genesisHash: string;
+    let chain: string;
     const network = this.project.network;
     try {
       token = this.project.network.apiKey ?? '';
@@ -30,12 +31,14 @@ export class ApiService {
       // get genesisHash in block
       const block = await this.api.lookupBlock(1).do();
       genesisHash = block['genesis-hash'] ?? '';
+      chain = block['genesis-id'] ?? '';
     } catch (e) {
       logger.error(e);
       process.exit(1);
     }
 
     this.networkMeta = {
+      chain,
       genesisHash,
     };
 
