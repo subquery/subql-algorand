@@ -32,6 +32,7 @@ export interface EventPayload<T> {
 }
 
 export interface NetworkMetadataPayload {
+  chain: string;
   genesisHash: string;
 }
 

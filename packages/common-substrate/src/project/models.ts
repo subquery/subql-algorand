@@ -19,6 +19,7 @@ import {
   AlgorandTransactionHandler,
   AlgorandTransactionFilter,
 } from '@subql/types';
+import {TransactionType} from 'algosdk';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -31,6 +32,7 @@ import {
   IsObject,
   ValidateNested,
   IsNumber,
+  ValidateIf,
 } from 'class-validator';
 
 export class BlockFilter implements AlgorandBlockFilter {
@@ -41,36 +43,49 @@ export class BlockFilter implements AlgorandBlockFilter {
 }
 
 export class TransactionFilter implements AlgorandTransactionFilter {
-  @IsString()
+  @IsEnum(TransactionType)
   @IsOptional()
-  txType?: string;
+  txType?: TransactionType;
 
   @IsString()
   @IsOptional()
+  @ValidateIf((o: TransactionFilter) => {
+    return o.txType === TransactionType.pay || o.txType === TransactionType.axfer || o.txType === TransactionType.appl;
+  })
   sender?: string;
 
   @IsString()
   @IsOptional()
+  @ValidateIf((o: TransactionFilter) => {
+    return o.txType === TransactionType.pay || o.txType === TransactionType.axfer;
+  })
   receiver?: string;
 
   @IsBoolean()
   @IsOptional()
+  @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.keyreg)
   nonParticipant?: boolean;
 
   @IsString()
   @IsOptional()
+  @ValidateIf((o: TransactionFilter) => {
+    return o.txType === TransactionType.acfg || o.txType === TransactionType.axfer || o.txType === TransactionType.afrz;
+  })
   assetId?: number;
 
   @IsBoolean()
   @IsOptional()
+  @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.afrz)
   newFreezeStatus?: boolean;
 
   @IsString()
   @IsOptional()
+  @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.afrz)
   address?: string;
 
   @IsNumber()
   @IsOptional()
+  @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.appl)
   applicationId?: number;
 }
 
