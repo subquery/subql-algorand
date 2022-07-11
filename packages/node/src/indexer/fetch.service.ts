@@ -19,7 +19,7 @@ import { DictionaryQueryEntry, AlgorandBlock } from '@subql/types';
 import { Indexer } from 'algosdk';
 import { isUndefined, range, sortBy, uniqBy } from 'lodash';
 import { NodeConfig } from '../configure/NodeConfig';
-import { SubqueryProject } from '../configure/SubqueryProject';
+import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import * as AlgorandUtils from '../utils/algorand';
 import { getLogger } from '../utils/logger';
 import { profilerWrap } from '../utils/profiler';
@@ -34,6 +34,7 @@ import {
   SpecVersion,
 } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';
+import { DynamicDsService } from './dynamic-ds.service';
 import { IndexerEvent } from './events';
 
 const logger = getLogger('fetch');
@@ -91,6 +92,7 @@ export class FetchService implements OnApplicationShutdown {
   private useDictionary: boolean;
   private dictionaryQueryEntries?: DictionaryQueryEntry[];
   private batchSizeScale: number;
+  private templateDynamicDatasouces: SubqlProjectDs[];
 
   constructor(
     private apiService: ApiService,
@@ -98,6 +100,7 @@ export class FetchService implements OnApplicationShutdown {
     private project: SubqueryProject,
     private dictionaryService: DictionaryService,
     private dsProcessorService: DsProcessorService,
+    private dynamicDsService: DynamicDsService,
     private eventEmitter: EventEmitter2,
   ) {
     this.blockBuffer = new BlockedQueue<AlgorandBlock>(
@@ -116,7 +119,10 @@ export class FetchService implements OnApplicationShutdown {
   get api(): Indexer {
     return this.apiService.getApi();
   }
-
+  async syncDynamicDatascourcesFromMeta(): Promise<void> {
+    this.templateDynamicDatasouces =
+      await this.dynamicDsService.getDynamicDatasources();
+  }
   getDictionaryQueryEntries(): DictionaryQueryEntry[] {
     const queryEntries: DictionaryQueryEntry[] = [];
     const dataSources = this.project.dataSources.filter((ds) =>
@@ -124,11 +130,21 @@ export class FetchService implements OnApplicationShutdown {
     );
 
     for (const ds of dataSources) {
+      const plugin = isCustomDs(ds)
+        ? this.dsProcessorService.getDsProcessor(ds)
+        : undefined;
       for (const handler of ds.mapping.handlers) {
         const baseHandlerKind = this.getBaseHandlerKind(ds, handler);
         let filterList: AlgorandRuntimeHandlerFilter[];
-
-        filterList = [handler.filter];
+        if (isCustomDs(ds)) {
+          //const processor = plugin.handlerProcessors[handler.kind];
+          filterList = this.getBaseHandlerFilters<AlgorandRuntimeHandlerFilter>(
+            ds,
+            handler.kind,
+          );
+        } else {
+          filterList = [handler.filter];
+        }
 
         filterList = filterList.filter((f) => f);
 
@@ -136,19 +152,21 @@ export class FetchService implements OnApplicationShutdown {
         switch (baseHandlerKind) {
           case AlgorandHandlerKind.Block:
             return [];
+          case AlgorandHandlerKind.Transaction:
+            filterList.forEach((f) => {
+              const conditions = Object.entries(f).map(([field, value]) => ({
+                field,
+                value,
+              }));
+              queryEntries.push({
+                entity: 'transactions',
+                conditions,
+              });
+            });
+
+            break;
           default:
         }
-
-        filterList.forEach((f) => {
-          const conditions = Object.entries(f).map(([field, value]) => ({
-            field,
-            value,
-          }));
-          queryEntries.push({
-            entity: 'transactions',
-            conditions,
-          });
-        });
       }
     }
 
@@ -367,7 +385,19 @@ export class FetchService implements OnApplicationShutdown {
     }
     return endBlockHeight;
   }
-
+  async resetForNewDs(blockHeight: number): Promise<void> {
+    await this.syncDynamicDatascourcesFromMeta();
+    this.updateDictionary();
+    this.blockBuffer.reset();
+    this.blockNumberBuffer.reset();
+    this.setLatestBufferedHeight(blockHeight);
+  }
+  updateDictionary() {
+    this.dictionaryQueryEntries = this.getDictionaryQueryEntries();
+    this.useDictionary =
+      !!this.dictionaryQueryEntries?.length &&
+      !!this.project.network.dictionary;
+  }
   private dictionaryValidation(
     { _metadata: metaData }: Dictionary,
     startBlockHeight: number,

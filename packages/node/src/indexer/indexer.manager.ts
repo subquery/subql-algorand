@@ -7,11 +7,21 @@ import { hexToU8a, u8aEq } from '@polkadot/util';
 import {
   isRuntimeDs,
   AlgorandHandlerKind,
-  AlgorandRuntimeHandlerInputMap,
+  isCustomDs,
+  isBlockHandlerProcessor,
+  isTransactionHandlerProcessor,
 } from '@subql/common-substrate';
-import { AlgorandBlock, AlgorandTransaction } from '@subql/types';
+import {
+  AlgorandBlock,
+  AlgorandCustomDataSource,
+  AlgorandCustomHandler,
+  AlgorandNetworkFilter,
+  AlgorandTransaction,
+  RuntimeHandlerInputMap,
+} from '@subql/types';
 import { Indexer } from 'algosdk';
 import { Sequelize } from 'sequelize';
+import { NodeConfig } from '../configure/NodeConfig';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { SubqueryRepo } from '../entities';
 import * as AlgorandUtil from '../utils/algorand';
@@ -19,10 +29,16 @@ import { getLogger } from '../utils/logger';
 import { profiler } from '../utils/profiler';
 import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
+import {
+  asSecondLayerHandlerProcessor_1_0_0,
+  DsProcessorService,
+} from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { IndexerEvent } from './events';
 import { FetchService } from './fetch.service';
 import { MmrService } from './mmr.service';
+import { PoiService } from './poi.service';
+import { PoiBlock } from './PoiBlock';
 import { ProjectService } from './project.service';
 import { IndexerSandbox, SandboxService } from './sandbox.service';
 import { StoreService } from './store.service';
@@ -47,9 +63,12 @@ export class IndexerManager {
     private project: SubqueryProject,
     private sandboxService: SandboxService,
     private dynamicDsService: DynamicDsService,
+    private dsProcessorService: DsProcessorService,
     @Inject('Subquery') protected subqueryRepo: SubqueryRepo,
     private eventEmitter: EventEmitter2,
     private projectService: ProjectService,
+    private nodeConfig: NodeConfig,
+    private poiService: PoiService,
   ) {}
 
   @profiler(argv.profiler)
@@ -63,7 +82,7 @@ export class IndexerManager {
     this.storeService.setTransaction(tx);
     this.storeService.setBlockHeight(blockHeight);
 
-    //let poiBlockHash: Uint8Array;
+    let poiBlockHash: Uint8Array;
     try {
       // Injected runtimeVersion from fetch service might be outdated
       // const runtimeVersion = await this.fetchService.getRuntimeVersion(block);
@@ -95,6 +114,7 @@ export class IndexerManager {
 
               // Push the newly created dynamic ds to be processed this block on any future extrinsics/events
               datasources.push(newDs);
+              await this.fetchService.resetForNewDs(blockHeight);
             },
             'createDynamicDataSource',
           );
@@ -122,6 +142,26 @@ export class IndexerManager {
         );
         this.projectService.setBlockOffset(blockHeight - 1);
       }
+
+      if (this.nodeConfig.proofOfIndex) {
+        //check if operation is null, then poi will not be inserted
+        if (!u8aEq(operationHash, NULL_MERKEL_ROOT)) {
+          const poiBlock = PoiBlock.create(
+            blockHeight,
+            blockContent.round.toString(),
+            operationHash,
+            await this.poiService.getLatestPoiBlockHash(),
+            this.project.id,
+          );
+          poiBlockHash = poiBlock.hash;
+          await this.storeService.setPoi(poiBlock, { transaction: tx });
+          this.poiService.setLatestPoiBlockHash(poiBlockHash);
+          await this.storeService.setMetadataBatch(
+            [{ key: 'lastPoiHeight', value: blockHeight }],
+            { transaction: tx },
+          );
+        }
+      }
     } catch (e) {
       await tx.rollback();
       throw e;
@@ -146,13 +186,23 @@ export class IndexerManager {
   }
 
   private filterDataSources(nextProcessingHeight: number): SubqlProjectDs[] {
-    const filteredDs = this.project.dataSources.filter(
+    let filteredDs = this.project.dataSources.filter(
       (ds) => ds.startBlock <= nextProcessingHeight,
     );
     if (filteredDs.length === 0) {
       logger.error(`Did not find any matching datasouces`);
       process.exit(1);
     }
+    // perform filter for custom ds
+    filteredDs = filteredDs.filter((ds) => {
+      if (isCustomDs(ds)) {
+        return this.dsProcessorService
+          .getDsProcessor(ds)
+          .dsFilterProcessor(ds, this.api);
+      } else {
+        return true;
+      }
+    });
 
     if (!filteredDs.length) {
       logger.error(`Did not find any datasources with associated processor`);
@@ -202,7 +252,7 @@ export class IndexerManager {
 
   private async indexData<K extends AlgorandHandlerKind>(
     kind: K,
-    data: AlgorandRuntimeHandlerInputMap[K],
+    data: RuntimeHandlerInputMap[K],
     ds: SubqlProjectDs,
     vm: IndexerSandbox,
   ): Promise<void> {
@@ -214,10 +264,112 @@ export class IndexerManager {
       for (const handler of handlers) {
         await vm.securedExec(handler.handler, [data]);
       }
+    } else if (isCustomDs(ds)) {
+      const handlers = this.filterCustomDsHandlers<K>(
+        ds,
+        data,
+        ProcessorTypeMap[kind],
+        (data, baseFilter) => {
+          switch (kind) {
+            case AlgorandHandlerKind.Block:
+              return !!AlgorandUtil.filterBlock(
+                data as AlgorandBlock,
+                baseFilter,
+              );
+            case AlgorandHandlerKind.Transaction:
+              return !!AlgorandUtil.filterTransaction(
+                data as AlgorandTransaction,
+                baseFilter,
+              );
+
+            default:
+              throw new Error('Unsuported handler kind');
+          }
+        },
+      );
+
+      for (const handler of handlers) {
+        await this.transformAndExecuteCustomDs(ds, vm, handler, data);
+      }
     }
+  }
+
+  private filterCustomDsHandlers<K extends AlgorandHandlerKind>(
+    ds: AlgorandCustomDataSource<string, AlgorandNetworkFilter>,
+    data: RuntimeHandlerInputMap[K],
+    baseHandlerCheck: ProcessorTypeMap[K],
+    baseFilter: (data: RuntimeHandlerInputMap[K], baseFilter: any) => boolean,
+  ): AlgorandCustomHandler[] {
+    const plugin = this.dsProcessorService.getDsProcessor(ds);
+
+    return ds.mapping.handlers
+      .filter((handler) => {
+        const processor = plugin.handlerProcessors[handler.kind];
+        if (baseHandlerCheck(processor)) {
+          processor.baseFilter;
+          return baseFilter(data, processor.baseFilter);
+        }
+        return false;
+      })
+      .filter((handler) => {
+        const processor = asSecondLayerHandlerProcessor_1_0_0(
+          plugin.handlerProcessors[handler.kind],
+        );
+
+        try {
+          return processor.filterProcessor({
+            filter: handler.filter,
+            input: data as any,
+            ds,
+          });
+        } catch (e) {
+          logger.error(e, 'Failed to run ds processer filter.');
+          throw e;
+        }
+      });
+  }
+
+  private async transformAndExecuteCustomDs<K extends AlgorandHandlerKind>(
+    ds: AlgorandCustomDataSource<string, AlgorandNetworkFilter>,
+    vm: IndexerSandbox,
+    handler: AlgorandCustomHandler,
+    data: RuntimeHandlerInputMap[K],
+  ): Promise<void> {
+    const plugin = this.dsProcessorService.getDsProcessor(ds);
+    const assets = await this.dsProcessorService.getAssets(ds);
+
+    const processor = asSecondLayerHandlerProcessor_1_0_0(
+      plugin.handlerProcessors[handler.kind],
+    );
+
+    const transformedData = await processor
+      .transformer({
+        input: data as any,
+        ds,
+        filter: handler.filter,
+        // TODO
+        api: null,
+        assets,
+      })
+      .catch((e) => {
+        logger.error(e, 'Failed to transform data with ds processor.');
+        throw e;
+      });
+
+    await Promise.all(
+      transformedData.map((data) => vm.securedExec(handler.handler, [data])),
+    );
   }
 }
 
+type ProcessorTypeMap = {
+  [AlgorandHandlerKind.Block]: typeof isBlockHandlerProcessor;
+  [AlgorandHandlerKind.Transaction]: typeof isTransactionHandlerProcessor;
+};
+const ProcessorTypeMap = {
+  [AlgorandHandlerKind.Block]: isBlockHandlerProcessor,
+  [AlgorandHandlerKind.Transaction]: isTransactionHandlerProcessor,
+};
 const FilterTypeMap = {
   [AlgorandHandlerKind.Block]: AlgorandUtil.filterBlock,
   [AlgorandHandlerKind.Transaction]: AlgorandUtil.filterTransaction,
