@@ -320,7 +320,7 @@ export class IndexerManager {
         try {
           return processor.filterProcessor({
             filter: handler.filter,
-            input: data as any,
+            input: data,
             ds,
           });
         } catch (e) {
@@ -345,7 +345,7 @@ export class IndexerManager {
 
     const transformedData = await processor
       .transformer({
-        input: data as any,
+        input: data,
         ds,
         filter: handler.filter,
         // TODO
