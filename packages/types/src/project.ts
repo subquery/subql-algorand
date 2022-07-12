@@ -149,7 +149,7 @@ type SecondLayerHandlerProcessorArray<
   F extends AlgorandNetworkFilter,
   T,
   DS extends AlgorandCustomDataSource<K, F> = AlgorandCustomDataSource<K, F>
-> = SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, F, T, DS>;
+> = SecondLayerHandlerProcessor<AlgorandHandlerKind, F, T, DS>;
 
 export interface AlgorandDataSourceProcessor<
   K extends string,
