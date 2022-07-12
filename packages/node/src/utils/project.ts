@@ -80,15 +80,85 @@ export function isCustomHandler(
 export async function updateDataSourcesV1_0_0(
   _dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[],
   reader: Reader,
+  root: string,
 ): Promise<SubqlProjectDs[]> {
   // force convert to updated ds
-  const dataSources = _dataSources as SubqlProjectDs[];
-  await Promise.all(
-    dataSources.map(async (ds) => {
-      ds.mapping.entryScript = await loadDataSourceScript(reader);
+  return Promise.all(
+    _dataSources.map(async (dataSource) => {
+      const entryScript = await loadDataSourceScript(
+        reader,
+        dataSource.mapping.file,
+      );
+      const file = await updateDataSourcesEntry(
+        reader,
+        dataSource.mapping.file,
+        root,
+        entryScript,
+      );
+      if (isCustomDs(dataSource)) {
+        if (dataSource.processor) {
+          dataSource.processor.file = await updateProcessor(
+            reader,
+            root,
+            dataSource.processor.file,
+          );
+        }
+        if (dataSource.assets) {
+          for (const [, asset] of dataSource.assets) {
+            if (reader instanceof LocalReader) {
+              asset.file = path.resolve(root, asset.file);
+            } else {
+              const res = await reader.getFile(asset.file);
+              const outputPath = path.resolve(
+                root,
+                asset.file.replace('ipfs://', ''),
+              );
+              await fs.promises.writeFile(outputPath, res as string);
+              asset.file = outputPath;
+            }
+          }
+        }
+        return {
+          ...dataSource,
+          mapping: { ...dataSource.mapping, entryScript, file },
+        };
+      } else {
+        return {
+          ...dataSource,
+          mapping: { ...dataSource.mapping, entryScript, file },
+        };
+      }
     }),
   );
-  return dataSources;
+}
+
+async function updateDataSourcesEntry(
+  reader: Reader,
+  file: string,
+  root: string,
+  script: string,
+): Promise<string> {
+  if (reader instanceof LocalReader) return file;
+  else if (reader instanceof IPFSReader || reader instanceof GithubReader) {
+    const outputPath = `${path.resolve(root, file.replace('ipfs://', ''))}.js`;
+    await fs.promises.writeFile(outputPath, script);
+    return outputPath;
+  }
+}
+
+async function updateProcessor(
+  reader: Reader,
+  root: string,
+  file: string,
+): Promise<string> {
+  if (reader instanceof LocalReader) {
+    return path.resolve(root, file);
+  } else {
+    const res = await reader.getFile(file);
+    const outputPath = `${path.resolve(root, file.replace('ipfs://', ''))}.js`;
+    await fs.promises.writeFile(outputPath, res);
+    return outputPath;
+  }
 }
 
 export async function getChainTypes(

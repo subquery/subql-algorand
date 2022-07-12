@@ -348,7 +348,6 @@ export class IndexerManager {
         input: data,
         ds,
         filter: handler.filter,
-        // TODO
         api: null,
         assets,
       })

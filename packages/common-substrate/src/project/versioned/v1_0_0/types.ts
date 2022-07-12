@@ -1,6 +1,7 @@
 // Copyright 2020-2021 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import {TemplateBase} from '@subql/common';
 import {
   AlgorandCustomDataSource,
   AlgorandDataSource,
@@ -17,6 +18,9 @@ export interface SubqlMappingV1_0_0<T extends AlgorandHandler> extends AlgorandM
 
 export type RuntimeDataSourceV1_0_0 = AlgorandRuntimeDataSource;
 export type CustomDataSourceV1_0_0 = AlgorandCustomDataSource;
+
+export interface RuntimeDataSourceTemplate extends Omit<RuntimeDataSourceV1_0_0, 'name'>, TemplateBase {}
+export interface CustomDataSourceTemplate extends Omit<CustomDataSourceV1_0_0, 'name'>, TemplateBase {}
 
 export interface ProjectManifestV1_0_0 extends IAlgorandProjectManifest {
   name: string;
