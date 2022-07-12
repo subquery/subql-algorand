@@ -1,7 +1,15 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {BaseMapping, ProjectManifestBaseImpl} from '@subql/common';
+import {
+  BaseMapping,
+  NodeSpec,
+  ProjectManifestBaseImpl,
+  QuerySpec,
+  RunnerQueryBaseModel,
+  RunnerSpecs,
+  SemverVersionValidator,
+} from '@subql/common';
 import {AlgorandNetworkFilter, TokenHeader} from '@subql/common-substrate';
 import {AlgorandCustomDataSource} from '@subql/types';
 import {plainToClass, Type} from 'class-transformer';
@@ -12,13 +20,43 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  Validate,
   ValidateNested,
   validateSync,
 } from 'class-validator';
 import yaml from 'js-yaml';
 import {CustomDataSourceBase, RuntimeDataSourceBase} from '../../models';
 import {IsStringOrObject} from '../../validation/is-string-or-object.validation';
-import {CustomDataSourceV1_0_0, ProjectManifestV1_0_0, RuntimeDataSourceV1_0_0} from './types';
+import {
+  CustomDataSourceTemplate,
+  CustomDataSourceV1_0_0,
+  ProjectManifestV1_0_0,
+  RuntimeDataSourceTemplate,
+  RuntimeDataSourceV1_0_0,
+} from './types';
+
+const ALGORAND_NODE_NAME = `@subql/node`;
+
+export class AlgorandRunnerNodeImpl implements NodeSpec {
+  @Equals(ALGORAND_NODE_NAME, {message: `Runner algorand node name incorrect, suppose be '${ALGORAND_NODE_NAME}'`})
+  name: string;
+
+  @IsString()
+  @Validate(SemverVersionValidator)
+  version: string;
+}
+
+export class AlgorandRunnerSpecsImpl implements RunnerSpecs {
+  @IsObject()
+  @ValidateNested()
+  @Type(() => AlgorandRunnerNodeImpl)
+  node: NodeSpec;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => RunnerQueryBaseModel)
+  query: QuerySpec;
+}
 
 export class FileType {
   @IsString()
@@ -74,6 +112,22 @@ export class AlgorandCustomDataSourceV1_0_0Impl<
   validate(): void {
     return validateObject(this, 'failed to validate custom datasource.');
   }
+}
+
+export class RuntimeDataSourceTemplateImpl
+  extends AlgorandRuntimeDataSourceV1_0_0Impl
+  implements RuntimeDataSourceTemplate
+{
+  @IsString()
+  name: string;
+}
+
+export class CustomDataSourceTemplateImpl
+  extends AlgorandCustomDataSourceV1_0_0Impl
+  implements CustomDataSourceTemplate
+{
+  @IsString()
+  name: string;
 }
 
 export class DeploymentV1_0_0 {
@@ -133,6 +187,23 @@ export class ProjectManifestV1_0_0Impl
     keepDiscriminatorProperty: true,
   })
   dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested()
+  @Type(() => CustomDataSourceTemplateImpl, {
+    discriminator: {
+      property: 'kind',
+      subTypes: [{value: RuntimeDataSourceTemplateImpl, name: 'algorand/Runtime'}],
+    },
+    keepDiscriminatorProperty: true,
+  })
+  templates?: (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[];
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => AlgorandRunnerSpecsImpl)
+  runner: RunnerSpecs;
 
   private _deployment: DeploymentV1_0_0;
 

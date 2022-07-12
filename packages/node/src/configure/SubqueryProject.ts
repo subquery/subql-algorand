@@ -61,7 +61,7 @@ export class SubqueryProject {
     const manifest = parseAlgorandProjectManifest(projectSchema);
 
     if (manifest.isV1_0_0) {
-      return loadProjectFromManifest0_1_0(
+      return loadProjectFromManifest1_0_0(
         manifest.asV1_0_0,
         reader,
         path,
@@ -88,27 +88,70 @@ function processChainId(network: any): SubqueryProjectNetwork {
   return network;
 }
 
-async function loadProjectFromManifest0_1_0(
+async function loadProjectFromManifest1_0_0(
   projectManifest: ProjectManifestV1_0_0Impl,
   reader: Reader,
   path: string,
   networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
 ): Promise<SubqueryProject> {
+  const root = await getProjectRoot(reader);
+  const network = processChainId({
+    ...projectManifest.network,
+    ...networkOverrides,
+  });
+
+  if (!network.endpoint) {
+    throw new Error(
+      `Network endpoint must be provided for network. chainId="${network.chainId}"`,
+    );
+  }
+
+  let schemaString: string;
+
+  try {
+    schemaString = await reader.getFile(projectManifest.schema.file);
+  } catch (e) {
+    throw new Error(
+      `unable to fetch the schema from ${projectManifest.schema.file}`,
+    );
+  }
+
+  const schema = buildSchemaFromString(schemaString);
+  const dataSources = await updateDataSourcesV1_0_0(
+    projectManifest.dataSources,
+    reader,
+    root,
+  );
+  const templates = await loadProjectTemplates(projectManifest, reader);
+  const runner = projectManifest.runner;
+
   return {
-    id: path, //user project path as it id for now
-    root: await getProjectRoot(reader),
-    network: {
-      ...projectManifest.network,
-      ...networkOverrides,
-    },
-    dataSources: await updateDataSourcesV1_0_0(
-      projectManifest.dataSources,
-      reader,
-    ),
-    schema: buildSchemaFromString(
-      await reader.getFile(projectManifest.schema.file),
-    ),
+    id: reader.root ? reader.root : path,
+    root,
+    network,
+    dataSources,
+    schema,
     chainTypes: undefined,
-    templates: [],
+    templates,
+    runner,
   };
+}
+
+async function loadProjectTemplates(
+  projectManifest: ProjectManifestV1_0_0Impl,
+  reader: Reader,
+): Promise<SubqlProjectDsTemplate[]> {
+  if (projectManifest.templates && projectManifest.templates.length !== 0) {
+    const root = await getProjectRoot(reader);
+
+    const dsTemplates = await updateDataSourcesV1_0_0(
+      projectManifest.templates,
+      reader,
+      root,
+    );
+    return dsTemplates.map((ds, index) => ({
+      ...ds,
+      name: projectManifest.templates[index].name,
+    }));
+  }
 }
