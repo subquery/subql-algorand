@@ -23,7 +23,7 @@ import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import * as AlgorandUtils from '../utils/algorand';
 import { getLogger } from '../utils/logger';
 import { profilerWrap } from '../utils/profiler';
-import { isBaseHandler } from '../utils/project';
+import { isBaseHandler, isCustomHandler } from '../utils/project';
 import { delay } from '../utils/promise';
 import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
@@ -129,7 +129,7 @@ export class FetchService implements OnApplicationShutdown {
       isRuntimeDataSourceV1_0_0(ds),
     );
 
-    for (const ds of dataSources) {
+    for (const ds of dataSources.concat(this.templateDynamicDatasouces)) {
       const plugin = isCustomDs(ds)
         ? this.dsProcessorService.getDsProcessor(ds)
         : undefined;
@@ -435,6 +435,16 @@ export class FetchService implements OnApplicationShutdown {
   ): AlgorandHandlerKind {
     if (isRuntimeDs(ds) && isBaseHandler(handler)) {
       return handler.kind;
+    } else if (isCustomDs(ds) && isCustomHandler(handler)) {
+      const plugin = this.dsProcessorService.getDsProcessor(ds);
+      const baseHandler =
+        plugin.handlerProcessors[handler.kind]?.baseHandlerKind;
+      if (!baseHandler) {
+        throw new Error(
+          `handler type ${handler.kind} not found in processor for ${ds.kind}`,
+        );
+      }
+      return baseHandler;
     } else {
       throw new Error('unknown base handler kind');
     }

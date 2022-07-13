@@ -6,6 +6,7 @@ import { Injectable } from '@nestjs/common';
 import { AlgorandDataSource } from '@subql/common-substrate';
 import { Store } from '@subql/types';
 import { levelFilter } from '@subql/utils';
+import { Indexer } from 'algosdk';
 import { merge } from 'lodash';
 import { NodeVM, NodeVMOptions, VMScript } from 'vm2';
 import { NodeConfig } from '../configure/NodeConfig';
@@ -112,10 +113,7 @@ export class SandboxService {
     private readonly project: SubqueryProject,
   ) {}
 
-  getDsProcessor(
-    ds: SubqlProjectDs,
-    // api: ApiAt
-  ): IndexerSandbox {
+  getDsProcessor(ds: SubqlProjectDs, api: Indexer): IndexerSandbox {
     const entry = this.getDataSourceEntry(ds);
     let processor = this.processorCache[entry];
     if (!processor) {
@@ -131,7 +129,7 @@ export class SandboxService {
       );
       this.processorCache[entry] = processor;
     }
-    // processor.freeze(api, 'api');
+    processor.freeze(api, 'api');
     if (argv.unsafe) {
       processor.freeze(this.apiService.getApi(), 'unsafeApi');
     }

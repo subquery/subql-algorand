@@ -44,7 +44,7 @@ export interface SubstrateEvent extends EventRecord {
   block: SubstrateBlock;
 }
 
-export type DynamicDataSourceCreator = (name: string, args: Record<string, unknown>) => Promise<void>;
+export type DynamicDatasourceCreator = (name: string, args: Record<string, unknown>) => Promise<void>;
 
 export enum EOnCompletion {
   noop = 'noop',
