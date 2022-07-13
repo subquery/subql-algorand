@@ -83,10 +83,6 @@ export class IndexerManager {
 
     let poiBlockHash: Uint8Array;
     try {
-      // Injected runtimeVersion from fetch service might be outdated
-      // const runtimeVersion = await this.fetchService.getRuntimeVersion(block);
-      // const apiAt = await this.apiService.getPatchedApi(block, runtimeVersion);
-
       this.filteredDataSources = this.filterDataSources(blockContent.round);
 
       const datasources = this.filteredDataSources.concat(
