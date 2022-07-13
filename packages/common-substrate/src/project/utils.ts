@@ -7,26 +7,23 @@ import {
   AlgorandDataSource,
   AlgorandDataSourceKind,
   AlgorandHandlerKind,
-  AlgorandNetworkFilter,
   AlgorandRuntimeDataSource,
 } from '@subql/types';
 
-export function isBlockHandlerProcessor<T extends AlgorandNetworkFilter, E>(
-  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, T, unknown>
-): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, T, E> {
+export function isBlockHandlerProcessor<E>(
+  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, unknown, unknown>
+): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, unknown, E> {
   return hp.baseHandlerKind === AlgorandHandlerKind.Block;
 }
 
-export function isTransactionHandlerProcessor<T extends AlgorandNetworkFilter, E>(
-  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, T, unknown>
-): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, T, E> {
+export function isTransactionHandlerProcessor<E>(
+  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, unknown, unknown>
+): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Transaction, unknown, E> {
   return hp.baseHandlerKind === AlgorandHandlerKind.Transaction;
 }
 
-export function isCustomDs<F extends AlgorandNetworkFilter>(
-  ds: AlgorandDataSource
-): ds is AlgorandCustomDataSource<string, F> {
-  return ds.kind !== AlgorandDataSourceKind.Runtime && !!(ds as AlgorandCustomDataSource<string, F>).processor;
+export function isCustomDs(ds: AlgorandDataSource): ds is AlgorandCustomDataSource<string> {
+  return ds.kind !== AlgorandDataSourceKind.Runtime && !!(ds as AlgorandCustomDataSource<string>).processor;
 }
 
 export function isRuntimeDs(ds: AlgorandDataSource): ds is AlgorandRuntimeDataSource {

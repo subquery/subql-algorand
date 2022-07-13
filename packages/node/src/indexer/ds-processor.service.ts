@@ -9,7 +9,6 @@ import {
   AlgorandCustomDataSource as AlgorandCustomDs,
   AlgorandDataSource,
   AlgorandDataSourceProcessor,
-  AlgorandNetworkFilter,
 } from '@subql/common-substrate';
 import {
   SecondLayerHandlerProcessor_0_0_0,
@@ -100,10 +99,7 @@ export class DsPluginSandbox extends Sandbox {
     this.freeze(logger, 'logger');
   }
 
-  getDsPlugin<
-    D extends string,
-    T extends AlgorandNetworkFilter,
-  >(): AlgorandDataSourceProcessor<D, T> {
+  getDsPlugin<D extends string>(): AlgorandDataSourceProcessor<D> {
     return this.run(this.script);
   }
 }
@@ -111,7 +107,7 @@ export class DsPluginSandbox extends Sandbox {
 @Injectable()
 export class DsProcessorService {
   private processorCache: {
-    [entry: string]: AlgorandDataSourceProcessor<string, AlgorandNetworkFilter>;
+    [entry: string]: AlgorandDataSourceProcessor<string>;
   } = {};
   constructor(private project: SubqueryProject) {}
 
@@ -152,9 +148,9 @@ export class DsProcessorService {
     );
   }
 
-  getDsProcessor<D extends string, T extends AlgorandNetworkFilter>(
-    ds: AlgorandCustomDs<string, T>,
-  ): AlgorandDataSourceProcessor<D, T> {
+  getDsProcessor<D extends string>(
+    ds: AlgorandCustomDs<string>,
+  ): AlgorandDataSourceProcessor<D> {
     if (!isCustomDs(ds)) {
       throw new Error(`data source is not a custom data source`);
     }
@@ -165,7 +161,7 @@ export class DsProcessorService {
         script: null /* TODO get working with Readers, same as with sandbox */,
       });
       try {
-        this.processorCache[ds.processor.file] = sandbox.getDsPlugin<D, T>();
+        this.processorCache[ds.processor.file] = sandbox.getDsPlugin<D>();
       } catch (e) {
         logger.error(e, `not supported ds @${ds.kind}`);
         throw e;
@@ -173,7 +169,7 @@ export class DsProcessorService {
     }
     return this.processorCache[
       ds.processor.file
-    ] as unknown as AlgorandDataSourceProcessor<D, T>;
+    ] as unknown as AlgorandDataSourceProcessor<D>;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await

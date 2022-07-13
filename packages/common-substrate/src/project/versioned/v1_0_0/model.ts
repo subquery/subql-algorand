@@ -10,7 +10,7 @@ import {
   RunnerSpecs,
   SemverVersionValidator,
 } from '@subql/common';
-import {AlgorandNetworkFilter, TokenHeader} from '@subql/common-substrate';
+import {TokenHeader} from '@subql/common-substrate';
 import {AlgorandCustomDataSource} from '@subql/types';
 import {plainToClass, Type} from 'class-transformer';
 import {
@@ -35,7 +35,7 @@ import {
   RuntimeDataSourceV1_0_0,
 } from './types';
 
-const ALGORAND_NODE_NAME = `@subql/node`;
+const ALGORAND_NODE_NAME = `@subql/node-algorand`;
 
 export class AlgorandRunnerNodeImpl implements NodeSpec {
   @Equals(ALGORAND_NODE_NAME, {message: `Runner algorand node name incorrect, suppose be '${ALGORAND_NODE_NAME}'`})
@@ -103,11 +103,10 @@ export class AlgorandRuntimeDataSourceV1_0_0Impl extends RuntimeDataSourceBase i
 
 export class AlgorandCustomDataSourceV1_0_0Impl<
     K extends string = string,
-    T extends AlgorandNetworkFilter = AlgorandNetworkFilter,
     M extends BaseMapping<any, any> = BaseMapping<Record<string, unknown>, any>
   >
-  extends CustomDataSourceBase<K, T, M>
-  implements AlgorandCustomDataSource<K, T, M>
+  extends CustomDataSourceBase<K, M>
+  implements AlgorandCustomDataSource<K, M>
 {
   validate(): void {
     return validateObject(this, 'failed to validate custom datasource.');

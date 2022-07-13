@@ -15,7 +15,6 @@ import {
   AlgorandBlock,
   AlgorandCustomDataSource,
   AlgorandCustomHandler,
-  AlgorandNetworkFilter,
   AlgorandTransaction,
   RuntimeHandlerInputMap,
 } from '@subql/types';
@@ -296,7 +295,7 @@ export class IndexerManager {
   }
 
   private filterCustomDsHandlers<K extends AlgorandHandlerKind>(
-    ds: AlgorandCustomDataSource<string, AlgorandNetworkFilter>,
+    ds: AlgorandCustomDataSource<string>,
     data: RuntimeHandlerInputMap[K],
     baseHandlerCheck: ProcessorTypeMap[K],
     baseFilter: (data: RuntimeHandlerInputMap[K], baseFilter: any) => boolean,
@@ -331,7 +330,7 @@ export class IndexerManager {
   }
 
   private async transformAndExecuteCustomDs<K extends AlgorandHandlerKind>(
-    ds: AlgorandCustomDataSource<string, AlgorandNetworkFilter>,
+    ds: AlgorandCustomDataSource<string>,
     vm: IndexerSandbox,
     handler: AlgorandCustomHandler,
     data: RuntimeHandlerInputMap[K],

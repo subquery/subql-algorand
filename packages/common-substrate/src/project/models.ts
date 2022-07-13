@@ -11,7 +11,6 @@ import {
   AlgorandCustomHandler,
   AlgorandDataSourceKind,
   AlgorandHandlerKind,
-  AlgorandNetworkFilter,
   AlgorandRuntimeDataSource,
   AlgorandRuntimeHandler,
   AlgorandRuntimeHandlerFilter,
@@ -34,13 +33,6 @@ import {
   IsNumber,
   ValidateIf,
 } from 'class-validator';
-
-export class BlockFilter implements AlgorandBlockFilter {
-  @IsOptional()
-  @IsArray()
-  @ArrayMaxSize(2)
-  specVersion?: [number, number];
-}
 
 export class TransactionFilter implements AlgorandTransactionFilter {
   @IsEnum(TransactionType)
@@ -112,11 +104,6 @@ export class ChainTypes implements RegisteredTypes {
 }
 
 export class BlockHandler implements AlgorandBlockHandler {
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => BlockFilter)
-  filter?: AlgorandBlockFilter;
-
   @IsEnum(AlgorandHandlerKind, {groups: [AlgorandHandlerKind.Block]})
   kind: AlgorandHandlerKind.Block;
 
@@ -181,12 +168,6 @@ export class CustomMapping implements BaseMapping<Record<string, unknown>, Algor
   file: string;
 }
 
-export class SubqlNetworkFilterImpl implements AlgorandNetworkFilter {
-  @IsString()
-  @IsOptional()
-  specName?: string;
-}
-
 export class RuntimeDataSourceBase implements AlgorandRuntimeDataSource {
   @IsEnum(AlgorandDataSourceKind, {groups: [AlgorandDataSourceKind.Runtime]})
   kind: AlgorandDataSourceKind.Runtime;
@@ -198,11 +179,6 @@ export class RuntimeDataSourceBase implements AlgorandRuntimeDataSource {
   @IsOptional()
   @IsInt()
   startBlock?: number;
-
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => SubqlNetworkFilterImpl)
-  filter?: AlgorandNetworkFilter;
 }
 
 export class FileReferenceImpl implements FileReference {
@@ -210,8 +186,8 @@ export class FileReferenceImpl implements FileReference {
   file: string;
 }
 
-export class CustomDataSourceBase<K extends string, T extends AlgorandNetworkFilter, M extends CustomMapping, O = any>
-  implements AlgorandCustomDataSource<K, T, M, O>
+export class CustomDataSourceBase<K extends string, M extends CustomMapping, O = any>
+  implements AlgorandCustomDataSource<K, M, O>
 {
   @IsString()
   kind: K;
@@ -231,8 +207,4 @@ export class CustomDataSourceBase<K extends string, T extends AlgorandNetworkFil
   @Type(() => FileReferenceImpl)
   @IsObject()
   processor: FileReference;
-
-  @IsOptional()
-  @IsObject()
-  filter?: T;
 }

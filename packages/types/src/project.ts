@@ -21,8 +21,8 @@ export type RuntimeHandlerInputMap = {
 };
 
 type RuntimeFilterMap = {
-  [AlgorandHandlerKind.Block]: AlgorandNetworkFilter;
-  [AlgorandHandlerKind.Transaction]: any;
+  [AlgorandHandlerKind.Block]: {};
+  [AlgorandHandlerKind.Transaction]: AlgorandTransactionFilter;
 };
 
 export interface ProjectManifest {
@@ -60,7 +60,11 @@ export interface AlgorandTransactionFilter {
   applicationId?: number;
 }
 
-export type AlgorandBlockHandler = AlgorandCustomHandler<AlgorandHandlerKind.Block, AlgorandBlockFilter>;
+export interface AlgorandBlockHandler {
+  handler: string;
+  kind: AlgorandHandlerKind.Block;
+}
+
 export type AlgorandTransactionHandler = AlgorandCustomHandler<
   AlgorandHandlerKind.Transaction,
   AlgorandTransactionFilter
@@ -80,10 +84,9 @@ export interface AlgorandMapping<T extends AlgorandHandler = AlgorandHandler> ex
   handlers: T[];
 }
 
-interface IAlgorandDataSource<M extends AlgorandMapping, F extends AlgorandNetworkFilter = AlgorandNetworkFilter> {
+interface IAlgorandDataSource<M extends AlgorandMapping> {
   name?: string;
   kind: string;
-  filter?: F;
   startBlock?: number;
   mapping: M;
 }
@@ -94,11 +97,7 @@ export interface AlgorandRuntimeDataSource<
   kind: AlgorandDataSourceKind.Runtime;
 }
 
-export interface AlgorandNetworkFilter {
-  specName?: string;
-}
-
-export type AlgorandDataSource = AlgorandRuntimeDataSource | AlgorandCustomDataSource; // | SubstrateBuiltinDataSource;
+export type AlgorandDataSource = AlgorandRuntimeDataSource | AlgorandCustomDataSource;
 
 export interface FileReference {
   file: string;
@@ -110,10 +109,9 @@ export type Processor<O = any> = FileReference & {options?: O};
 
 export interface AlgorandCustomDataSource<
   K extends string = string,
-  T extends AlgorandNetworkFilter = AlgorandNetworkFilter,
   M extends AlgorandMapping = AlgorandMapping<AlgorandCustomHandler>,
   O = any
-> extends IAlgorandDataSource<M, T> {
+> extends IAlgorandDataSource<M> {
   kind: K;
   assets: Map<string, CustomDataSourceAsset>;
   processor: Processor<O>;
@@ -146,18 +144,16 @@ export interface HandlerInputTransformer_1_0_0<
 
 type SecondLayerHandlerProcessorArray<
   K extends string,
-  F extends AlgorandNetworkFilter,
   T,
-  DS extends AlgorandCustomDataSource<K, F> = AlgorandCustomDataSource<K, F>
-> = SecondLayerHandlerProcessor<AlgorandHandlerKind, F, T, DS>;
+  DS extends AlgorandCustomDataSource<K> = AlgorandCustomDataSource<K>
+> = SecondLayerHandlerProcessor<AlgorandHandlerKind, T, DS>;
 
 export interface AlgorandDataSourceProcessor<
   K extends string,
-  F extends AlgorandNetworkFilter,
-  DS extends AlgorandCustomDataSource<K, F> = AlgorandCustomDataSource<K, F>,
-  P extends Record<string, SecondLayerHandlerProcessorArray<K, F, any, DS>> = Record<
+  DS extends AlgorandCustomDataSource<K> = AlgorandCustomDataSource<K>,
+  P extends Record<string, SecondLayerHandlerProcessorArray<K, any, DS>> = Record<
     string,
-    SecondLayerHandlerProcessorArray<K, F, any, DS>
+    SecondLayerHandlerProcessorArray<K, any, DS>
   >
 > {
   kind: K;

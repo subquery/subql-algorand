@@ -14,7 +14,6 @@ export {
   AlgorandCustomDataSource as AlgorandCustomDataSource,
   AlgorandBlockFilter,
   AlgorandDataSourceProcessor,
-  AlgorandNetworkFilter,
   AlgorandRuntimeHandlerFilter,
   AlgorandDataSourceKind,
   RuntimeHandlerInputMap as AlgorandRuntimeHandlerInputMap,
