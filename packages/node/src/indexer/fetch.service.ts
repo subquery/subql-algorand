@@ -337,11 +337,10 @@ export class FetchService implements OnApplicationShutdown {
 
   async fillBlockBuffer(): Promise<void> {
     while (!this.isShutdown) {
-      let takeCount = Math.min(
+      const takeCount = Math.min(
         this.blockBuffer.freeSize,
         Math.round(this.batchSizeScale * this.nodeConfig.batchSize),
       );
-      takeCount = Math.min(5, takeCount);
 
       if (this.blockNumberBuffer.size === 0 || takeCount === 0) {
         await delay(1);
