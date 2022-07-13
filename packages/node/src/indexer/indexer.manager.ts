@@ -97,7 +97,7 @@ export class IndexerManager {
         blockContent,
         datasources,
         (ds: SubqlProjectDs) => {
-          const vm = this.sandboxService.getDsProcessor(ds);
+          const vm = this.sandboxService.getDsProcessor(ds, this.api);
 
           // Inject function to create ds into vm
           vm.freeze(

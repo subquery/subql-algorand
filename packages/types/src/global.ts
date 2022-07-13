@@ -4,7 +4,7 @@
 import {ApiPromise} from '@polkadot/api';
 import {ApiDecoration} from '@polkadot/api/types';
 import Pino from 'pino';
-import {Store, DynamicDataSourceCreator} from './interfaces';
+import {Store, DynamicDatasourceCreator} from './interfaces';
 
 type ApiAt = ApiDecoration<'promise'> & {rpc: ApiPromise['rpc']};
 
@@ -12,5 +12,5 @@ declare global {
   const api: ApiAt;
   const logger: Pino.Logger;
   const store: Store;
-  const createDynamicDataSource: DynamicDataSourceCreator;
+  const createDynamicDatasource: DynamicDatasourceCreator;
 }

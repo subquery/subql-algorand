@@ -60,11 +60,7 @@ export interface AlgorandTransactionFilter {
   applicationId?: number;
 }
 
-export interface AlgorandBlockHandler {
-  handler: string;
-  kind: AlgorandHandlerKind.Block;
-}
-
+export type AlgorandBlockHandler = AlgorandCustomHandler<AlgorandHandlerKind.Block, AlgorandBlockFilter>;
 export type AlgorandTransactionHandler = AlgorandCustomHandler<
   AlgorandHandlerKind.Transaction,
   AlgorandTransactionFilter
