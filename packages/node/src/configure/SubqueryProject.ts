@@ -1,7 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RegisteredTypes } from '@polkadot/types/types';
 import {
   ReaderFactory,
   ReaderOptions,
@@ -12,16 +11,11 @@ import {
   AlgorandProjectNetworkConfig,
   parseAlgorandProjectManifest,
   AlgorandDataSource,
-  FileType,
   ProjectManifestV1_0_0Impl,
 } from '@subql/common-substrate';
 import { buildSchemaFromString } from '@subql/utils';
 import { GraphQLSchema } from 'graphql';
-import {
-  getChainTypes,
-  getProjectRoot,
-  updateDataSourcesV1_0_0,
-} from '../utils/project';
+import { getProjectRoot, updateDataSourcesV1_0_0 } from '../utils/project';
 
 export type SubqlProjectDs = AlgorandDataSource & {
   mapping: AlgorandDataSource['mapping'] & { entryScript: string };
@@ -42,7 +36,6 @@ export class SubqueryProject {
   dataSources: SubqlProjectDs[];
   schema: GraphQLSchema;
   templates: SubqlProjectDsTemplate[];
-  chainTypes?: RegisteredTypes;
   runner?: RunnerSpecs;
 
   static async create(
@@ -75,7 +68,6 @@ export interface SubqueryProjectNetwork {
   chainId: string;
   endpoint?: string;
   dictionary?: string;
-  chaintypes?: FileType;
 }
 
 function processChainId(network: any): SubqueryProjectNetwork {
@@ -131,7 +123,6 @@ async function loadProjectFromManifest1_0_0(
     network,
     dataSources,
     schema,
-    chainTypes: undefined,
     templates,
     runner,
   };
