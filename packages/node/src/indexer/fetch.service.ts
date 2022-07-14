@@ -208,10 +208,8 @@ export class FetchService implements OnApplicationShutdown {
   }
 
   async init(): Promise<void> {
-    this.dictionaryQueryEntries = this.getDictionaryQueryEntries();
-    this.useDictionary =
-      !!this.dictionaryQueryEntries?.length &&
-      !!this.project.network.dictionary;
+    await this.syncDynamicDatascourcesFromMeta();
+    this.updateDictionary();
 
     this.eventEmitter.emit(IndexerEvent.UsingDictionary, {
       value: Number(this.useDictionary),
