@@ -12,10 +12,8 @@ import {
   loadFromJsonOrYaml,
 } from '@subql/common';
 import {
-  ChainTypes,
   isCustomDs,
   // loadChainTypesFromJs,
-  parseChainTypes,
   AlgorandRuntimeHandler,
   AlgorandCustomHandler,
   AlgorandHandler,
@@ -158,37 +156,6 @@ async function updateProcessor(
     const outputPath = `${path.resolve(root, file.replace('ipfs://', ''))}.js`;
     await fs.promises.writeFile(outputPath, res);
     return outputPath;
-  }
-}
-
-export async function getChainTypes(
-  reader: Reader,
-  root: string,
-  file: string,
-): Promise<ChainTypes> {
-  // If the project is load from local, we will direct load them
-  if (reader instanceof LocalReader) {
-    return loadChainTypes(file, root);
-  } else {
-    // If it is stored in ipfs or other resources, we will use the corresponding reader to read the file
-    // Because ipfs not provide extension of the file, it is difficult to determine its format
-    // We will use yaml.load to try to load the script and parse them to supported chain types
-    // if it failed, we will give it another another attempt, and assume the script written in js
-    // we will download it to a temp folder, and load them within sandbox
-    const res = await reader.getFile(file);
-    let raw: unknown;
-    try {
-      raw = yaml.load(res);
-      return parseChainTypes(raw);
-    } catch (e) {
-      const chainTypesPath = `${path.resolve(
-        root,
-        file.replace('ipfs://', ''),
-      )}.js`;
-      await fs.promises.writeFile(chainTypesPath, res);
-      raw = loadChainTypesFromJs(chainTypesPath); //root not required, as it been packed in single js
-      return parseChainTypes(raw);
-    }
   }
 }
 

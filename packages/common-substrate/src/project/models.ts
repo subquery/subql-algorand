@@ -81,28 +81,6 @@ export class TransactionFilter implements AlgorandTransactionFilter {
   applicationId?: number;
 }
 
-export class ChainTypes implements RegisteredTypes {
-  @IsObject()
-  @IsOptional()
-  types?: RegistryTypes;
-
-  @IsObject()
-  @IsOptional()
-  typesAlias?: Record<string, OverrideModuleType>;
-
-  @IsObject()
-  @IsOptional()
-  typesBundle?: OverrideBundleType;
-
-  @IsObject()
-  @IsOptional()
-  typesChain?: Record<string, RegistryTypes>;
-
-  @IsObject()
-  @IsOptional()
-  typesSpec?: Record<string, RegistryTypes>;
-}
-
 export class BlockHandler implements AlgorandBlockHandler {
   @IsEnum(AlgorandHandlerKind, {groups: [AlgorandHandlerKind.Block]})
   kind: AlgorandHandlerKind.Block;
