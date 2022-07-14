@@ -83,6 +83,8 @@ export class IndexerManager {
 
     let poiBlockHash: Uint8Array;
     try {
+      const safeApi = this.apiService.getSafeApi(blockHeight);
+
       this.filteredDataSources = this.filterDataSources(blockContent.round);
 
       const datasources = this.filteredDataSources.concat(
@@ -93,7 +95,7 @@ export class IndexerManager {
         blockContent,
         datasources,
         (ds: SubqlProjectDs) => {
-          const vm = this.sandboxService.getDsProcessor(ds, this.api);
+          const vm = this.sandboxService.getDsProcessor(ds, safeApi);
 
           // Inject function to create ds into vm
           vm.freeze(

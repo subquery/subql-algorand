@@ -1,13 +1,7 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ApiPromise } from '@polkadot/api';
 import '@polkadot/api-augment/substrate';
-import {
-  BlockHash,
-  RuntimeVersion,
-  SignedBlock,
-} from '@polkadot/types/interfaces';
 import {
   AlgorandBlock,
   AlgorandBlockFilter,
@@ -16,7 +10,7 @@ import {
   mappingFilterTransaction,
 } from '@subql/types';
 import { Indexer } from 'algosdk';
-import { get, range } from 'lodash';
+import { get } from 'lodash';
 import { getLogger } from './logger';
 import { camelCaseObjectKey } from './object';
 const logger = getLogger('fetch');
@@ -47,7 +41,7 @@ export function filterTransaction(
   return validate;
 }
 
-async function getBlockByHeight(
+export async function getBlockByHeight(
   api: Indexer,
   height: number,
 ): Promise<AlgorandBlock> {

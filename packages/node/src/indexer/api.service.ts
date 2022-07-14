@@ -3,11 +3,12 @@
 
 import { Injectable } from '@nestjs/common';
 import { TokenHeader } from '@subql/common-substrate';
+import { AlgorandBlock, AlgorandTransaction } from '@subql/types';
 import algosdk, { Indexer } from 'algosdk';
 import { SubqueryProject } from '../configure/SubqueryProject';
+import * as AlgorandUtils from '../utils/algorand';
 import { getLogger } from '../utils/logger';
 import { NetworkMetadataPayload } from './events';
-
 const logger = getLogger('api');
 
 @Injectable()
@@ -57,5 +58,43 @@ export class ApiService {
 
   getApi(): Indexer {
     return this.api;
+  }
+  getSafeApi(height: number): SafeAPIService {
+    return new SafeAPIService(this.api, height);
+  }
+}
+
+export class SafeAPIService {
+  private readonly indexer: Indexer;
+  private readonly height;
+  constructor(indexer: Indexer, height: number) {
+    this.indexer = indexer;
+    this.height = height;
+  }
+  async getBlock(): Promise<AlgorandBlock> {
+    try {
+      const block = await AlgorandUtils.getBlockByHeight(
+        this.indexer,
+        this.height,
+      );
+      if (!block.round) throw new Error();
+      return block;
+    } catch (error) {
+      throw new Error('ERROR: failed to get block from safe api service.');
+    }
+  }
+  async getTxns(): Promise<AlgorandTransaction[]> {
+    try {
+      const block = await AlgorandUtils.getBlockByHeight(
+        this.indexer,
+        this.height,
+      );
+      if (!block.transactions) throw new Error();
+      return block.transactions;
+    } catch (error) {
+      throw new Error(
+        'ERROR: failed to get transactions from safe api service.',
+      );
+    }
   }
 }
