@@ -9,6 +9,7 @@ import { SubqueryProject } from '../configure/SubqueryProject';
 import * as AlgorandUtils from '../utils/algorand';
 import { getLogger } from '../utils/logger';
 import { NetworkMetadataPayload } from './events';
+import { SafeAPI } from './types';
 const logger = getLogger('api');
 
 @Injectable()
@@ -59,13 +60,13 @@ export class ApiService {
   getApi(): Indexer {
     return this.api;
   }
-  getSafeApi(height: number): SafeAPIService {
+  getSafeApi(height: number): SafeAPI {
     return new SafeAPIService(this.api, height);
   }
 }
 
 export class SafeAPIService {
-  private readonly indexer: Indexer;
+  readonly indexer: Indexer;
   private readonly height;
   constructor(indexer: Indexer, height: number) {
     this.indexer = indexer;
