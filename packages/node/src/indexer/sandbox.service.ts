@@ -15,8 +15,9 @@ import { getLogger } from '../utils/logger';
 import { getProjectEntry } from '../utils/project';
 import { timeout } from '../utils/promise';
 import { getYargsOption } from '../yargs';
-import { ApiService, SafeAPIService } from './api.service';
+import { ApiService } from './api.service';
 import { StoreService } from './store.service';
+import { SafeAPI } from './types';
 
 const { argv } = getYargsOption();
 
@@ -113,7 +114,7 @@ export class SandboxService {
     private readonly project: SubqueryProject,
   ) {}
 
-  getDsProcessor(ds: SubqlProjectDs, api: SafeAPIService): IndexerSandbox {
+  getDsProcessor(ds: SubqlProjectDs, api: SafeAPI): IndexerSandbox {
     const entry = this.getDataSourceEntry(ds);
     let processor = this.processorCache[entry];
     if (!processor) {

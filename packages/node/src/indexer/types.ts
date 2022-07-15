@@ -9,7 +9,7 @@ import {
   // SubstrateEvent,
   // SubstrateExtrinsic,
 } from '@subql/types';
-import { Transaction } from 'algosdk';
+import { Indexer, Transaction } from 'algosdk';
 export interface BlockContent {
   description: string;
   transactions: Transaction[];
@@ -26,4 +26,6 @@ export type OperationEntity = {
   data: Entity | string;
 };
 
-export type ApiAt = ApiDecoration<'promise'> & { rpc: ApiPromise['rpc'] };
+export type SafeAPI = {
+  indexer: Indexer;
+};
