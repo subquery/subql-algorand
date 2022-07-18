@@ -11,7 +11,7 @@ import {
   SemverVersionValidator,
 } from '@subql/common';
 import {TokenHeader} from '@subql/common-substrate';
-import {AlgorandCustomDataSource} from '@subql/types';
+import {AlgorandCustomDataSource} from '@subql/types-algorand';
 import {plainToClass, Type} from 'class-transformer';
 import {
   Equals,

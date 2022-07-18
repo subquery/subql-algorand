@@ -3,13 +3,16 @@
 
 import { Injectable } from '@nestjs/common';
 import { TokenHeader } from '@subql/common-substrate';
-import { AlgorandBlock, AlgorandTransaction } from '@subql/types';
+import {
+  AlgorandBlock,
+  AlgorandTransaction,
+  SafeAPI,
+} from '@subql/types-algorand';
 import algosdk, { Indexer } from 'algosdk';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import * as AlgorandUtils from '../utils/algorand';
 import { getLogger } from '../utils/logger';
 import { NetworkMetadataPayload } from './events';
-import { SafeAPI } from './types';
 const logger = getLogger('api');
 
 @Injectable()

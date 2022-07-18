@@ -17,7 +17,7 @@ import {
   AlgorandCustomHandler,
   AlgorandTransaction,
   RuntimeHandlerInputMap,
-} from '@subql/types';
+} from '@subql/types-algorand';
 import { Indexer } from 'algosdk';
 import { Sequelize } from 'sequelize';
 import { NodeConfig } from '../configure/NodeConfig';

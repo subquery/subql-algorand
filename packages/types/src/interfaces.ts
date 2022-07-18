@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {Extrinsic, EventRecord, SignedBlock} from '@polkadot/types/interfaces';
-import {TransactionType} from 'algosdk';
+import {TransactionType, Indexer} from 'algosdk';
 
 export interface Entity {
   id: string;
@@ -237,3 +237,7 @@ export interface AlgorandBlock {
   upgradeState?: BlockUpgradeState;
   upgradeVote?: BlockUpgradeVote;
 }
+
+export type SafeAPI = {
+  indexer: Indexer;
+};

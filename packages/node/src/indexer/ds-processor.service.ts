@@ -15,7 +15,7 @@ import {
   SecondLayerHandlerProcessor_1_0_0,
   AlgorandCustomDataSource,
   AlgorandHandlerKind,
-} from '@subql/types';
+} from '@subql/types-algorand';
 
 import { VMScript } from 'vm2';
 import { SubqueryProject } from '../configure/SubqueryProject';

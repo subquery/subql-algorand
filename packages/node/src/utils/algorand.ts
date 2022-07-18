@@ -8,7 +8,7 @@ import {
   AlgorandTransaction,
   AlgorandTransactionFilter,
   mappingFilterTransaction,
-} from '@subql/types';
+} from '@subql/types-algorand';
 import { Indexer } from 'algosdk';
 import { get } from 'lodash';
 import { getLogger } from './logger';

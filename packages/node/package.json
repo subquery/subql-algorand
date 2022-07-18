@@ -27,7 +27,7 @@
     "@polkadot/api": "8.8.2",
     "@subql/common": "latest",
     "@subql/common-substrate": "workspace:*",
-    "@subql/types": "workspace:*",
+    "@subql/types-algorand": "workspace:*",
     "@subql/utils": "latest",
     "@subql/x-merkle-mountain-range": "2.0.0-0.1.2",
     "@willsoto/nestjs-prometheus": "^4.4.0",

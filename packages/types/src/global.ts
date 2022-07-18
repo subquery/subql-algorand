@@ -1,13 +1,8 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {Indexer} from 'algosdk';
 import Pino from 'pino';
-import {Store, DynamicDatasourceCreator} from './interfaces';
-
-type SafeAPI = {
-  indexer: Indexer;
-};
+import {Store, DynamicDatasourceCreator, SafeAPI} from './interfaces';
 
 declare global {
   const api: SafeAPI;

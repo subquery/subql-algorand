@@ -9,7 +9,7 @@ import {
   AlgorandHandler,
   AlgorandMapping,
   AlgorandRuntimeDataSource,
-} from '@subql/types';
+} from '@subql/types-algorand';
 import {IAlgorandProjectManifest} from '../../types';
 
 export interface SubqlMappingV1_0_0<T extends AlgorandHandler> extends AlgorandMapping<T> {

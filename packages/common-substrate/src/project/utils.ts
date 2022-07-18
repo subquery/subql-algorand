@@ -8,7 +8,7 @@ import {
   AlgorandDataSourceKind,
   AlgorandHandlerKind,
   AlgorandRuntimeDataSource,
-} from '@subql/types';
+} from '@subql/types-algorand';
 
 export function isBlockHandlerProcessor<E>(
   hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, unknown, unknown>
