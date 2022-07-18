@@ -4,20 +4,17 @@
 import path from 'path';
 import { Injectable } from '@nestjs/common';
 import { AlgorandDataSource } from '@subql/common-substrate';
-import { Store } from '@subql/types';
+import { SafeAPI, Store } from '@subql/types-algorand';
 import { levelFilter } from '@subql/utils';
-import { Indexer } from 'algosdk';
 import { merge } from 'lodash';
 import { NodeVM, NodeVMOptions, VMScript } from 'vm2';
 import { NodeConfig } from '../configure/NodeConfig';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { getLogger } from '../utils/logger';
-import { getProjectEntry } from '../utils/project';
 import { timeout } from '../utils/promise';
 import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
 import { StoreService } from './store.service';
-import { SafeAPI } from './types';
 
 const { argv } = getYargsOption();
 

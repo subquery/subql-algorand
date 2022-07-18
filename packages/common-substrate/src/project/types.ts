@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {IProjectManifest, ProjectNetworkConfig} from '@subql/common';
-import {AlgorandDataSource} from '@subql/types';
+import {AlgorandDataSource} from '@subql/types-algorand';
 
 // All of these used to be redefined in this file, re-exporting for simplicity
 export {
@@ -17,7 +17,7 @@ export {
   AlgorandRuntimeHandlerFilter,
   AlgorandDataSourceKind,
   RuntimeHandlerInputMap as AlgorandRuntimeHandlerInputMap,
-} from '@subql/types';
+} from '@subql/types-algorand';
 
 export type IAlgorandProjectManifest = IProjectManifest<AlgorandDataSource>;
 export type TokenHeader = Record<string, string>;

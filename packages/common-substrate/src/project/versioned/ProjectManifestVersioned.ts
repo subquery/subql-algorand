@@ -1,7 +1,7 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {AlgorandDataSource} from '@subql/types';
+import {AlgorandDataSource} from '@subql/types-algorand';
 import {plainToClass} from 'class-transformer';
 import {IAlgorandProjectManifest} from '../types';
 import {ProjectManifestV1_0_0Impl} from './v1_0_0';

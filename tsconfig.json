@@ -20,8 +20,8 @@
     "paths": {
       "@subql/common-substrate": ["packages/common-substrate/src"],
       "@subql/common-substrate/*": ["packages/common-substrate/src/*"],
-      "@subql/types": ["packages/types/src"],
-      "@subql/types/*": ["packages/types/src/*"],
+      "@subql/types-algorand": ["packages/types/src"],
+      "@subql/types-algorand/*": ["packages/types/src/*"],
     },
     "skipLibCheck": true
   },

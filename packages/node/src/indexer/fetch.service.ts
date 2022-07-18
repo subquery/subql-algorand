@@ -14,7 +14,7 @@ import {
   AlgorandRuntimeHandlerFilter,
   isRuntimeDataSourceV1_0_0,
 } from '@subql/common-substrate';
-import { DictionaryQueryEntry, AlgorandBlock } from '@subql/types';
+import { DictionaryQueryEntry, AlgorandBlock } from '@subql/types-algorand';
 
 import { Indexer } from 'algosdk';
 import { isUndefined, range, sortBy, uniqBy } from 'lodash';

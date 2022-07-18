@@ -17,7 +17,7 @@ import {
   AlgorandCustomDataSource,
   AlgorandTransactionHandler,
   AlgorandTransactionFilter,
-} from '@subql/types';
+} from '@subql/types-algorand';
 import {TransactionType} from 'algosdk';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {
