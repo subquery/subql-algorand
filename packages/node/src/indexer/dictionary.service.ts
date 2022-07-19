@@ -39,7 +39,7 @@ function extractVar(name: string, cond: DictionaryQueryCondition): GqlVar {
   return {
     name,
     gqlType: 'String!',
-    value: cond.value,
+    value: cond.value.toString(),
   };
 }
 
