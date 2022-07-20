@@ -36,10 +36,25 @@ const logger = getLogger('dictionary');
 const { argv } = getYargsOption();
 
 function extractVar(name: string, cond: DictionaryQueryCondition): GqlVar {
+  let gqlType: string;
+  switch (typeof cond.value) {
+    case 'string':
+      gqlType = 'String!';
+      break;
+    case 'number':
+      gqlType = 'BigFloat!';
+      break;
+    case 'boolean':
+      gqlType = 'Boolean!';
+      break;
+    default:
+      break;
+  }
+
   return {
     name,
-    gqlType: 'String!',
-    value: cond.value.toString(),
+    gqlType,
+    value: cond.value,
   };
 }
 
