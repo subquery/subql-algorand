@@ -113,7 +113,7 @@ export class IndexerManager {
               datasources.push(newDs);
               await this.fetchService.resetForNewDs(blockHeight);
             },
-            'createDynamicDataSource',
+            'createDynamicDatasource',
           );
 
           return vm;
