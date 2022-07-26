@@ -4,6 +4,7 @@
 import assert from 'assert';
 import { Injectable } from '@nestjs/common';
 import { isCustomDs, isRuntimeDs } from '@subql/common-substrate';
+import { TransactionType } from 'algosdk';
 import { Transaction } from 'sequelize/types';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { getLogger } from '../utils/logger';
@@ -130,7 +131,9 @@ export class DynamicDsService {
         };
         await this.dsProcessorService.validateCustomDs([dsObj]);
       } else if (isRuntimeDs(dsObj)) {
-        // XXX add any modifications to the ds here
+        dsObj.mapping.handlers.forEach((handler) => {
+          handler.filter = { ...handler.filter, txType: TransactionType.appl };
+        });
       }
 
       return dsObj;

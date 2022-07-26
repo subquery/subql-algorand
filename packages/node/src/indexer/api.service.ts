@@ -63,6 +63,7 @@ export class ApiService {
   getApi(): Indexer {
     return this.api;
   }
+
   getSafeApi(height: number): SafeAPI {
     return new SafeAPIService(this.api, height);
   }
