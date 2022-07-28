@@ -6,17 +6,16 @@ import path from 'path';
 import { Injectable } from '@nestjs/common';
 import {
   isCustomDs,
-  SubstrateCustomDataSource,
-  SubstrateDataSource,
-  SubstrateDatasourceProcessor,
-  SubstrateNetworkFilter,
+  AlgorandCustomDataSource as AlgorandCustomDs,
+  AlgorandDataSource,
+  AlgorandDataSourceProcessor,
 } from '@subql/common-substrate';
 import {
   SecondLayerHandlerProcessor_0_0_0,
   SecondLayerHandlerProcessor_1_0_0,
-  SubstrateCustomDatasource,
-  SubstrateHandlerKind,
-} from '@subql/types';
+  AlgorandCustomDataSource,
+  AlgorandHandlerKind,
+} from '@subql/types-algorand';
 
 import { VMScript } from 'vm2';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -32,10 +31,10 @@ export interface DsPluginSandboxOption {
 const logger = getLogger('ds-sandbox');
 
 export function isSecondLayerHandlerProcessor_0_0_0<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource,
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource,
 >(
   processor:
     | SecondLayerHandlerProcessor_0_0_0<K, F, E, DS>
@@ -46,10 +45,10 @@ export function isSecondLayerHandlerProcessor_0_0_0<
 }
 
 export function isSecondLayerHandlerProcessor_1_0_0<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource,
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource,
 >(
   processor:
     | SecondLayerHandlerProcessor_0_0_0<K, F, E, DS>
@@ -59,10 +58,10 @@ export function isSecondLayerHandlerProcessor_1_0_0<
 }
 
 export function asSecondLayerHandlerProcessor_1_0_0<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource,
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource,
 >(
   processor:
     | SecondLayerHandlerProcessor_0_0_0<K, F, E, DS>
@@ -100,10 +99,7 @@ export class DsPluginSandbox extends Sandbox {
     this.freeze(logger, 'logger');
   }
 
-  getDsPlugin<
-    D extends string,
-    T extends SubstrateNetworkFilter,
-  >(): SubstrateDatasourceProcessor<D, T> {
+  getDsPlugin<D extends string>(): AlgorandDataSourceProcessor<D> {
     return this.run(this.script);
   }
 }
@@ -111,16 +107,11 @@ export class DsPluginSandbox extends Sandbox {
 @Injectable()
 export class DsProcessorService {
   private processorCache: {
-    [entry: string]: SubstrateDatasourceProcessor<
-      string,
-      SubstrateNetworkFilter
-    >;
+    [entry: string]: AlgorandDataSourceProcessor<string>;
   } = {};
   constructor(private project: SubqueryProject) {}
 
-  async validateCustomDs(
-    datasources: SubstrateCustomDataSource[],
-  ): Promise<void> {
+  async validateCustomDs(datasources: AlgorandCustomDs[]): Promise<void> {
     for (const ds of datasources) {
       const processor = this.getDsProcessor(ds);
       /* Standard validation applicable to all custom ds and processors */
@@ -151,15 +142,15 @@ export class DsProcessorService {
     }
   }
 
-  async validateProjectCustomDatasources(): Promise<void> {
+  async validateProjectCustomDataSources(): Promise<void> {
     await this.validateCustomDs(
-      (this.project.dataSources as SubstrateDataSource[]).filter(isCustomDs),
+      (this.project.dataSources as AlgorandDataSource[]).filter(isCustomDs),
     );
   }
 
-  getDsProcessor<D extends string, T extends SubstrateNetworkFilter>(
-    ds: SubstrateCustomDataSource<string, T>,
-  ): SubstrateDatasourceProcessor<D, T> {
+  getDsProcessor<D extends string>(
+    ds: AlgorandCustomDs<string>,
+  ): AlgorandDataSourceProcessor<D> {
     if (!isCustomDs(ds)) {
       throw new Error(`data source is not a custom data source`);
     }
@@ -170,7 +161,7 @@ export class DsProcessorService {
         script: null /* TODO get working with Readers, same as with sandbox */,
       });
       try {
-        this.processorCache[ds.processor.file] = sandbox.getDsPlugin<D, T>();
+        this.processorCache[ds.processor.file] = sandbox.getDsPlugin<D>();
       } catch (e) {
         logger.error(e, `not supported ds @${ds.kind}`);
         throw e;
@@ -178,13 +169,11 @@ export class DsProcessorService {
     }
     return this.processorCache[
       ds.processor.file
-    ] as unknown as SubstrateDatasourceProcessor<D, T>;
+    ] as unknown as AlgorandDataSourceProcessor<D>;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  async getAssets(
-    ds: SubstrateCustomDataSource,
-  ): Promise<Record<string, string>> {
+  async getAssets(ds: AlgorandCustomDs): Promise<Record<string, string>> {
     if (!isCustomDs(ds)) {
       throw new Error(`data source is not a custom data source`);
     }

@@ -5,22 +5,20 @@ import {RegisteredTypes, RegistryTypes, OverrideModuleType, OverrideBundleType} 
 
 import {BaseMapping, FileReference} from '@subql/common';
 import {
-  CustomDataSourceAsset as SubstrateCustomDataSourceAsset,
-  SubstrateBlockFilter,
-  SubstrateBlockHandler,
-  SubstrateCallFilter,
-  SubstrateCallHandler,
-  SubstrateCustomHandler,
-  SubstrateDatasourceKind,
-  SubstrateEventFilter,
-  SubstrateEventHandler,
-  SubstrateHandlerKind,
-  SubstrateNetworkFilter,
-  SubstrateRuntimeDatasource,
-  SubstrateRuntimeHandler,
-  SubstrateRuntimeHandlerFilter,
-  SubstrateCustomDatasource,
-} from '@subql/types';
+  CustomDataSourceAsset as AlgorandCustomDataSourceAsset,
+  AlgorandBlockFilter,
+  AlgorandBlockHandler,
+  AlgorandCustomHandler,
+  AlgorandDataSourceKind,
+  AlgorandHandlerKind,
+  AlgorandRuntimeDataSource,
+  AlgorandRuntimeHandler,
+  AlgorandRuntimeHandlerFilter,
+  AlgorandCustomDataSource,
+  AlgorandTransactionHandler,
+  AlgorandTransactionFilter,
+} from '@subql/types-algorand';
+import {TransactionType} from 'algosdk';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -32,102 +30,99 @@ import {
   IsString,
   IsObject,
   ValidateNested,
+  IsNumber,
+  ValidateIf,
 } from 'class-validator';
 
-export class BlockFilter implements SubstrateBlockFilter {
+export class TransactionFilter implements AlgorandTransactionFilter {
+  @IsEnum(TransactionType)
   @IsOptional()
-  @IsArray()
-  @ArrayMaxSize(2)
-  specVersion?: [number, number];
-}
+  txType?: TransactionType;
 
-export class EventFilter extends BlockFilter implements SubstrateEventFilter {
-  @IsOptional()
   @IsString()
-  module?: string;
   @IsOptional()
+  @ValidateIf((o: TransactionFilter) => {
+    return o.txType === TransactionType.pay || o.txType === TransactionType.axfer || o.txType === TransactionType.appl;
+  })
+  sender?: string;
+
   @IsString()
-  method?: string;
-}
+  @IsOptional()
+  @ValidateIf((o: TransactionFilter) => {
+    return o.txType === TransactionType.pay || o.txType === TransactionType.axfer;
+  })
+  receiver?: string;
 
-export class ChainTypes implements RegisteredTypes {
-  @IsObject()
-  @IsOptional()
-  types?: RegistryTypes;
-  @IsObject()
-  @IsOptional()
-  typesAlias?: Record<string, OverrideModuleType>;
-  @IsObject()
-  @IsOptional()
-  typesBundle?: OverrideBundleType;
-  @IsObject()
-  @IsOptional()
-  typesChain?: Record<string, RegistryTypes>;
-  @IsObject()
-  @IsOptional()
-  typesSpec?: Record<string, RegistryTypes>;
-}
-
-export class CallFilter extends EventFilter implements SubstrateCallFilter {
-  @IsOptional()
   @IsBoolean()
-  success?: boolean;
+  @IsOptional()
+  @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.keyreg)
+  nonParticipant?: boolean;
+
+  @IsString()
+  @IsOptional()
+  @ValidateIf((o: TransactionFilter) => {
+    return o.txType === TransactionType.acfg || o.txType === TransactionType.axfer || o.txType === TransactionType.afrz;
+  })
+  assetId?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.afrz)
+  newFreezeStatus?: boolean;
+
+  @IsString()
+  @IsOptional()
+  @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.afrz)
+  address?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.appl)
+  applicationId?: number;
 }
 
-export class BlockHandler implements SubstrateBlockHandler {
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => BlockFilter)
-  filter?: SubstrateBlockFilter;
-  @IsEnum(SubstrateHandlerKind, {groups: [SubstrateHandlerKind.Block]})
-  kind: SubstrateHandlerKind.Block;
+export class BlockHandler implements AlgorandBlockHandler {
+  @IsEnum(AlgorandHandlerKind, {groups: [AlgorandHandlerKind.Block]})
+  kind: AlgorandHandlerKind.Block;
+
   @IsString()
   handler: string;
 }
 
-export class CallHandler implements SubstrateCallHandler {
+export class TransactionHandler implements AlgorandTransactionHandler {
   @IsOptional()
   @ValidateNested()
-  @Type(() => CallFilter)
-  filter?: SubstrateCallFilter;
-  @IsEnum(SubstrateHandlerKind, {groups: [SubstrateHandlerKind.Call]})
-  kind: SubstrateHandlerKind.Call;
+  @Type(() => TransactionFilter)
+  filter?: TransactionFilter;
+
+  @IsEnum(AlgorandHandlerKind, {groups: [AlgorandHandlerKind.Block]})
+  kind: AlgorandHandlerKind.Transaction;
+
   @IsString()
   handler: string;
 }
 
-export class EventHandler implements SubstrateEventHandler {
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => EventFilter)
-  filter?: SubstrateEventFilter;
-  @IsEnum(SubstrateHandlerKind, {groups: [SubstrateHandlerKind.Event]})
-  kind: SubstrateHandlerKind.Event;
-  @IsString()
-  handler: string;
-}
-
-export class CustomHandler implements SubstrateCustomHandler {
+export class CustomHandler implements AlgorandCustomHandler {
   @IsString()
   kind: string;
+
   @IsString()
   handler: string;
+
   @IsObject()
   @IsOptional()
   filter?: Record<string, unknown>;
 }
 
-export class RuntimeMapping implements BaseMapping<SubstrateRuntimeHandlerFilter, SubstrateRuntimeHandler> {
+export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandlerFilter, AlgorandRuntimeHandler> {
   @Transform((params) => {
-    const handlers: SubstrateRuntimeHandler[] = params.value;
+    const handlers: AlgorandRuntimeHandler[] = params.value;
     return handlers.map((handler) => {
       switch (handler.kind) {
-        case SubstrateHandlerKind.Event:
-          return plainToClass(EventHandler, handler);
-        case SubstrateHandlerKind.Call:
-          return plainToClass(CallHandler, handler);
-        case SubstrateHandlerKind.Block:
+        case AlgorandHandlerKind.Block:
           return plainToClass(BlockHandler, handler);
+        case AlgorandHandlerKind.Transaction:
+          return plainToClass(TransactionHandler, handler);
         default:
           throw new Error(`handler ${(handler as any).kind} not supported`);
       }
@@ -135,39 +130,33 @@ export class RuntimeMapping implements BaseMapping<SubstrateRuntimeHandlerFilter
   })
   @IsArray()
   @ValidateNested()
-  handlers: SubstrateRuntimeHandler[];
+  handlers: AlgorandRuntimeHandler[];
+
   @IsString()
   file: string;
 }
 
-export class CustomMapping implements BaseMapping<Record<string, unknown>, SubstrateCustomHandler> {
+export class CustomMapping implements BaseMapping<Record<string, unknown>, AlgorandCustomHandler> {
   @IsArray()
   @Type(() => CustomHandler)
   @ValidateNested()
   handlers: CustomHandler[];
+
   @IsString()
   file: string;
 }
 
-export class SubqlNetworkFilterImpl implements SubstrateNetworkFilter {
-  @IsString()
-  @IsOptional()
-  specName?: string;
-}
+export class RuntimeDataSourceBase implements AlgorandRuntimeDataSource {
+  @IsEnum(AlgorandDataSourceKind, {groups: [AlgorandDataSourceKind.Runtime]})
+  kind: AlgorandDataSourceKind.Runtime;
 
-export class RuntimeDataSourceBase implements SubstrateRuntimeDatasource {
-  @IsEnum(SubstrateDatasourceKind, {groups: [SubstrateDatasourceKind.Runtime]})
-  kind: SubstrateDatasourceKind.Runtime;
   @Type(() => RuntimeMapping)
   @ValidateNested()
   mapping: RuntimeMapping;
+
   @IsOptional()
   @IsInt()
   startBlock?: number;
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => SubqlNetworkFilterImpl)
-  filter?: SubstrateNetworkFilter;
 }
 
 export class FileReferenceImpl implements FileReference {
@@ -175,24 +164,25 @@ export class FileReferenceImpl implements FileReference {
   file: string;
 }
 
-export class CustomDataSourceBase<K extends string, T extends SubstrateNetworkFilter, M extends CustomMapping, O = any>
-  implements SubstrateCustomDatasource<K, T, M, O>
+export class CustomDataSourceBase<K extends string, M extends CustomMapping, O = any>
+  implements AlgorandCustomDataSource<K, M, O>
 {
   @IsString()
   kind: K;
+
   @Type(() => CustomMapping)
   @ValidateNested()
   mapping: M;
+
   @IsOptional()
   @IsInt()
   startBlock?: number;
+
   @Type(() => FileReferenceImpl)
   @ValidateNested({each: true})
-  assets: Map<string, SubstrateCustomDataSourceAsset>;
+  assets: Map<string, AlgorandCustomDataSourceAsset>;
+
   @Type(() => FileReferenceImpl)
   @IsObject()
   processor: FileReference;
-  @IsOptional()
-  @IsObject()
-  filter?: T;
 }

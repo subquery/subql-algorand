@@ -25,11 +25,8 @@ import { StoreService } from './store.service';
     StoreService,
     {
       provide: ApiService,
-      useFactory: async (
-        project: SubqueryProject,
-        eventEmitter: EventEmitter2,
-      ) => {
-        const apiService = new ApiService(project, eventEmitter);
+      useFactory: async (project: SubqueryProject) => {
+        const apiService = new ApiService(project);
         await apiService.init();
         return apiService;
       },

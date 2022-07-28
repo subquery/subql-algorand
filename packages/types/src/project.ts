@@ -3,28 +3,26 @@
 
 import {ApiPromise} from '@polkadot/api';
 import {RegistryTypes} from '@polkadot/types/types';
-import {SubstrateBlock, SubstrateEvent, SubstrateExtrinsic} from './interfaces';
+import {Indexer, TransactionType} from 'algosdk';
+import {AlgorandBlock, AlgorandTransaction} from './interfaces';
 
-export enum SubstrateDatasourceKind {
-  Runtime = 'substrate/Runtime',
+export enum AlgorandDataSourceKind {
+  Runtime = 'algorand/Runtime',
 }
 
-export enum SubstrateHandlerKind {
-  Block = 'substrate/BlockHandler',
-  Call = 'substrate/CallHandler',
-  Event = 'substrate/EventHandler',
+export enum AlgorandHandlerKind {
+  Block = 'algorand/BlockHandler',
+  Transaction = 'algorand/TransactionHandler',
 }
 
 export type RuntimeHandlerInputMap = {
-  [SubstrateHandlerKind.Block]: SubstrateBlock;
-  [SubstrateHandlerKind.Event]: SubstrateEvent;
-  [SubstrateHandlerKind.Call]: SubstrateExtrinsic;
+  [AlgorandHandlerKind.Block]: AlgorandBlock;
+  [AlgorandHandlerKind.Transaction]: AlgorandTransaction;
 };
 
 type RuntimeFilterMap = {
-  [SubstrateHandlerKind.Block]: SubstrateNetworkFilter;
-  [SubstrateHandlerKind.Event]: SubstrateEventFilter;
-  [SubstrateHandlerKind.Call]: SubstrateCallFilter;
+  [AlgorandHandlerKind.Block]: {};
+  [AlgorandHandlerKind.Transaction]: AlgorandTransactionFilter;
 };
 
 export interface ProjectManifest {
@@ -39,64 +37,63 @@ export interface ProjectManifest {
     customTypes?: RegistryTypes;
   };
 
-  dataSources: SubstrateDatasource[];
+  dataSources: AlgorandDataSource[];
 }
 
 // [startSpecVersion?, endSpecVersion?] closed range
 export type SpecVersionRange = [number, number];
 
-interface SubstrateBaseHandlerFilter {
+interface AlgorandBaseHandlerFilter {
   specVersion?: SpecVersionRange;
 }
 
-export type SubstrateBlockFilter = SubstrateBaseHandlerFilter;
+export type AlgorandBlockFilter = AlgorandBaseHandlerFilter;
 
-export interface SubstrateEventFilter extends SubstrateBaseHandlerFilter {
-  module?: string;
-  method?: string;
+export interface AlgorandTransactionFilter {
+  txType?: string;
+  sender?: string;
+  receiver?: string;
+  nonParticipant?: boolean;
+  assetId?: number;
+  newFreezeStatus?: boolean;
+  address?: string;
+  applicationId?: number;
 }
 
-export interface SubstrateCallFilter extends SubstrateEventFilter {
-  success?: boolean;
-}
+export type AlgorandBlockHandler = AlgorandCustomHandler<AlgorandHandlerKind.Block, AlgorandBlockFilter>;
+export type AlgorandTransactionHandler = AlgorandCustomHandler<
+  AlgorandHandlerKind.Transaction,
+  AlgorandTransactionFilter
+>;
 
-export type SubstrateBlockHandler = SubstrateCustomHandler<SubstrateHandlerKind.Block, SubstrateBlockFilter>;
-export type SubstrateCallHandler = SubstrateCustomHandler<SubstrateHandlerKind.Call, SubstrateCallFilter>;
-export type SubstrateEventHandler = SubstrateCustomHandler<SubstrateHandlerKind.Event, SubstrateEventFilter>;
-
-export interface SubstrateCustomHandler<K extends string = string, F = Record<string, unknown>> {
+export interface AlgorandCustomHandler<K extends string = string, F = Record<string, unknown>> {
   handler: string;
   kind: K;
   filter?: F;
 }
 
-export type SubstrateRuntimeHandler = SubstrateBlockHandler | SubstrateCallHandler | SubstrateEventHandler;
-export type SubstrateHandler = SubstrateRuntimeHandler | SubstrateCustomHandler<string, unknown>;
-export type SubstrateRuntimeHandlerFilter = SubstrateBlockFilter | SubstrateCallFilter | SubstrateEventFilter;
+export type AlgorandRuntimeHandler = AlgorandBlockHandler | AlgorandTransactionHandler;
+export type AlgorandHandler = AlgorandRuntimeHandler | AlgorandCustomHandler<string, unknown>;
+export type AlgorandRuntimeHandlerFilter = AlgorandBlockFilter | AlgorandTransactionFilter;
 
-export interface SubstrateMapping<T extends SubstrateHandler = SubstrateHandler> extends FileReference {
+export interface AlgorandMapping<T extends AlgorandHandler = AlgorandHandler> extends FileReference {
   handlers: T[];
 }
 
-interface ISubstrateDatasource<M extends SubstrateMapping, F extends SubstrateNetworkFilter = SubstrateNetworkFilter> {
+interface IAlgorandDataSource<M extends AlgorandMapping> {
   name?: string;
   kind: string;
-  filter?: F;
   startBlock?: number;
   mapping: M;
 }
 
-export interface SubstrateRuntimeDatasource<
-  M extends SubstrateMapping<SubstrateRuntimeHandler> = SubstrateMapping<SubstrateRuntimeHandler>
-> extends ISubstrateDatasource<M> {
-  kind: SubstrateDatasourceKind.Runtime;
+export interface AlgorandRuntimeDataSource<
+  M extends AlgorandMapping<AlgorandRuntimeHandler> = AlgorandMapping<AlgorandRuntimeHandler>
+> extends IAlgorandDataSource<M> {
+  kind: AlgorandDataSourceKind.Runtime;
 }
 
-export interface SubstrateNetworkFilter {
-  specName?: string;
-}
-
-export type SubstrateDatasource = SubstrateRuntimeDatasource | SubstrateCustomDatasource; // | SubstrateBuiltinDataSource;
+export type AlgorandDataSource = AlgorandRuntimeDataSource | AlgorandCustomDataSource;
 
 export interface FileReference {
   file: string;
@@ -106,32 +103,31 @@ export type CustomDataSourceAsset = FileReference;
 
 export type Processor<O = any> = FileReference & {options?: O};
 
-export interface SubstrateCustomDatasource<
+export interface AlgorandCustomDataSource<
   K extends string = string,
-  T extends SubstrateNetworkFilter = SubstrateNetworkFilter,
-  M extends SubstrateMapping = SubstrateMapping<SubstrateCustomHandler>,
+  M extends AlgorandMapping = AlgorandMapping<AlgorandCustomHandler>,
   O = any
-> extends ISubstrateDatasource<M, T> {
+> extends IAlgorandDataSource<M> {
   kind: K;
   assets: Map<string, CustomDataSourceAsset>;
   processor: Processor<O>;
 }
 
-//export type SubstrateBuiltinDataSource = ISubstrateDatasource;
+//export type SubstrateBuiltinDataSource = IAlgorandDataSource;
 
 export interface HandlerInputTransformer_0_0_0<
-  T extends SubstrateHandlerKind,
+  T extends AlgorandHandlerKind,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > {
   (input: RuntimeHandlerInputMap[T], ds: DS, api: ApiPromise, assets?: Record<string, string>): Promise<E>; //  | SubstrateBuiltinDataSource
 }
 
 export interface HandlerInputTransformer_1_0_0<
-  T extends SubstrateHandlerKind,
+  T extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > {
   (params: {
     input: RuntimeHandlerInputMap[T];
@@ -144,26 +140,21 @@ export interface HandlerInputTransformer_1_0_0<
 
 type SecondLayerHandlerProcessorArray<
   K extends string,
-  F extends SubstrateNetworkFilter,
   T,
-  DS extends SubstrateCustomDatasource<K, F> = SubstrateCustomDatasource<K, F>
-> =
-  | SecondLayerHandlerProcessor<SubstrateHandlerKind.Block, F, T, DS>
-  | SecondLayerHandlerProcessor<SubstrateHandlerKind.Call, F, T, DS>
-  | SecondLayerHandlerProcessor<SubstrateHandlerKind.Event, F, T, DS>;
+  DS extends AlgorandCustomDataSource<K> = AlgorandCustomDataSource<K>
+> = SecondLayerHandlerProcessor<AlgorandHandlerKind, T, DS>;
 
-export interface SubstrateDatasourceProcessor<
+export interface AlgorandDataSourceProcessor<
   K extends string,
-  F extends SubstrateNetworkFilter,
-  DS extends SubstrateCustomDatasource<K, F> = SubstrateCustomDatasource<K, F>,
-  P extends Record<string, SecondLayerHandlerProcessorArray<K, F, any, DS>> = Record<
+  DS extends AlgorandCustomDataSource<K> = AlgorandCustomDataSource<K>,
+  P extends Record<string, SecondLayerHandlerProcessorArray<K, any, DS>> = Record<
     string,
-    SecondLayerHandlerProcessorArray<K, F, any, DS>
+    SecondLayerHandlerProcessorArray<K, any, DS>
   >
 > {
   kind: K;
   validate(ds: DS, assets: Record<string, string>): void;
-  dsFilterProcessor(ds: DS, api: ApiPromise): boolean;
+  dsFilterProcessor(ds: DS, api: Indexer): boolean;
   handlerProcessors: P;
 }
 
@@ -178,9 +169,9 @@ export interface DictionaryQueryEntry {
 }
 
 interface SecondLayerHandlerProcessorBase<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > {
   baseHandlerKind: K;
   baseFilter: RuntimeFilterMap[K] | RuntimeFilterMap[K][];
@@ -190,10 +181,10 @@ interface SecondLayerHandlerProcessorBase<
 
 // only allow one custom handler for each baseHandler kind
 export interface SecondLayerHandlerProcessor_0_0_0<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > extends SecondLayerHandlerProcessorBase<K, F, DS> {
   specVersion: undefined;
   transformer: HandlerInputTransformer_0_0_0<K, E, DS>;
@@ -201,10 +192,10 @@ export interface SecondLayerHandlerProcessor_0_0_0<
 }
 
 export interface SecondLayerHandlerProcessor_1_0_0<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > extends SecondLayerHandlerProcessorBase<K, F, DS> {
   specVersion: '1.0.0';
   transformer: HandlerInputTransformer_1_0_0<K, F, E, DS>;
@@ -212,8 +203,34 @@ export interface SecondLayerHandlerProcessor_1_0_0<
 }
 
 export type SecondLayerHandlerProcessor<
-  K extends SubstrateHandlerKind,
+  K extends AlgorandHandlerKind,
   F,
   E,
-  DS extends SubstrateCustomDatasource = SubstrateCustomDatasource
+  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > = SecondLayerHandlerProcessor_0_0_0<K, F, E, DS> | SecondLayerHandlerProcessor_1_0_0<K, F, E, DS>;
+
+export const mappingFilterTransaction = {
+  [TransactionType.pay]: {
+    sender: 'sender',
+    receiver: 'paymentTransaction.receiver',
+  },
+  [TransactionType.keyreg]: {
+    nonParticipant: 'keyregTransaction.nonParticipation',
+  },
+  [TransactionType.acfg]: {
+    assetId: 'assetConfigTransaction.assetId',
+  },
+  [TransactionType.axfer]: {
+    assetId: 'assetTransferTransaction.assetId',
+    sender: 'sender',
+    receiver: 'assetTransferTransaction.receiver',
+  },
+  [TransactionType.afrz]: {
+    assetId: 'assetFreezeTransaction.assetId',
+    newFreezeStatus: 'assetFreezeTransaction.newFreezeStatus',
+    address: 'sender',
+  },
+  [TransactionType.appl]: {
+    applicationId: 'applicationTransaction.applicationId',
+  },
+};

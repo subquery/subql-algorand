@@ -5,7 +5,7 @@ import assert from 'assert';
 import path from 'path';
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import { getProjectRootAndManifest, IPFS_REGEX } from '@subql/common';
-import { SubstrateProjectNetworkConfig } from '@subql/common-substrate';
+import { AlgorandProjectNetworkConfig } from '@subql/common-substrate';
 import { camelCase, last, omitBy, isNil } from 'lodash';
 import { getLogger, setLevel } from '../utils/logger';
 import { getYargsOption } from '../yargs';
@@ -120,7 +120,7 @@ export class ConfigureModule {
     const project = async () => {
       const p = await SubqueryProject.create(
         argv.subquery,
-        omitBy<SubstrateProjectNetworkConfig>(
+        omitBy<AlgorandProjectNetworkConfig>(
           {
             endpoint: config.networkEndpoint,
             dictionary: config.networkDictionary,

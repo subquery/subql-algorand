@@ -2,31 +2,28 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {IProjectManifest, ProjectNetworkConfig} from '@subql/common';
-import {SubstrateDatasource} from '@subql/types';
-import {RuntimeDataSourceV0_0_1} from '../project/versioned/v0_0_1';
+import {AlgorandDataSource} from '@subql/types-algorand';
 
 // All of these used to be redefined in this file, re-exporting for simplicity
 export {
-  SubstrateRuntimeHandler,
-  SubstrateCustomHandler,
-  SubstrateHandler,
-  SubstrateHandlerKind,
-  SubstrateDatasource as SubstrateDataSource,
-  SubstrateCustomDatasource as SubstrateCustomDataSource,
-  SubstrateBlockFilter,
-  SubstrateCallFilter,
-  SubstrateEventFilter,
-  SubstrateDatasourceProcessor,
-  SubstrateNetworkFilter,
-  SubstrateRuntimeHandlerFilter,
-  SubstrateDatasourceKind,
-  RuntimeHandlerInputMap as SubstrateRuntimeHandlerInputMap,
-} from '@subql/types';
+  AlgorandRuntimeHandler,
+  AlgorandCustomHandler,
+  AlgorandHandler,
+  AlgorandHandlerKind,
+  AlgorandDataSource as AlgorandDataSource,
+  AlgorandCustomDataSource as AlgorandCustomDataSource,
+  AlgorandBlockFilter,
+  AlgorandDataSourceProcessor,
+  AlgorandRuntimeHandlerFilter,
+  AlgorandDataSourceKind,
+  RuntimeHandlerInputMap as AlgorandRuntimeHandlerInputMap,
+} from '@subql/types-algorand';
 
-//make exception for runtime datasource 0.0.1
-export type ISubstrateProjectManifest = IProjectManifest<SubstrateDatasource | RuntimeDataSourceV0_0_1>;
+export type IAlgorandProjectManifest = IProjectManifest<AlgorandDataSource>;
+export type TokenHeader = Record<string, string>;
 
-export interface SubstrateProjectNetworkConfig extends ProjectNetworkConfig {
+export interface AlgorandProjectNetworkConfig extends ProjectNetworkConfig {
   genesisHash?: string;
   chainId?: string;
+  apiKey?: string | TokenHeader;
 }

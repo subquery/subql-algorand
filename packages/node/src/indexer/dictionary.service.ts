@@ -9,7 +9,10 @@ import {
   gql,
 } from '@apollo/client/core';
 import { Injectable, OnApplicationShutdown } from '@nestjs/common';
-import { DictionaryQueryCondition, DictionaryQueryEntry } from '@subql/types';
+import {
+  DictionaryQueryCondition,
+  DictionaryQueryEntry,
+} from '@subql/types-algorand';
 import { buildQuery, GqlNode, GqlQuery, GqlVar, MetaData } from '@subql/utils';
 import fetch from 'node-fetch';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -33,9 +36,24 @@ const logger = getLogger('dictionary');
 const { argv } = getYargsOption();
 
 function extractVar(name: string, cond: DictionaryQueryCondition): GqlVar {
+  let gqlType: string;
+  switch (typeof cond.value) {
+    case 'string':
+      gqlType = 'String!';
+      break;
+    case 'number':
+      gqlType = 'BigFloat!';
+      break;
+    case 'boolean':
+      gqlType = 'Boolean!';
+      break;
+    default:
+      break;
+  }
+
   return {
     name,
-    gqlType: 'String!',
+    gqlType,
     value: cond.value,
   };
 }
@@ -214,15 +232,6 @@ export class DictionaryService implements OnApplicationShutdown {
       {
         entity: '_metadata',
         project: ['lastProcessedHeight', 'genesisHash'],
-      },
-      {
-        entity: 'specVersions',
-        project: [
-          {
-            entity: 'nodes',
-            project: ['id', 'blockHeight'],
-          },
-        ],
       },
     ];
     for (const entity of Object.keys(mapped)) {
