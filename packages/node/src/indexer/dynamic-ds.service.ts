@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 import { Injectable } from '@nestjs/common';
-import { isCustomDs, isRuntimeDs } from '@subql/common-substrate';
+import { isCustomDs, isRuntimeDs } from '@subql/common-algorand';
 import { TransactionType } from 'algosdk';
 import { Transaction } from 'sequelize/types';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';

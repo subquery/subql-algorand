@@ -18,15 +18,15 @@
     "inlineSources": true,
     "composite": true,
     "paths": {
-      "@subql/common-substrate": ["packages/common-substrate/src"],
-      "@subql/common-substrate/*": ["packages/common-substrate/src/*"],
+      "@subql/common-algorand": ["packages/common-algorand/src"],
+      "@subql/common-algorand/*": ["packages/common-algorand/src/*"],
       "@subql/types-algorand": ["packages/types/src"],
       "@subql/types-algorand/*": ["packages/types/src/*"],
     },
     "skipLibCheck": true
   },
   "references": [
-    {"path": "packages/common-substrate"},
+    {"path": "packages/common-algorand"},
     {"path": "packages/node"},
     {"path": "packages/types"},
   ],

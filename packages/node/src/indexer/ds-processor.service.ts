@@ -9,7 +9,7 @@ import {
   AlgorandCustomDataSource as AlgorandCustomDs,
   AlgorandDataSource,
   AlgorandDataSourceProcessor,
-} from '@subql/common-substrate';
+} from '@subql/common-algorand';
 import {
   SecondLayerHandlerProcessor_0_0_0,
   SecondLayerHandlerProcessor_1_0_0,

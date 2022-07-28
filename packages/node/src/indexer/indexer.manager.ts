@@ -10,7 +10,7 @@ import {
   isCustomDs,
   isBlockHandlerProcessor,
   isTransactionHandlerProcessor,
-} from '@subql/common-substrate';
+} from '@subql/common-algorand';
 import {
   AlgorandBlock,
   AlgorandCustomDataSource,

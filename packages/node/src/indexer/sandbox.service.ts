@@ -3,7 +3,7 @@
 
 import path from 'path';
 import { Injectable } from '@nestjs/common';
-import { AlgorandDataSource } from '@subql/common-substrate';
+import { AlgorandDataSource } from '@subql/common-algorand';
 import { SafeAPI, Store } from '@subql/types-algorand';
 import { levelFilter } from '@subql/utils';
 import { merge } from 'lodash';
