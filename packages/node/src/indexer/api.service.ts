@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Injectable } from '@nestjs/common';
-import { TokenHeader } from '@subql/common-substrate';
+import { TokenHeader } from '@subql/common-algorand';
 import {
   AlgorandBlock,
   AlgorandTransaction,

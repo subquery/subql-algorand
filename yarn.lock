@@ -2473,9 +2473,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/common-substrate@workspace:*, @subql/common-substrate@workspace:packages/common-substrate":
+"@subql/common-algorand@workspace:*, @subql/common-algorand@workspace:packages/common-algorand":
   version: 0.0.0-use.local
-  resolution: "@subql/common-substrate@workspace:packages/common-substrate"
+  resolution: "@subql/common-algorand@workspace:packages/common-algorand"
   dependencies:
     "@subql/common": latest
     "@subql/types-algorand": "workspace:*"
@@ -2519,7 +2519,7 @@ __metadata:
     "@nestjs/testing": ^8.2.6
     "@polkadot/api": 8.8.2
     "@subql/common": latest
-    "@subql/common-substrate": "workspace:*"
+    "@subql/common-algorand": "workspace:*"
     "@subql/types-algorand": "workspace:*"
     "@subql/utils": latest
     "@subql/x-merkle-mountain-range": 2.0.0-0.1.2

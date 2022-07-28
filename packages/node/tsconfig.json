@@ -7,6 +7,6 @@
     "rootDir": "src",
     "outDir": "./dist"
   },
-  "references": [{ "path": "../common-substrate" }, { "path": "../types" }],
+  "references": [{ "path": "../common-algorand" }, { "path": "../types" }],
   "include": ["src/**/*"]
 }
