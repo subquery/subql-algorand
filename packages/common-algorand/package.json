@@ -8,7 +8,7 @@
     "format": "prettier --write \"src/**/*.ts\""
   },
   "homepage": "https://github.com/subquery/subql",
-  "repository": "github:subquery/subql",
+  "repository": "github:subquery/subql-algorand",
   "author": "Ian He",
   "main": "dist/index.js",
   "license": "Apache-2.0",

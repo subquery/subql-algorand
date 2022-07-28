@@ -13,7 +13,7 @@
     "start:prod": "node dist/main"
   },
   "homepage": "https://github.com/subquery/subql",
-  "repository": "github:subquery/subql",
+  "repository": "github:subquery/subql-algorand",
   "bin": {
     "subql-node-algorand": "./bin/run"
   },
