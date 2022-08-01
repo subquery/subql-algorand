@@ -13,9 +13,9 @@
     "start:prod": "node dist/main"
   },
   "homepage": "https://github.com/subquery/subql",
-  "repository": "github:subquery/subql",
+  "repository": "github:subquery/subql-algorand",
   "bin": {
-    "subql-node": "./bin/run"
+    "subql-node-algorand": "./bin/run"
   },
   "dependencies": {
     "@apollo/client": "3.5.8",
@@ -26,7 +26,7 @@
     "@nestjs/schedule": "^1.0.2",
     "@polkadot/api": "8.8.2",
     "@subql/common": "latest",
-    "@subql/common-substrate": "workspace:*",
+    "@subql/common-algorand": "workspace:*",
     "@subql/types-algorand": "workspace:*",
     "@subql/utils": "latest",
     "@subql/x-merkle-mountain-range": "2.0.0-0.1.2",

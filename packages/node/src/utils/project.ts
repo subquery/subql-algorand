@@ -20,7 +20,7 @@ import {
   AlgorandHandlerKind,
   RuntimeDataSourceV1_0_0,
   CustomDataSourceV1_0_0,
-} from '@subql/common-substrate';
+} from '@subql/common-algorand';
 import yaml from 'js-yaml';
 import tar from 'tar';
 import { NodeVM, VMScript } from 'vm2';

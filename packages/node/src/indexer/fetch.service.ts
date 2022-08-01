@@ -13,7 +13,7 @@ import {
   AlgorandDataSource,
   AlgorandRuntimeHandlerFilter,
   isRuntimeDataSourceV1_0_0,
-} from '@subql/common-substrate';
+} from '@subql/common-algorand';
 import { DictionaryQueryEntry, AlgorandBlock } from '@subql/types-algorand';
 
 import { Indexer } from 'algosdk';

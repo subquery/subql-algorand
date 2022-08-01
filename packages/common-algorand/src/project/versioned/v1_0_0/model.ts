@@ -10,7 +10,6 @@ import {
   RunnerSpecs,
   SemverVersionValidator,
 } from '@subql/common';
-import {TokenHeader} from '@subql/common-substrate';
 import {AlgorandCustomDataSource} from '@subql/types-algorand';
 import {plainToClass, Type} from 'class-transformer';
 import {
@@ -26,6 +25,7 @@ import {
 } from 'class-validator';
 import yaml from 'js-yaml';
 import {CustomDataSourceBase, RuntimeDataSourceBase} from '../../models';
+import {TokenHeader} from '../../types';
 import {IsStringOrObject} from '../../validation/is-string-or-object.validation';
 import {
   CustomDataSourceTemplate,

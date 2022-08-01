@@ -12,7 +12,7 @@ import {
   parseAlgorandProjectManifest,
   AlgorandDataSource,
   ProjectManifestV1_0_0Impl,
-} from '@subql/common-substrate';
+} from '@subql/common-algorand';
 import { buildSchemaFromString } from '@subql/utils';
 import { GraphQLSchema } from 'graphql';
 import { getProjectRoot, updateDataSourcesV1_0_0 } from '../utils/project';
