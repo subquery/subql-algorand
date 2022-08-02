@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {Extrinsic, EventRecord, SignedBlock} from '@polkadot/types/interfaces';
-import {TransactionType, Indexer} from 'algosdk';
+import type {TransactionType, Indexer} from 'algosdk';
 
 export interface Entity {
   id: string;

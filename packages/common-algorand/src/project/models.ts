@@ -1,8 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {RegisteredTypes, RegistryTypes, OverrideModuleType, OverrideBundleType} from '@polkadot/types/types';
-
 import {BaseMapping, FileReference} from '@subql/common';
 import {
   CustomDataSourceAsset as AlgorandCustomDataSourceAsset,
@@ -21,7 +19,6 @@ import {
 import {TransactionType} from 'algosdk';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {
-  ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsEnum,

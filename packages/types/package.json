@@ -16,11 +16,11 @@
     "/dist"
   ],
   "peerDependencies": {
-    "@polkadot/api": "^8"
+    "algosdk": "^1.19.0"
   },
   "devDependencies": {
-    "@polkadot/api": "^8",
-    "@types/app-module-path": "^2.2.0"
+    "@types/app-module-path": "^2.2.0",
+    "algosdk": "^1.19.0"
   },
   "stableVersion": "1.1.0"
 }
