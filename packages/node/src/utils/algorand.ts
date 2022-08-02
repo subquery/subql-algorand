@@ -7,13 +7,38 @@ import {
   AlgorandBlockFilter,
   AlgorandTransaction,
   AlgorandTransactionFilter,
-  mappingFilterTransaction,
 } from '@subql/types-algorand';
-import { Indexer } from 'algosdk';
+import { Indexer, TransactionType } from 'algosdk';
 import { get } from 'lodash';
 import { getLogger } from './logger';
 import { camelCaseObjectKey } from './object';
 const logger = getLogger('fetch');
+
+export const mappingFilterTransaction = {
+  [TransactionType.pay]: {
+    sender: 'sender',
+    receiver: 'paymentTransaction.receiver',
+  },
+  [TransactionType.keyreg]: {
+    nonParticipant: 'keyregTransaction.nonParticipation',
+  },
+  [TransactionType.acfg]: {
+    assetId: 'assetConfigTransaction.assetId',
+  },
+  [TransactionType.axfer]: {
+    assetId: 'assetTransferTransaction.assetId',
+    sender: 'sender',
+    receiver: 'assetTransferTransaction.receiver',
+  },
+  [TransactionType.afrz]: {
+    assetId: 'assetFreezeTransaction.assetId',
+    newFreezeStatus: 'assetFreezeTransaction.newFreezeStatus',
+    address: 'sender',
+  },
+  [TransactionType.appl]: {
+    applicationId: 'applicationTransaction.applicationId',
+  },
+};
 
 export function filterBlock(
   block: AlgorandBlock,

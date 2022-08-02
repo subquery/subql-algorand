@@ -1,9 +1,8 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {ApiPromise} from '@polkadot/api';
 import {RegistryTypes} from '@polkadot/types/types';
-import {Indexer, TransactionType} from 'algosdk';
+import type {Indexer} from 'algosdk';
 import {AlgorandBlock, AlgorandTransaction} from './interfaces';
 
 export enum AlgorandDataSourceKind {
@@ -120,7 +119,7 @@ export interface HandlerInputTransformer_0_0_0<
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > {
-  (input: RuntimeHandlerInputMap[T], ds: DS, api: ApiPromise, assets?: Record<string, string>): Promise<E>; //  | SubstrateBuiltinDataSource
+  (input: RuntimeHandlerInputMap[T], ds: DS, api: Indexer, assets?: Record<string, string>): Promise<E>; //  | SubstrateBuiltinDataSource
 }
 
 export interface HandlerInputTransformer_1_0_0<
@@ -133,7 +132,7 @@ export interface HandlerInputTransformer_1_0_0<
     input: RuntimeHandlerInputMap[T];
     ds: DS;
     filter?: F;
-    api: ApiPromise;
+    api: Indexer;
     assets?: Record<string, string>;
   }): Promise<E[]>; //  | SubstrateBuiltinDataSource
 }
@@ -208,29 +207,3 @@ export type SecondLayerHandlerProcessor<
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > = SecondLayerHandlerProcessor_0_0_0<K, F, E, DS> | SecondLayerHandlerProcessor_1_0_0<K, F, E, DS>;
-
-export const mappingFilterTransaction = {
-  [TransactionType.pay]: {
-    sender: 'sender',
-    receiver: 'paymentTransaction.receiver',
-  },
-  [TransactionType.keyreg]: {
-    nonParticipant: 'keyregTransaction.nonParticipation',
-  },
-  [TransactionType.acfg]: {
-    assetId: 'assetConfigTransaction.assetId',
-  },
-  [TransactionType.axfer]: {
-    assetId: 'assetTransferTransaction.assetId',
-    sender: 'sender',
-    receiver: 'assetTransferTransaction.receiver',
-  },
-  [TransactionType.afrz]: {
-    assetId: 'assetFreezeTransaction.assetId',
-    newFreezeStatus: 'assetFreezeTransaction.newFreezeStatus',
-    address: 'sender',
-  },
-  [TransactionType.appl]: {
-    applicationId: 'applicationTransaction.applicationId',
-  },
-};

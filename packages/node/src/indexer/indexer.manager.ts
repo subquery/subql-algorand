@@ -345,7 +345,7 @@ export class IndexerManager {
         input: data,
         ds,
         filter: handler.filter,
-        api: null,
+        api: this.api,
         assets,
       })
       .catch((e) => {
