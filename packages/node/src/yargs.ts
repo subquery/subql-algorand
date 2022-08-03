@@ -117,6 +117,11 @@ export function getYargsOption() {
       describe: 'Specify the dictionary api for this network',
       type: 'string',
     },
+    'dictionary-timeout': {
+      demandOption: false,
+      describe: 'Max timeout for dictionary query',
+      type: 'number',
+    },
     'mmr-path': {
       alias: 'm',
       demandOption: false,
@@ -145,6 +150,18 @@ export function getYargsOption() {
       default: true,
       describe: 'Disable storing historical state entities',
       type: 'boolean',
+    },
+    reindex: {
+      demandOption: false,
+      describe: 'Reindex to specified block height',
+      type: 'number',
+    },
+    workers: {
+      alias: 'w',
+      demandOption: false,
+      describe:
+        'Number of worker threads to use for fetching and processing blocks. Disabled by default.',
+      type: 'number',
     },
   });
 }

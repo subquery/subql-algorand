@@ -54,7 +54,7 @@ export class DynamicDsService {
 
       return ds;
     } catch (e) {
-      logger.error(e.message);
+      logger.error(e, 'Failed to create dynamic ds');
       process.exit(1);
     }
   }
@@ -68,7 +68,7 @@ export class DynamicDsService {
           params.map((params) => this.getDatasource(params)),
         );
       } catch (e) {
-        logger.error(`Unable to get dynamic datasources:\n${e.message}`);
+        logger.error(e, `Unable to get dynamic datasources`);
         process.exit(1);
       }
     }

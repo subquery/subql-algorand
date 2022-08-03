@@ -31,6 +31,12 @@ import {
   ValidateIf,
 } from 'class-validator';
 
+export class BlockFilter implements AlgorandBlockFilter {
+  @IsOptional()
+  @IsInt()
+  modulo?: number;
+}
+
 export class TransactionFilter implements AlgorandTransactionFilter {
   @IsEnum(TransactionType)
   @IsOptional()
@@ -84,13 +90,18 @@ export class BlockHandler implements AlgorandBlockHandler {
 
   @IsString()
   handler: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => BlockFilter)
+  filter?: AlgorandBlockFilter;
 }
 
 export class TransactionHandler implements AlgorandTransactionHandler {
   @IsOptional()
   @ValidateNested()
   @Type(() => TransactionFilter)
-  filter?: TransactionFilter;
+  filter?: AlgorandTransactionFilter;
 
   @IsEnum(AlgorandHandlerKind, {groups: [AlgorandHandlerKind.Block]})
   kind: AlgorandHandlerKind.Transaction;

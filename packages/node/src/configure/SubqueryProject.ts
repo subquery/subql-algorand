@@ -114,7 +114,7 @@ async function loadProjectFromManifest1_0_0(
     reader,
     root,
   );
-  const templates = await loadProjectTemplates(projectManifest, reader);
+  const templates = await loadProjectTemplates(projectManifest, root, reader);
   const runner = projectManifest.runner;
 
   return {
@@ -130,6 +130,7 @@ async function loadProjectFromManifest1_0_0(
 
 async function loadProjectTemplates(
   projectManifest: ProjectManifestV1_0_0Impl,
+  root: string,
   reader: Reader,
 ): Promise<SubqlProjectDsTemplate[]> {
   if (projectManifest.templates && projectManifest.templates.length !== 0) {
