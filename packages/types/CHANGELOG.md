@@ -10,7 +10,6 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 ## [Unreleased]
 
 ## [1.2.0] - 2022-08-04
-
 Initial Algorand support
 
 [Unreleased]: https://github.com/subquery/subql/compare/types/v1.2.0...HEAD
