@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [1.6.0] - 2022-08-04
+
 Initial Algorand support.
 
 [Unreleased]: https://github.com/subquery/subql/compare/node/v1.6.0...HEAD

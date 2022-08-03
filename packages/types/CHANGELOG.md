@@ -9,9 +9,13 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [Unreleased]
 
+## [1.2.1] - 2022-08-04
+No Changes, fixing build issue
+
 ## [1.2.0] - 2022-08-04
 Initial Algorand support
 
-[Unreleased]: https://github.com/subquery/subql/compare/types/v1.2.0...HEAD
+[Unreleased]: https://github.com/subquery/subql/compare/types/v1.2.1...HEAD
+[1.2.1]: https://github.com/subquery/subql/compare/types/v1.2.0...types/v1.2.1
 [1.2.0]: https://github.com/subquery/subql/compare/types/v1.2.0
 
