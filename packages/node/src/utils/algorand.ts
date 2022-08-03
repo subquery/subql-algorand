@@ -44,8 +44,19 @@ export function filterBlock(
   block: AlgorandBlock,
   filter?: AlgorandBlockFilter,
 ): boolean {
+  if (!filter) return true;
+  if (!filterBlockModulo(block, filter)) return false;
   // no filters for block.
   return true;
+}
+
+export function filterBlockModulo(
+  block: AlgorandBlock,
+  filter: AlgorandBlockFilter,
+): boolean {
+  const { modulo } = filter;
+  if (!modulo) return true;
+  return block.round % modulo === 0;
 }
 
 export function filterTransaction(
@@ -93,4 +104,9 @@ export async function fetchBlocksBatches(
   blockArray: number[],
 ): Promise<AlgorandBlock[]> {
   return fetchBlocksArray(api, blockArray);
+}
+
+export function calcInterval(api: Indexer): number {
+  // Pulled from https://metrics.algorand.org/#/protocol/#blocks
+  return 4300;
 }

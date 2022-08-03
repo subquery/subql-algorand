@@ -1,7 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {RegistryTypes} from '@polkadot/types/types';
 import type {Indexer} from 'algosdk';
 import {AlgorandBlock, AlgorandTransaction} from './interfaces';
 
@@ -33,7 +32,6 @@ export interface ProjectManifest {
 
   network: {
     endpoint: string;
-    customTypes?: RegistryTypes;
   };
 
   dataSources: AlgorandDataSource[];
@@ -46,7 +44,9 @@ interface AlgorandBaseHandlerFilter {
   specVersion?: SpecVersionRange;
 }
 
-export type AlgorandBlockFilter = AlgorandBaseHandlerFilter;
+export interface AlgorandBlockFilter extends AlgorandBaseHandlerFilter {
+  modulo?: number;
+}
 
 export interface AlgorandTransactionFilter {
   txType?: string;
