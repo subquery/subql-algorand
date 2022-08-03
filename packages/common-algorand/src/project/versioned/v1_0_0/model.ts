@@ -11,7 +11,7 @@ import {
   SemverVersionValidator,
 } from '@subql/common';
 import {AlgorandCustomDataSource} from '@subql/types-algorand';
-import {plainToClass, Type} from 'class-transformer';
+import {plainToClass, Transform, Type} from 'class-transformer';
 import {
   Equals,
   IsArray,
@@ -130,9 +130,22 @@ export class CustomDataSourceTemplateImpl
 }
 
 export class DeploymentV1_0_0 {
+  @Transform((params) => {
+    if (params.value.genesisHash && !params.value.chainId) {
+      params.value.chainId = params.value.genesisHash;
+    }
+    return plainToClass(ProjectNetworkDeploymentV1_0_0, params.value);
+  })
+  @ValidateNested()
+  @Type(() => ProjectNetworkDeploymentV1_0_0)
+  network: ProjectNetworkDeploymentV1_0_0;
   @Equals('1.0.0')
   @IsString()
   specVersion: string;
+  @IsObject()
+  @ValidateNested()
+  @Type(() => AlgorandRunnerSpecsImpl)
+  runner: RunnerSpecs;
 
   @ValidateNested()
   @Type(() => FileType)
@@ -148,10 +161,17 @@ export class DeploymentV1_0_0 {
     keepDiscriminatorProperty: true,
   })
   dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[];
-
+  @IsOptional()
+  @IsArray()
   @ValidateNested()
-  @Type(() => ProjectNetworkV1_0_0)
-  network: ProjectNetworkV1_0_0;
+  @Type(() => CustomDataSourceTemplateImpl, {
+    discriminator: {
+      property: 'kind',
+      subTypes: [{value: RuntimeDataSourceTemplateImpl, name: 'algorand/Runtime'}],
+    },
+    keepDiscriminatorProperty: true,
+  })
+  templates?: (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[];
 }
 
 export class ProjectManifestV1_0_0Impl
