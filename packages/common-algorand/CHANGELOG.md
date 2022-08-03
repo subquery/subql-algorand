@@ -8,6 +8,9 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [Unreleased]
 
+## [1.0.0] - 2022-08.04
+
 Initial Algorand support
 
-[Unreleased]: https://github.com/subquery/subql/compare/common-algorand/HEAD
+[Unreleased]: https://github.com/subquery/subql/compare/common-algorand/v1.0.0...HEAD
+[1.0.0]: https://github.com/subquery/subql/compare/common-algorand/v1.0.0
