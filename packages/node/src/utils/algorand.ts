@@ -107,5 +107,6 @@ export async function fetchBlocksBatches(
 }
 
 export function calcInterval(api: Indexer): number {
-  return 6000; // TODO
+  // Pulled from https://metrics.algorand.org/#/protocol/#blocks
+  return 4300;
 }
