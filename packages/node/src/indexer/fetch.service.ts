@@ -13,7 +13,10 @@ import {
   AlgorandRuntimeHandlerFilter,
   isRuntimeDataSourceV1_0_0,
 } from '@subql/common-algorand';
-import { DictionaryQueryEntry } from '@subql/types-algorand';
+import {
+  AlgorandBlockFilter,
+  DictionaryQueryEntry,
+} from '@subql/types-algorand';
 import { MetaData } from '@subql/utils';
 import { Indexer } from 'algosdk';
 import { range, sortBy, uniqBy } from 'lodash';
@@ -109,7 +112,12 @@ export class FetchService implements OnApplicationShutdown {
         if (!filterList.length) return [];
         switch (baseHandlerKind) {
           case AlgorandHandlerKind.Block:
-            return [];
+            for (const filter of filterList as AlgorandBlockFilter[]) {
+              if (filter.modulo === undefined) {
+                return [];
+              }
+            }
+            break;
           case AlgorandHandlerKind.Transaction:
             filterList.forEach((f) => {
               const conditions = Object.entries(f).map(([field, value]) => ({
@@ -121,7 +129,6 @@ export class FetchService implements OnApplicationShutdown {
                 conditions,
               });
             });
-
             break;
           default:
         }
@@ -155,7 +162,6 @@ export class FetchService implements OnApplicationShutdown {
     this.eventEmitter.emit(IndexerEvent.UsingDictionary, {
       value: Number(this.useDictionary),
     });
-
     await this.getLatestRound();
 
     await this.blockDispatcher.init(this.resetForNewDs.bind(this));

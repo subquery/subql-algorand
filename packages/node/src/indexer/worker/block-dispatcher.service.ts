@@ -11,9 +11,11 @@ import { hexToU8a, u8aEq } from '@polkadot/util';
 import chalk from 'chalk';
 import { last } from 'lodash';
 import { NodeConfig } from '../../configure/NodeConfig';
-import { fetchBlocksBatches } from '../../utils/algorand';
+import * as AlgorandUtil from '../../utils/algorand';
 import { AutoQueue, Queue } from '../../utils/autoQueue';
 import { getLogger } from '../../utils/logger';
+import { profilerWrap } from '../../utils/profiler';
+import { getYargsOption } from '../../yargs';
 import { ApiService } from '../api.service';
 import { IndexerEvent } from '../events';
 import { IndexerManager } from '../indexer.manager';
@@ -103,6 +105,8 @@ export class BlockDispatcherService
   private isShutdown = false;
   private onDynamicDsCreated: (height: number) => Promise<void>;
   private _latestBufferedHeight: number;
+  private fetchBlocksBatches = AlgorandUtil.fetchBlocksBatches;
+  private latestProcessedHeight: number;
 
   constructor(
     private apiService: ApiService,
@@ -113,6 +117,16 @@ export class BlockDispatcherService
   ) {
     this.fetchQueue = new Queue(nodeConfig.batchSize * 3);
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3);
+
+    const { argv } = getYargsOption();
+
+    if (argv.profiler) {
+      this.fetchBlocksBatches = profilerWrap(
+        AlgorandUtil.fetchBlocksBatches,
+        'AlgorandUtil',
+        'fetchBlocksBatches',
+      );
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -130,7 +144,11 @@ export class BlockDispatcherService
   enqueueBlocks(heights: number[]): void {
     if (!heights.length) return;
 
-    logger.info(`Enqueing blocks ${heights[0]}...${last(heights)}`);
+    logger.info(
+      `Enqueing blocks ${heights[0]}...${last(heights)}, total ${
+        heights.length
+      } blocks`,
+    );
 
     this.fetchQueue.putMany(heights);
     this.latestBufferedHeight = last(heights);
@@ -173,7 +191,7 @@ export class BlockDispatcherService
         }], total ${blockNums.length} blocks`,
       );
 
-      const blocks = await fetchBlocksBatches(
+      const blocks = await this.fetchBlocksBatches(
         this.apiService.getApi(),
         blockNums,
       );
@@ -208,6 +226,12 @@ export class BlockDispatcherService
           if (dynamicDsCreated) {
             await this.onDynamicDsCreated(height);
           }
+
+          assert(
+            !this.latestProcessedHeight || height > this.latestProcessedHeight,
+            `Block processed out of order. Height: ${height}. Latest: ${this.latestProcessedHeight}`,
+          );
+          this.latestProcessedHeight = height;
         } catch (e) {
           if (this.isShutdown) {
             return;
@@ -225,13 +249,11 @@ export class BlockDispatcherService
       // There can be enough of a delay after fetching blocks that shutdown could now be true
       if (this.isShutdown) break;
 
-      const pendingBlockTasks = this.processQueue.putMany(blockTasks);
+      void this.processQueue.putMany(blockTasks);
 
       this.eventEmitter.emit(IndexerEvent.BlockQueueSize, {
         value: this.processQueue.size,
       });
-
-      await Promise.all(pendingBlockTasks);
     }
 
     this.fetching = false;
