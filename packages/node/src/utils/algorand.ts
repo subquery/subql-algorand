@@ -63,18 +63,18 @@ export function filterTransaction(
   txn: AlgorandTransaction,
   filter?: AlgorandTransactionFilter,
 ): boolean {
-  if (!filter || !filter.txType) return true;
+  if (!filter) return true;
   const { txType, ...filterByKey } = filter;
-  let validate = true;
-  validate = validate && txn.txType === txType;
+
+  if (txn.txType !== txType) return false;
 
   for (const key in filterByKey) {
-    validate =
-      validate &&
-      filterByKey[key] === get(txn, mappingFilterTransaction[txType][key]);
+    if (filterByKey[key] !== get(txn, mappingFilterTransaction[txType][key])) {
+      return false;
+    }
   }
 
-  return validate;
+  return true;
 }
 
 export async function getBlockByHeight(
