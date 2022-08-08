@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Filtering issues with transaction handlers. (#9)
 
 ### Changed
-- Synced latest changes from main repo (#10)
+- Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
 
