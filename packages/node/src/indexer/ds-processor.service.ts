@@ -4,6 +4,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Injectable } from '@nestjs/common';
+import { AnyTuple } from '@polkadot/types-codec/types';
 import {
   isCustomDs,
   AlgorandCustomDataSource as AlgorandCustomDs,

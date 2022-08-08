@@ -134,8 +134,6 @@ async function loadProjectTemplates(
   reader: Reader,
 ): Promise<SubqlProjectDsTemplate[]> {
   if (projectManifest.templates && projectManifest.templates.length !== 0) {
-    const root = await getProjectRoot(reader);
-
     const dsTemplates = await updateDataSourcesV1_0_0(
       projectManifest.templates,
       reader,
