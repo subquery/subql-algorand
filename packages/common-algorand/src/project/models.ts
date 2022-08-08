@@ -61,7 +61,7 @@ export class TransactionFilter implements AlgorandTransactionFilter {
   @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.keyreg)
   nonParticipant?: boolean;
 
-  @IsString()
+  @IsNumber()
   @IsOptional()
   @ValidateIf((o: TransactionFilter) => {
     return o.txType === TransactionType.acfg || o.txType === TransactionType.axfer || o.txType === TransactionType.afrz;
