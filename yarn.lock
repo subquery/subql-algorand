@@ -2520,6 +2520,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@subql/common@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@subql/common@npm:1.4.0"
+  dependencies:
+    axios: ^0.27.2
+    class-transformer: 0.5.1
+    class-validator: ^0.13.2
+    fs-extra: ^10.1.0
+    ipfs-http-client: ^52.0.3
+    js-yaml: ^4.1.0
+    reflect-metadata: ^0.1.13
+    semver: ^7.3.5
+  checksum: b53a929c70586c26433488a2360f2df8da740f2121068f4def73934c0b28298a30676376b4f32f15df3515c5c71e812ce2ae0a36a0e12149580262868b856fdc
+  languageName: node
+  linkType: hard
+
 "@subql/common@npm:latest":
   version: 1.2.2
   resolution: "@subql/common@npm:1.2.2"
@@ -2550,6 +2566,7 @@ __metadata:
     "@polkadot/api": 9.1.1
     "@subql/common": latest
     "@subql/common-algorand": "workspace:*"
+    "@subql/node-core": latest
     "@subql/types-algorand": "workspace:*"
     "@subql/utils": latest
     "@subql/x-merkle-mountain-range": 2.0.0-0.1.2
@@ -2588,6 +2605,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@subql/node-core@npm:latest":
+  version: 0.1.1
+  resolution: "@subql/node-core@npm:0.1.1"
+  dependencies:
+    "@nestjs/common": ^8.2.6
+    "@nestjs/event-emitter": ^1.3.0
+    "@nestjs/schedule": ^1.0.2
+    "@polkadot/api": 9.1.1
+    "@subql/common": 1.4.0
+    "@subql/types": 1.4.0
+    "@subql/utils": 1.1.0
+    "@subql/x-merkle-mountain-range": ^2.0.0-0.1.2
+    "@willsoto/nestjs-prometheus": ^4.4.0
+    lodash: ^4.17.21
+    prom-client: ^14.0.1
+    sequelize: 6.19.0
+    yargs: ^16.2.0
+  checksum: 4f06f5ff10c1fb4a9628ce244a5400dd2fc6471f9b799000777938e9ecd2eb4cc414895d2d529692d5f152551a364d6a4ad73b74f76b0d5501216d6cb2250e99
+  languageName: node
+  linkType: hard
+
 "@subql/types-algorand@workspace:*, @subql/types-algorand@workspace:packages/types":
   version: 0.0.0-use.local
   resolution: "@subql/types-algorand@workspace:packages/types"
@@ -2598,6 +2636,36 @@ __metadata:
     algosdk: ^1.19.0
   languageName: unknown
   linkType: soft
+
+"@subql/types@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@subql/types@npm:1.4.0"
+  peerDependencies:
+    "@polkadot/api": ^8
+  checksum: 4a194eccfc9daba612b425970124eefff476fa07bf02ef32e8f2fcbd9d9b13e490a7f2c970fc809b417214d8596b37ef4e854dd8c830f91b3825d2926c78e255
+  languageName: node
+  linkType: hard
+
+"@subql/utils@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@subql/utils@npm:1.1.0"
+  dependencies:
+    "@polkadot/util": ^10
+    ansi-styles: ^6.1.0
+    axios: ^0.27.1
+    chalk: ^4.1.2
+    detect-port: ^1.3.0
+    flatted: ^3.2.5
+    graphql: ^15.8.0
+    graphql-tag: ^2.12.6
+    pino: ^6.13.3
+    rotating-file-stream: ^3.0.2
+    semver: ^7.3.7
+    sequelize: ^6.15.0
+    tar: ^6.1.11
+  checksum: 0667298f2cd95cf47783c550e51d9f2495b4666462de8001a7e193b52cc9e6bff02eaf1e83b8781c1d3c956a84b240f3f4d9b7154a0c72ff12f1256817372de6
+  languageName: node
+  linkType: hard
 
 "@subql/utils@npm:latest":
   version: 1.0.1
@@ -2620,7 +2688,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/x-merkle-mountain-range@npm:2.0.0-0.1.2":
+"@subql/x-merkle-mountain-range@npm:2.0.0-0.1.2, @subql/x-merkle-mountain-range@npm:^2.0.0-0.1.2":
   version: 2.0.0-0.1.2
   resolution: "@subql/x-merkle-mountain-range@npm:2.0.0-0.1.2"
   dependencies:
@@ -5712,7 +5780,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:10.1.0":
+"fs-extra@npm:10.1.0, fs-extra@npm:^10.1.0":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
   dependencies:

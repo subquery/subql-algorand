@@ -3,13 +3,12 @@
 
 import { threadId } from 'node:worker_threads';
 import { Injectable } from '@nestjs/common';
-import { AlgorandBlock } from '@subql/types-algorand';
-import { NodeConfig } from '../../configure/NodeConfig';
+import { NodeConfig, getLogger } from '@subql/node-core';
 import { fetchBlocksBatches } from '../../utils/algorand';
 import { AutoQueue } from '../../utils/autoQueue';
-import { getLogger } from '../../utils/logger';
 import { ApiService } from '../api.service';
 import { IndexerManager } from '../indexer.manager';
+import { BlockContent } from '../types';
 
 export type FetchBlockResponse = undefined;
 
@@ -29,7 +28,7 @@ const logger = getLogger(`Worker Service #${threadId}`);
 
 @Injectable()
 export class WorkerService {
-  private fetchedBlocks: Record<string, AlgorandBlock> = {};
+  private fetchedBlocks: Record<string, BlockContent> = {};
   private _isIndexing = false;
 
   private queue: AutoQueue<FetchBlockResponse>;

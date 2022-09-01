@@ -11,6 +11,17 @@ import {
   isTransactionHandlerProcessor,
 } from '@subql/common-algorand';
 import {
+  PoiBlock,
+  StoreService,
+  PoiService,
+  SubqueryRepo,
+  NodeConfig,
+  getYargsOption,
+  getLogger,
+  profiler,
+  profilerWrap,
+} from '@subql/node-core';
+import {
   AlgorandBlock,
   AlgorandCustomDataSource,
   AlgorandCustomHandler,
@@ -20,24 +31,17 @@ import {
 } from '@subql/types-algorand';
 import { Indexer } from 'algosdk';
 import { Sequelize } from 'sequelize';
-import { NodeConfig } from '../configure/NodeConfig';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
-import { SubqueryRepo } from '../entities';
 import * as AlgorandUtil from '../utils/algorand';
-import { getLogger } from '../utils/logger';
-import { profiler } from '../utils/profiler';
-import { getYargsOption } from '../yargs';
 import { ApiService } from './api.service';
 import {
   asSecondLayerHandlerProcessor_1_0_0,
   DsProcessorService,
 } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
-import { PoiService } from './poi.service';
-import { PoiBlock } from './PoiBlock';
 import { ProjectService } from './project.service';
 import { IndexerSandbox, SandboxService } from './sandbox.service';
-import { StoreService } from './store.service';
+import { BlockContent } from './types';
 
 const NULL_MERKEL_ROOT = hexToU8a('0x00');
 
@@ -128,6 +132,9 @@ export class IndexerManager {
         ],
         { transaction: tx },
       );
+      // Db Metadata increase BlockCount, in memory ref to block-dispatcher _processedBlockCount
+      await this.storeService.incrementBlockCount(tx);
+
       // Need calculate operationHash to ensure correct offset insert all time
       operationHash = this.storeService.getOperationMerkleRoot();
       if (this.nodeConfig.proofOfIndex) {
@@ -194,7 +201,7 @@ export class IndexerManager {
   }
 
   private async indexBlockData(
-    block: AlgorandBlock,
+    block: BlockContent,
     dataSources: SubqlProjectDs[],
     getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
@@ -242,7 +249,13 @@ export class IndexerManager {
 
       for (const handler of handlers) {
         vm = vm ?? (await getVM(ds));
-        await vm.securedExec(handler.handler, [data]);
+        argv.profiler
+          ? await profilerWrap(
+              vm.securedExec.bind(vm),
+              'handlerPerformance',
+              handler.handler,
+            )(handler.handler, [data])
+          : await vm.securedExec(handler.handler, [data]);
       }
     } else if (isCustomDs(ds)) {
       const handlers = this.filterCustomDsHandlers<K>(
@@ -263,7 +276,7 @@ export class IndexerManager {
               );
 
             default:
-              throw new Error('Unsuported handler kind');
+              throw new Error('Unsupported handler kind');
           }
         },
       );
@@ -336,9 +349,11 @@ export class IndexerManager {
         throw e;
       });
 
-    await Promise.all(
-      transformedData.map((data) => vm.securedExec(handler.handler, [data])),
-    );
+    // We can not run this in parallel. the transformed data items may be dependent on one another.
+    // An example of this is with Acala EVM packing multiple EVM logs into a single Substrate event
+    for (const _data of transformedData) {
+      await vm.securedExec(handler.handler, [_data]);
+    }
   }
 }
 

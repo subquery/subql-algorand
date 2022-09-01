@@ -3,18 +3,20 @@
 
 import { Module } from '@nestjs/common';
 import {
+  MetricEventListener,
+  ReadyController,
+  ReadyService,
+  HealthController,
+  HealthService,
+  MmrQueryController,
+} from '@subql/node-core';
+import {
   makeGaugeProvider,
   PrometheusModule,
 } from '@willsoto/nestjs-prometheus';
 import { FetchModule } from '../indexer/fetch.module';
-import { MetricEventListener } from './event.listener';
-import { HealthController } from './health.controller';
-import { HealthService } from './health.service';
 import { MetaController } from './meta.controller';
 import { MetaService } from './meta.service';
-import { MmrQueryController } from './mmrQuery.controller';
-import { ReadyController } from './ready.controller';
-import { ReadyService } from './ready.service';
 
 @Module({
   imports: [PrometheusModule.register(), FetchModule],
@@ -57,6 +59,10 @@ import { ReadyService } from './ready.service';
     makeGaugeProvider({
       name: 'subql_indexer_skip_dictionary_count',
       help: 'The number of times indexer been skip use dictionary',
+    }),
+    makeGaugeProvider({
+      name: 'subql_indexer_processed_block_count',
+      help: 'The number of processed block',
     }),
     MetaService,
     HealthService,

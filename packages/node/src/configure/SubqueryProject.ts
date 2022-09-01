@@ -6,6 +6,7 @@ import {
   ReaderOptions,
   Reader,
   RunnerSpecs,
+  validateSemver,
 } from '@subql/common';
 import {
   AlgorandProjectNetworkConfig,
@@ -80,6 +81,8 @@ function processChainId(network: any): SubqueryProjectNetwork {
   return network;
 }
 
+const { version: packageVersion } = require('../../package.json');
+
 async function loadProjectFromManifest1_0_0(
   projectManifest: ProjectManifestV1_0_0Impl,
   reader: Reader,
@@ -116,6 +119,11 @@ async function loadProjectFromManifest1_0_0(
   );
   const templates = await loadProjectTemplates(projectManifest, root, reader);
   const runner = projectManifest.runner;
+  if (!validateSemver(packageVersion, runner.node.version)) {
+    throw new Error(
+      `Runner require node version ${runner.node.version}, current node ${packageVersion}`,
+    );
+  }
 
   return {
     id: reader.root ? reader.root : path,
