@@ -6,13 +6,7 @@ SubQuery is an Open, Flexible, Fast and Universal data indexing framework for we
 
 SubQuery allows every Substrate/Polkadot team to process and query their data. The project is inspired by the growth of data protocols serving the application layer and its aim is to help Polkadot/Substrate projects build better dApps by allowing anyone to reliably find and consume data faster. Today, anyone can query and extract Polkadot network data in only minutes and at no cost.
 
-<<<<<<< HEAD
-SubQuery aims to support all Substrate-compatible networks. For SubQuery support on other networks, please visit:
-* [SubQuery Algorand](https://github.com/subquery/subql-algorand)
-* [SubQuery Cosmos](https://github.com/subquery/subql-cosmos)
-=======
 The future is multi-chain - SubQuery is no different. SubQuery is well on our way to support all leading blockchain networks with support for the following:
->>>>>>> origin/main
 
 - [Polkadot (and all Substrate networks)](https://academy.subquery.network/quickstart/quickstart_chains/polkadot.html)
 - [Cosmos (and all CosmWasm and Ethermint networks)](https://academy.subquery.network/quickstart/quickstart_chains/cosmos.html)

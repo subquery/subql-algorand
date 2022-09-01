@@ -21,14 +21,7 @@ module.exports = {
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: [
-<<<<<<< HEAD
     'packages/common-algorand/src/**/*.ts',
-=======
-    'packages/cli/src/**/*.ts',
-    'packages/common/src/**/*.ts',
-    'packages/common-substrate/src/**/*.ts',
-    'packages/node-core/src/**/*.ts',
->>>>>>> origin/main
     'packages/node/src/**/*.ts',
   ],
 
@@ -92,14 +85,7 @@ module.exports = {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   // moduleNameMapper: {},
   moduleNameMapper: {
-<<<<<<< HEAD
     '^@subql/common-algorand/(.*)$': '<rootDir>/packages/common-algorand/src/$1',
-=======
-    '^@subql/common-substrate/(.*)$': '<rootDir>/packages/common-substrate/src/$1',
-    '^@subql/common/(.*)$': '<rootDir>/packages/common/src/$1',
-    '^@subql/node-core/(.*)$': '<rootDir>/packages/node-core/src/$1',
-    '^@subql/utils/(.*)$': '<rootDir>/packages/utils/src/$1',
->>>>>>> origin/main
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
