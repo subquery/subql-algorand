@@ -2,11 +2,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AlgorandBlock } from '@subql/types-algorand';
-// import { Transaction } from 'algosdk';
-
-// export interface BlockContent {
-//   description: string;
-//   transactions: Transaction[];
-// }
 
 export type BlockContent = AlgorandBlock;
