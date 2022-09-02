@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2022-09-02
+
+### Changed
+- Update to same version numbering as Substrate SDK.
+- Sync with latest changes on Substrate SDK:
+  - Use `@subql/node-core` package.
+  - Updated `store.getByField` to have limit and offset options: `getByField(entity: string, field: string, value: any, options?: {offset?: number; limit?: number}): Promise<Entity[]>`;.
+  - Improved performance logging.
+  - Added `bulkUpdate` and `bulkGet` to the injected store. This can be used to optimise handlers and speed up indexing.
+  - Fixed indexing stop processing blocks.
+
 ## [1.6.1] - 2022-08-09
 
 ### Fixed
@@ -18,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial Algorand support.
 
-[Unreleased]: https://github.com/subquery/subql/compare/node/v1.6.1...HEAD
+[Unreleased]: https://github.com/subquery/subql/compare/node/v1.9.0...HEAD
+[1.9.0]: https://github.com/subquery/subql/compare/node/v1.6.1.../node/v1.9.0
 [1.6.1]: https://github.com/subquery/subql/compare/node/v1.6.0.../node/v1.6.1
 [1.6.0]: https://github.com/subquery/subql/compare/node/v1.6.0
