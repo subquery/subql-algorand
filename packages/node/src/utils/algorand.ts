@@ -1,7 +1,7 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import '@polkadot/api-augment/substrate';
+import { getLogger } from '@subql/node-core';
 import {
   AlgorandBlock,
   AlgorandBlockFilter,
@@ -9,9 +9,7 @@ import {
   AlgorandTransactionFilter,
 } from '@subql/types-algorand';
 import { Indexer, TransactionType } from 'algosdk';
-import { get } from 'lodash';
-import { getLogger } from './logger';
-import { camelCaseObjectKey } from './object';
+import { camelCase, get } from 'lodash';
 const logger = getLogger('fetch');
 
 export const mappingFilterTransaction = {
@@ -39,6 +37,22 @@ export const mappingFilterTransaction = {
     applicationId: 'applicationTransaction.applicationId',
   },
 };
+
+export function camelCaseObjectKey(object: object) {
+  if (Array.isArray(object)) {
+    return object.map((v) => camelCaseObjectKey(v));
+  } else if (object !== null && object.constructor === Object) {
+    return Object.keys(object).reduce(
+      (result, key) => ({
+        ...result,
+        [camelCase(key)]: camelCaseObjectKey(object[key]),
+      }),
+      {},
+    );
+  }
+
+  return object;
+}
 
 export function filterBlock(
   block: AlgorandBlock,

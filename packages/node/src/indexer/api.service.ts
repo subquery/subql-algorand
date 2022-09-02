@@ -3,6 +3,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { TokenHeader } from '@subql/common-algorand';
+import { NetworkMetadataPayload, getLogger } from '@subql/node-core';
 import {
   AlgorandBlock,
   AlgorandTransaction,
@@ -11,8 +12,7 @@ import {
 import algosdk, { Indexer } from 'algosdk';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import * as AlgorandUtils from '../utils/algorand';
-import { getLogger } from '../utils/logger';
-import { NetworkMetadataPayload } from './events';
+
 const logger = getLogger('api');
 
 @Injectable()
@@ -45,6 +45,7 @@ export class ApiService {
     this.networkMeta = {
       chain,
       genesisHash,
+      specName: undefined,
     };
 
     if (network.chainId && network.chainId !== genesisHash) {

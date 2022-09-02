@@ -1,21 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Entity } from '@subql/types-algorand';
-import { Indexer, Transaction } from 'algosdk';
+import { AlgorandBlock } from '@subql/types-algorand';
 
-export interface BlockContent {
-  description: string;
-  transactions: Transaction[];
-}
-
-export enum OperationType {
-  Set = 'Set',
-  Remove = 'Remove',
-}
-
-export type OperationEntity = {
-  operation: OperationType;
-  entityType: string;
-  data: Entity | string;
-};
+export type BlockContent = AlgorandBlock;

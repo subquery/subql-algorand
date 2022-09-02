@@ -4,12 +4,11 @@
 import assert from 'assert';
 import { Injectable } from '@nestjs/common';
 import { isCustomDs, isRuntimeDs } from '@subql/common-algorand';
+import { getLogger, MetadataRepo } from '@subql/node-core';
 import { TransactionType } from 'algosdk';
 import { Transaction } from 'sequelize/types';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
-import { getLogger } from '../utils/logger';
 import { DsProcessorService } from './ds-processor.service';
-import { MetadataRepo } from './entities/Metadata.entity';
 
 const logger = getLogger('dynamic-ds');
 
