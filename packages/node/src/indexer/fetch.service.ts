@@ -21,6 +21,7 @@ import {
   IndexerEvent,
   getLogger,
 } from '@subql/node-core';
+import { DictionaryQueryCondition } from '@subql/types';
 import {
   AlgorandBlockFilter,
   DictionaryQueryEntry,
@@ -120,9 +121,12 @@ export class FetchService implements OnApplicationShutdown {
             break;
           case AlgorandHandlerKind.Transaction:
             filterList.forEach((f) => {
-              const conditions = Object.entries(f).map(([field, value]) => ({
+              const conditions: DictionaryQueryCondition[] = Object.entries(
+                f,
+              ).map(([field, value]) => ({
                 field,
                 value,
+                matcher: 'equalTo',
               }));
               queryEntries.push({
                 entity: 'transactions',
