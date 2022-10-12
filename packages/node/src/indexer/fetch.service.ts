@@ -19,9 +19,9 @@ import {
   checkMemoryUsage,
   NodeConfig,
   IndexerEvent,
-  getYargsOption,
   getLogger,
 } from '@subql/node-core';
+import { DictionaryQueryCondition } from '@subql/types';
 import {
   AlgorandBlockFilter,
   DictionaryQueryEntry,
@@ -33,7 +33,7 @@ import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { calcInterval } from '../utils/algorand';
 import { isBaseHandler, isCustomHandler } from '../utils/project';
 import { ApiService } from './api.service';
-import { DictionaryService, SpecVersion } from './dictionary.service';
+import { DictionaryService } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { IBlockDispatcher } from './worker/block-dispatcher.service';
@@ -43,8 +43,6 @@ let BLOCK_TIME_VARIANCE = 5000; //ms
 const DICTIONARY_MAX_QUERY_SIZE = 10000;
 const CHECK_MEMORY_INTERVAL = 60000;
 const MINIMUM_BATCH_SIZE = 5;
-
-const { argv } = getYargsOption();
 
 const INTERVAL_PERCENT = 0.9;
 
@@ -123,9 +121,12 @@ export class FetchService implements OnApplicationShutdown {
             break;
           case AlgorandHandlerKind.Transaction:
             filterList.forEach((f) => {
-              const conditions = Object.entries(f).map(([field, value]) => ({
+              const conditions: DictionaryQueryCondition[] = Object.entries(
+                f,
+              ).map(([field, value]) => ({
                 field,
                 value,
+                matcher: 'equalTo',
               }));
               queryEntries.push({
                 entity: 'transactions',
@@ -174,8 +175,8 @@ export class FetchService implements OnApplicationShutdown {
 
   @Interval(CHECK_MEMORY_INTERVAL)
   checkBatchScale(): void {
-    if (argv['scale-batch-size']) {
-      const scale = checkMemoryUsage(this.batchSizeScale);
+    if (this.nodeConfig['scale-batch-size']) {
+      const scale = checkMemoryUsage(this.batchSizeScale, this.nodeConfig);
 
       if (this.batchSizeScale !== scale) {
         this.batchSizeScale = scale;
@@ -324,17 +325,6 @@ export class FetchService implements OnApplicationShutdown {
     }
   }
 
-  getSpecFromMap(
-    blockHeight: number,
-    specVersions: SpecVersion[],
-  ): number | undefined {
-    //return undefined if can not find inside range
-    const spec = specVersions.find(
-      (spec) => blockHeight >= spec.start && blockHeight <= spec.end,
-    );
-    return spec ? Number(spec.id) : undefined;
-  }
-
   private nextEndBlockHeight(
     startBlockHeight: number,
     scaledBatchSize: number,
@@ -368,7 +358,9 @@ export class FetchService implements OnApplicationShutdown {
       const { _metadata: metaData } = dictionary;
 
       if (metaData.genesisHash !== this.apiService.networkMeta.genesisHash) {
-        logger.warn(`Dictionary is disabled since now`);
+        logger.error(
+          'The dictionary that you have specified does not match the chain you are indexing, it will be ignored. Please update your project manifest to reference the correct dictionary',
+        );
         this.useDictionary = false;
         this.eventEmitter.emit(IndexerEvent.UsingDictionary, {
           value: Number(this.useDictionary),

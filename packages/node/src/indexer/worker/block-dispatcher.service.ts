@@ -11,15 +11,15 @@ import {
   getLogger,
   NodeConfig,
   IndexerEvent,
+  AutoQueue,
+  Queue,
   Worker,
   delay,
-  getYargsOption,
   profilerWrap,
 } from '@subql/node-core';
 import chalk from 'chalk';
 import { last } from 'lodash';
 import * as AlgorandUtil from '../../utils/algorand';
-import { AutoQueue, Queue } from '../../utils/autoQueue';
 import { ApiService } from '../api.service';
 import { IndexerManager } from '../indexer.manager';
 import { ProjectService } from '../project.service';
@@ -117,9 +117,7 @@ export class BlockDispatcherService
     this.fetchQueue = new Queue(nodeConfig.batchSize * 3);
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3);
 
-    const { argv } = getYargsOption();
-
-    if (argv.profiler) {
+    if (this.nodeConfig.profiler) {
       this.fetchBlocksBatches = profilerWrap(
         AlgorandUtil.fetchBlocksBatches,
         'AlgorandUtil',

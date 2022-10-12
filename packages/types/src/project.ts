@@ -160,6 +160,7 @@ export interface AlgorandDataSourceProcessor<
 export interface DictionaryQueryCondition {
   field: string;
   value: string;
+  matcher?: string; // defaults to "equalTo", use "contains" for JSON
 }
 
 export interface DictionaryQueryEntry {

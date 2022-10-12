@@ -1,7 +1,7 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { hexToU8a, u8aEq } from '@polkadot/util';
 import {
   isRuntimeDs,
@@ -14,9 +14,8 @@ import {
   PoiBlock,
   StoreService,
   PoiService,
-  SubqueryRepo,
   NodeConfig,
-  getYargsOption,
+  IndexerSandbox,
   getLogger,
   profiler,
   profilerWrap,
@@ -33,6 +32,7 @@ import { Indexer } from 'algosdk';
 import { Sequelize } from 'sequelize';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import * as AlgorandUtil from '../utils/algorand';
+import { yargsOptions } from '../yargs';
 import { ApiService } from './api.service';
 import {
   asSecondLayerHandlerProcessor_1_0_0,
@@ -40,13 +40,12 @@ import {
 } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { ProjectService } from './project.service';
-import { IndexerSandbox, SandboxService } from './sandbox.service';
+import { SandboxService } from './sandbox.service';
 import { BlockContent } from './types';
 
 const NULL_MERKEL_ROOT = hexToU8a('0x00');
 
 const logger = getLogger('indexer');
-const { argv } = getYargsOption();
 
 @Injectable()
 export class IndexerManager {
@@ -63,7 +62,6 @@ export class IndexerManager {
     private sandboxService: SandboxService,
     private dsProcessorService: DsProcessorService,
     private dynamicDsService: DynamicDsService,
-    @Inject('Subquery') protected subqueryRepo: SubqueryRepo,
     private projectService: ProjectService,
   ) {
     logger.info('indexer manager start');
@@ -71,7 +69,7 @@ export class IndexerManager {
     this.api = this.apiService.getApi();
   }
 
-  @profiler(argv.profiler)
+  @profiler(yargsOptions.argv.profiler)
   async indexBlock(
     blockContent: AlgorandBlock,
   ): Promise<{ dynamicDsCreated: boolean; operationHash: Uint8Array }> {
@@ -249,7 +247,7 @@ export class IndexerManager {
 
       for (const handler of handlers) {
         vm = vm ?? (await getVM(ds));
-        argv.profiler
+        this.nodeConfig.profiler
           ? await profilerWrap(
               vm.securedExec.bind(vm),
               'handlerPerformance',
