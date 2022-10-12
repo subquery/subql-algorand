@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2022-10-12
+### Updated
+- Sync with latest changes on Substrate SDK:
+  - Remove deprecated subqueries table
+  - New reindex and force-clean subcommands.
+  - Enable historical feature by default.
+
 ## [1.9.0] - 2022-09-02
 ### Changed
 - Update to same version numbering as Substrate SDK.
