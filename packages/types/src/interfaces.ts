@@ -202,6 +202,7 @@ export interface AlgorandTransaction {
 }
 
 export interface AlgorandBlock {
+  hash: string;
   genesisHash: string;
   genesisId: string;
   previousBlockHash: string;

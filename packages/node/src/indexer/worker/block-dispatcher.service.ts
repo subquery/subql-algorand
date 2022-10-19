@@ -17,6 +17,7 @@ import {
   delay,
   profilerWrap,
 } from '@subql/node-core';
+import { AlgorandBlock } from '@subql/types-algorand';
 import chalk from 'chalk';
 import { last } from 'lodash';
 import * as AlgorandUtil from '../../utils/algorand';
@@ -97,6 +98,7 @@ export class BlockDispatcherService
 {
   private fetchQueue: Queue<number>;
   private processQueue: AutoQueue<void>;
+  private blockCache: AlgorandBlock[];
 
   private fetching = false;
   private isShutdown = false;
@@ -116,7 +118,7 @@ export class BlockDispatcherService
   ) {
     this.fetchQueue = new Queue(nodeConfig.batchSize * 3);
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3);
-
+    this.blockCache = [];
     if (this.nodeConfig.profiler) {
       this.fetchBlocksBatches = profilerWrap(
         AlgorandUtil.fetchBlocksBatches,
@@ -205,9 +207,29 @@ export class BlockDispatcherService
           }], total ${blockNums.length} blocks`,
         );
 
-        const blocks = await this.fetchBlocksBatches(
+        let blocks: AlgorandBlock[] = [];
+
+        for (let i = 0; i < blockNums.length; i++) {
+          const cached = this.blockInCache(blockNums[i]);
+          if (cached) {
+            blocks.push(cached);
+            blockNums.splice(i, 1);
+          }
+        }
+
+        const fetchedBlocks = await this.fetchBlocksBatches(
           this.apiService.getApi(),
           blockNums,
+        );
+
+        blocks = [...blocks, ...fetchedBlocks];
+
+        blocks = await Promise.all(
+          blocks.map(async (block) => {
+            block.hash = await this.getBlockHash(block.round, blocks);
+            logger.info(block.hash);
+            return block;
+          }),
         );
 
         if (bufferedHeight > this._latestBufferedHeight) {
@@ -293,6 +315,38 @@ export class BlockDispatcherService
       value: this.queueSize,
     });
     this._latestBufferedHeight = height;
+  }
+
+  private blockInCache(number): AlgorandBlock {
+    for (let i = 0; i < this.blockCache.length; i++) {
+      if (this.blockCache[i].round === number) {
+        const block = this.blockCache[i];
+        //remove block cache once used
+        this.blockCache.splice(i, 1);
+        return block;
+      }
+    }
+
+    return undefined;
+  }
+
+  private async getBlockHash(
+    round: number,
+    blocks: AlgorandBlock[],
+  ): Promise<string> {
+    for (const block of blocks) {
+      if (block.round === round + 1) {
+        return block.previousBlockHash;
+      }
+    }
+
+    const fetchedBlock = await AlgorandUtil.getBlockByHeight(
+      this.apiService.getApi(),
+      round,
+    );
+    this.blockCache.push(fetchedBlock);
+
+    return fetchedBlock.previousBlockHash;
   }
 }
 
