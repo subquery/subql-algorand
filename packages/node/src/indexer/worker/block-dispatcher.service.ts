@@ -227,7 +227,6 @@ export class BlockDispatcherService
         blocks = await Promise.all(
           blocks.map(async (block) => {
             block.hash = await this.getBlockHash(block.round, blocks);
-            logger.info(block.hash);
             return block;
           }),
         );
