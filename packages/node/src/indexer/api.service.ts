@@ -3,7 +3,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { TokenHeader } from '@subql/common-algorand';
-import { NetworkMetadataPayload, getLogger } from '@subql/node-core';
+import { NetworkMetadataPayload, getLogger, delay } from '@subql/node-core';
 import {
   AlgorandBlock,
   AlgorandTransaction,
@@ -19,8 +19,12 @@ const logger = getLogger('api');
 export class ApiService {
   private api: Indexer;
   networkMeta: NetworkMetadataPayload;
+  private blockCache: AlgorandBlock[];
+  private fetchBlocksBatches = AlgorandUtils.fetchBlocksBatches;
 
-  constructor(protected project: SubqueryProject) {}
+  constructor(protected project: SubqueryProject) {
+    this.blockCache = [];
+  }
 
   async init(): Promise<ApiService> {
     let token: string | TokenHeader;
@@ -67,6 +71,79 @@ export class ApiService {
 
   getSafeApi(height: number): SafeAPI {
     return new SafeAPIService(this.api, height);
+  }
+
+  async fetchBlocks(blockNums: number[]): Promise<AlgorandBlock[]> {
+    let blocks: AlgorandBlock[] = [];
+
+    for (let i = 0; i < blockNums.length; i++) {
+      const cached = this.blockInCache(blockNums[i]);
+      if (cached) {
+        blocks.push(cached);
+        blockNums.splice(i, 1);
+      }
+    }
+
+    const fetchedBlocks = await this.fetchBlocksBatches(
+      this.getApi(),
+      blockNums,
+    );
+
+    blocks = [...blocks, ...fetchedBlocks];
+
+    blocks = await Promise.all(
+      blocks.map(async (block) => {
+        block.hash = await this.getBlockHash(block.round, blocks);
+        return block;
+      }),
+    );
+
+    return blocks;
+  }
+
+  private blockInCache(number): AlgorandBlock {
+    for (let i = 0; i < this.blockCache.length; i++) {
+      if (this.blockCache[i].round === number) {
+        const block = this.blockCache[i];
+        //remove block cache once used
+        this.blockCache.splice(i, 1);
+        return block;
+      }
+    }
+
+    return undefined;
+  }
+
+  private async getBlockHash(
+    round: number,
+    blocks: AlgorandBlock[],
+  ): Promise<string> {
+    for (const block of blocks) {
+      if (block.round === round + 1) {
+        return block.previousBlockHash;
+      }
+    }
+
+    try {
+      const fetchedBlock = await AlgorandUtils.getBlockByHeight(
+        this.getApi(),
+        round + 1,
+      );
+      this.blockCache.push(fetchedBlock);
+
+      return fetchedBlock.previousBlockHash;
+    } catch (e) {
+      let checkHealth = await this.api.makeHealthCheck().do();
+      let currentRound = checkHealth.round;
+      if (currentRound >= round + 1) {
+        throw e;
+      }
+      while (currentRound < round + 1) {
+        await delay(1); // eslint-disable-line @typescript-eslint/await-thenable
+        checkHealth = await this.api.makeHealthCheck(); // eslint-disable-line @typescript-eslint/await-thenable
+        currentRound = checkHealth.round;
+      }
+    }
   }
 }
 

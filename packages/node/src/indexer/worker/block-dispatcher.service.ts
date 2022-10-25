@@ -98,7 +98,6 @@ export class BlockDispatcherService
 {
   private fetchQueue: Queue<number>;
   private processQueue: AutoQueue<void>;
-  private blockCache: AlgorandBlock[];
 
   private fetching = false;
   private isShutdown = false;
@@ -106,7 +105,6 @@ export class BlockDispatcherService
   private _latestBufferedHeight: number;
   private _processedBlockCount: number;
 
-  private fetchBlocksBatches = AlgorandUtil.fetchBlocksBatches;
   private latestProcessedHeight: number;
 
   constructor(
@@ -118,14 +116,6 @@ export class BlockDispatcherService
   ) {
     this.fetchQueue = new Queue(nodeConfig.batchSize * 3);
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3);
-    this.blockCache = [];
-    if (this.nodeConfig.profiler) {
-      this.fetchBlocksBatches = profilerWrap(
-        AlgorandUtil.fetchBlocksBatches,
-        'AlgorandUtil',
-        'fetchBlocksBatches',
-      );
-    }
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -207,29 +197,7 @@ export class BlockDispatcherService
           }], total ${blockNums.length} blocks`,
         );
 
-        let blocks: AlgorandBlock[] = [];
-
-        for (let i = 0; i < blockNums.length; i++) {
-          const cached = this.blockInCache(blockNums[i]);
-          if (cached) {
-            blocks.push(cached);
-            blockNums.splice(i, 1);
-          }
-        }
-
-        const fetchedBlocks = await this.fetchBlocksBatches(
-          this.apiService.getApi(),
-          blockNums,
-        );
-
-        blocks = [...blocks, ...fetchedBlocks];
-
-        blocks = await Promise.all(
-          blocks.map(async (block) => {
-            block.hash = await this.getBlockHash(block.round, blocks);
-            return block;
-          }),
-        );
+        const blocks = await this.apiService.fetchBlocks(blockNums);
 
         if (bufferedHeight > this._latestBufferedHeight) {
           logger.debug(`Queue was reset for new DS, discarding fetched blocks`);
@@ -314,38 +282,6 @@ export class BlockDispatcherService
       value: this.queueSize,
     });
     this._latestBufferedHeight = height;
-  }
-
-  private blockInCache(number): AlgorandBlock {
-    for (let i = 0; i < this.blockCache.length; i++) {
-      if (this.blockCache[i].round === number) {
-        const block = this.blockCache[i];
-        //remove block cache once used
-        this.blockCache.splice(i, 1);
-        return block;
-      }
-    }
-
-    return undefined;
-  }
-
-  private async getBlockHash(
-    round: number,
-    blocks: AlgorandBlock[],
-  ): Promise<string> {
-    for (const block of blocks) {
-      if (block.round === round + 1) {
-        return block.previousBlockHash;
-      }
-    }
-
-    const fetchedBlock = await AlgorandUtil.getBlockByHeight(
-      this.apiService.getApi(),
-      round,
-    );
-    this.blockCache.push(fetchedBlock);
-
-    return fetchedBlock.previousBlockHash;
   }
 }
 
