@@ -140,7 +140,7 @@ export class ApiService {
       }
       while (currentRound < round + 1) {
         await delay(1); // eslint-disable-line @typescript-eslint/await-thenable
-        checkHealth = await this.api.makeHealthCheck(); // eslint-disable-line @typescript-eslint/await-thenable
+        checkHealth = await this.api.makeHealthCheck().do(); // eslint-disable-line @typescript-eslint/await-thenable
         currentRound = checkHealth.round;
       }
     }
