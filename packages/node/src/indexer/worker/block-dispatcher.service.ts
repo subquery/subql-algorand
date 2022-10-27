@@ -17,6 +17,7 @@ import {
   delay,
   profilerWrap,
 } from '@subql/node-core';
+import { AlgorandBlock } from '@subql/types-algorand';
 import chalk from 'chalk';
 import { last } from 'lodash';
 import * as AlgorandUtil from '../../utils/algorand';
@@ -104,7 +105,6 @@ export class BlockDispatcherService
   private _latestBufferedHeight: number;
   private _processedBlockCount: number;
 
-  private fetchBlocksBatches = AlgorandUtil.fetchBlocksBatches;
   private latestProcessedHeight: number;
 
   constructor(
@@ -116,14 +116,6 @@ export class BlockDispatcherService
   ) {
     this.fetchQueue = new Queue(nodeConfig.batchSize * 3);
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3);
-
-    if (this.nodeConfig.profiler) {
-      this.fetchBlocksBatches = profilerWrap(
-        AlgorandUtil.fetchBlocksBatches,
-        'AlgorandUtil',
-        'fetchBlocksBatches',
-      );
-    }
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -205,10 +197,7 @@ export class BlockDispatcherService
           }], total ${blockNums.length} blocks`,
         );
 
-        const blocks = await this.fetchBlocksBatches(
-          this.apiService.getApi(),
-          blockNums,
-        );
+        const blocks = await this.apiService.fetchBlocks(blockNums);
 
         if (bufferedHeight > this._latestBufferedHeight) {
           logger.debug(`Queue was reset for new DS, discarding fetched blocks`);

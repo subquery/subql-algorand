@@ -23,6 +23,7 @@ import {
 } from '@subql/node-core';
 import { DictionaryQueryCondition } from '@subql/types';
 import {
+  AlgorandBlock,
   AlgorandBlockFilter,
   DictionaryQueryEntry,
 } from '@subql/types-algorand';
@@ -54,7 +55,6 @@ export class FetchService implements OnApplicationShutdown {
   private dictionaryQueryEntries?: DictionaryQueryEntry[];
   private batchSizeScale: number;
   private templateDynamicDatasouces: SubqlProjectDs[];
-
   constructor(
     private apiService: ApiService,
     private nodeConfig: NodeConfig,
