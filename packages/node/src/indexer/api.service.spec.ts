@@ -4,6 +4,7 @@
 import { INestApplication } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
+import { NodeConfig } from '@subql/node-core';
 import { GraphQLSchema } from 'graphql';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { ApiService } from './api.service';
@@ -41,6 +42,7 @@ describe('ApiService', () => {
           provide: SubqueryProject,
           useFactory: () => testSubqueryProject(endpoint),
         },
+        NodeConfig,
         ApiService,
       ],
       imports: [EventEmitterModule.forRoot()],

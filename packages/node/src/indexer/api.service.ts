@@ -3,7 +3,13 @@
 
 import { Injectable } from '@nestjs/common';
 import { TokenHeader } from '@subql/common-algorand';
-import { NetworkMetadataPayload, getLogger, delay } from '@subql/node-core';
+import {
+  NetworkMetadataPayload,
+  getLogger,
+  delay,
+  NodeConfig,
+  profilerWrap,
+} from '@subql/node-core';
 import {
   AlgorandBlock,
   AlgorandTransaction,
@@ -22,8 +28,18 @@ export class ApiService {
   private blockCache: AlgorandBlock[];
   private fetchBlocksBatches = AlgorandUtils.fetchBlocksBatches;
 
-  constructor(protected project: SubqueryProject) {
+  constructor(
+    protected project: SubqueryProject,
+    private nodeConfig: NodeConfig,
+  ) {
     this.blockCache = [];
+    if (this.nodeConfig.profiler) {
+      this.fetchBlocksBatches = profilerWrap(
+        AlgorandUtils.fetchBlocksBatches,
+        'AlgorandUtil',
+        'fetchBlocksBatches',
+      );
+    }
   }
 
   async init(): Promise<ApiService> {

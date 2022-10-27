@@ -3,7 +3,12 @@
 
 import { Module } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { StoreService, PoiService, MmrService } from '@subql/node-core';
+import {
+  StoreService,
+  PoiService,
+  MmrService,
+  NodeConfig,
+} from '@subql/node-core';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { ApiService } from './api.service';
 import { DictionaryService } from './dictionary.service';
@@ -20,12 +25,12 @@ import { WorkerService } from './worker/worker.service';
     StoreService,
     {
       provide: ApiService,
-      useFactory: async (project: SubqueryProject) => {
-        const apiService = new ApiService(project);
+      useFactory: async (project: SubqueryProject, nodeConfig: NodeConfig) => {
+        const apiService = new ApiService(project, nodeConfig);
         await apiService.init();
         return apiService;
       },
-      inject: [SubqueryProject, EventEmitter2],
+      inject: [SubqueryProject, EventEmitter2, NodeConfig],
     },
     DictionaryService,
     SandboxService,
