@@ -27,7 +27,7 @@
     "@polkadot/api": "9.4.2",
     "@subql/common": "latest",
     "@subql/common-algorand": "workspace:*",
-    "@subql/node-core": "dev",
+    "@subql/node-core": "latest",
     "@subql/types-algorand": "workspace:*",
     "@subql/utils": "latest",
     "@subql/x-merkle-mountain-range": "2.0.0-0.1.2",
