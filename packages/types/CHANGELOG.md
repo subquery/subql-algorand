@@ -9,6 +9,7 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [Unreleased]
 
+
 ## [1.4.0] - 2022-11-11
 ### Changed
 - Sync changes from main SDK, update `AlgorandBlockFilter` include timestamp.  

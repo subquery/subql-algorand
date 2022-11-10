@@ -8,6 +8,7 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [Unreleased]
 
+
 ## [1.1.0] - 2022-11-11
 ### Added
 - Added timestamp to BlockFilter. (#19)
