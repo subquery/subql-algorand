@@ -8,6 +8,10 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [Unreleased]
 
+## [1.1.0] - 2022-11-11
+### Added
+- Added timestamp to BlockFilter. (#19)
+
 ## [1.0.1] - 2022-08-09
 ### Fixes
 - Fixed `assetId` on transaction filter being validated as a string. (#9)
