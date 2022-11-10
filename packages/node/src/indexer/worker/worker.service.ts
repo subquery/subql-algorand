@@ -52,8 +52,6 @@ export class WorkerService {
           this.fetchedBlocks[height] = block;
         }
 
-        const block = this.fetchedBlocks[height];
-
         return undefined;
       });
     } catch (e) {

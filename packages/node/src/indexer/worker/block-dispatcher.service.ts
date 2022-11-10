@@ -13,15 +13,12 @@ import {
   IndexerEvent,
   Worker,
   delay,
-  profilerWrap,
   AutoQueue,
   Queue,
 } from '@subql/node-core';
-import { AlgorandBlock } from '@subql/types-algorand';
 import chalk from 'chalk';
 import { last } from 'lodash';
 import * as AlgorandUtil from '../../utils/algorand';
-import { yargsOptions } from '../../yargs';
 import { ApiService } from '../api.service';
 import { IndexerManager } from '../indexer.manager';
 import { ProjectService } from '../project.service';
@@ -35,7 +32,6 @@ import {
 } from './worker';
 
 const NULL_MERKEL_ROOT = hexToU8a('0x00');
-const { argv } = yargsOptions;
 
 function isNullMerkelRoot(operationHash: Uint8Array): boolean {
   return u8aEq(operationHash, NULL_MERKEL_ROOT);

@@ -22,6 +22,7 @@ import { buildSchemaFromString } from '@subql/utils';
 import Cron from 'cron-converter';
 import { GraphQLSchema } from 'graphql';
 import { ApiService } from '../indexer/api.service';
+import { getBlockByHeight } from '../utils/algorand';
 import { getProjectRoot, updateDataSourcesV1_0_0 } from '../utils/project';
 
 export type SubqlProjectDs = AlgorandDataSource & {
@@ -182,14 +183,12 @@ export async function generateTimestampReferenceForBlockFilters(
         const startBlock = ds.startBlock ?? 1;
         let block: AlgorandBlock;
         let timestampReference: Date;
-        const safeApi = api.getSafeApi(startBlock);
-
         ds.mapping.handlers = await Promise.all(
           ds.mapping.handlers.map(async (handler) => {
             if (handler.kind === AlgorandHandlerKind.Block) {
               if (handler.filter?.timestamp) {
                 if (!block) {
-                  block = await safeApi.getBlock();
+                  block = await getBlockByHeight(api.getApi(), startBlock);
 
                   timestampReference = new Date(block.timestamp);
                 }

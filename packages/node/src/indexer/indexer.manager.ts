@@ -176,9 +176,7 @@ export class IndexerManager {
   }
 
   private filterDataSources(nextProcessingHeight: number): SubqlProjectDs[] {
-    let filteredDs: SubqlProjectDs[];
-
-    filteredDs = this.projectService.dataSources.filter(
+    let filteredDs = this.projectService.dataSources.filter(
       (ds) => ds.startBlock <= nextProcessingHeight,
     );
 
