@@ -35,6 +35,9 @@ export class BlockFilter implements AlgorandBlockFilter {
   @IsOptional()
   @IsInt()
   modulo?: number;
+  @IsOptional()
+  @IsString()
+  timestamp?: string;
 }
 
 export class TransactionFilter implements AlgorandTransactionFilter {

@@ -13,13 +13,26 @@ import {
   parseAlgorandProjectManifest,
   AlgorandDataSource,
   ProjectManifestV1_0_0Impl,
+  BlockFilter,
+  isRuntimeDs,
+  AlgorandHandlerKind,
 } from '@subql/common-algorand';
+import { AlgorandBlock } from '@subql/types-algorand';
 import { buildSchemaFromString } from '@subql/utils';
+import Cron from 'cron-converter';
 import { GraphQLSchema } from 'graphql';
+import { ApiService } from '../indexer/api.service';
 import { getProjectRoot, updateDataSourcesV1_0_0 } from '../utils/project';
 
 export type SubqlProjectDs = AlgorandDataSource & {
   mapping: AlgorandDataSource['mapping'] & { entryScript: string };
+};
+
+export type SubqlProjectBlockFilter = BlockFilter & {
+  cronSchedule?: {
+    schedule: Cron.Seeker;
+    next: number;
+  };
 };
 
 export type SubqlProjectDsTemplate = Omit<SubqlProjectDs, 'startBlock'> & {
@@ -152,4 +165,58 @@ async function loadProjectTemplates(
       name: projectManifest.templates[index].name,
     }));
   }
+
+  return [];
+}
+
+// eslint-disable-next-line @typescript-eslint/require-await
+export async function generateTimestampReferenceForBlockFilters(
+  dataSources: SubqlProjectDs[],
+  api: ApiService,
+): Promise<SubqlProjectDs[]> {
+  const cron = new Cron();
+
+  dataSources = await Promise.all(
+    dataSources.map(async (ds) => {
+      if (isRuntimeDs(ds)) {
+        const startBlock = ds.startBlock ?? 1;
+        let block: AlgorandBlock;
+        let timestampReference: Date;
+        const safeApi = api.getSafeApi(startBlock);
+
+        ds.mapping.handlers = await Promise.all(
+          ds.mapping.handlers.map(async (handler) => {
+            if (handler.kind === AlgorandHandlerKind.Block) {
+              if (handler.filter?.timestamp) {
+                if (!block) {
+                  block = await safeApi.getBlock();
+
+                  timestampReference = new Date(block.timestamp);
+                }
+                try {
+                  cron.fromString(handler.filter.timestamp);
+                } catch (e) {
+                  throw new Error(
+                    `Invalid Cron string: ${handler.filter.timestamp}`,
+                  );
+                }
+
+                const schedule = cron.schedule(timestampReference);
+                (handler.filter as SubqlProjectBlockFilter).cronSchedule = {
+                  schedule: schedule,
+                  get next() {
+                    return Date.parse(this.schedule.next().format());
+                  },
+                };
+              }
+            }
+            return handler;
+          }),
+        );
+      }
+      return ds;
+    }),
+  );
+
+  return dataSources;
 }
