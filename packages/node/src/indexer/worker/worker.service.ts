@@ -14,6 +14,7 @@ export type FetchBlockResponse = undefined;
 export type ProcessBlockResponse = {
   dynamicDsCreated: boolean;
   operationHash: string; // Base64 encoded u8a array
+  reindexBlockHeight: number;
 };
 
 export type WorkerStatusResponse = {
@@ -27,7 +28,7 @@ const logger = getLogger(`Worker Service #${threadId}`);
 
 @Injectable()
 export class WorkerService {
-  private fetchedBlocks: Record<string, BlockContent> = {};
+  private fetchedBlocks: Record<number, BlockContent> = {};
   private _isIndexing = false;
 
   private queue: AutoQueue<FetchBlockResponse>;
@@ -51,11 +52,11 @@ export class WorkerService {
           this.fetchedBlocks[height] = block;
         }
 
-        // Return info to get the runtime version, this lets the worker thread know
         return undefined;
       });
     } catch (e) {
       logger.error(e, `Failed to fetch block ${height}`);
+      // throw e;
     }
   }
 

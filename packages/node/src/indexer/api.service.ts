@@ -85,7 +85,7 @@ export class ApiService {
     return this.api;
   }
 
-  getSafeApi(height: number): SafeAPI {
+  getSafeApi(height: number) {
     return new SafeAPIService(this.api, height);
   }
 

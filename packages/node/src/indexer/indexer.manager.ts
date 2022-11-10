@@ -70,9 +70,11 @@ export class IndexerManager {
   }
 
   @profiler(yargsOptions.argv.profiler)
-  async indexBlock(
-    blockContent: AlgorandBlock,
-  ): Promise<{ dynamicDsCreated: boolean; operationHash: Uint8Array }> {
+  async indexBlock(blockContent: AlgorandBlock): Promise<{
+    dynamicDsCreated: boolean;
+    operationHash: Uint8Array;
+    reindexBlockHeight: null;
+  }> {
     let dynamicDsCreated = false;
     const blockHeight = blockContent.round;
     const tx = await this.sequelize.transaction();
@@ -164,15 +166,17 @@ export class IndexerManager {
     return {
       dynamicDsCreated,
       operationHash,
+      reindexBlockHeight: null,
     };
   }
 
   async start(): Promise<void> {
     await this.projectService.init();
+    logger.info('indexer manager started');
   }
 
   private filterDataSources(nextProcessingHeight: number): SubqlProjectDs[] {
-    let filteredDs = this.project.dataSources.filter(
+    let filteredDs = this.projectService.dataSources.filter(
       (ds) => ds.startBlock <= nextProcessingHeight,
     );
 

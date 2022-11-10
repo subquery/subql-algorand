@@ -46,6 +46,7 @@ interface AlgorandBaseHandlerFilter {
 
 export interface AlgorandBlockFilter extends AlgorandBaseHandlerFilter {
   modulo?: number;
+  timestamp?: string;
 }
 
 export interface AlgorandTransactionFilter {
