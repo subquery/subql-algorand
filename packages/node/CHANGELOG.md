@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.11.0] - 2022-11-11
 ### Updated
-- Sync with latest changes on Substrate SDK (#19)
+- Sync with latest changes on Substrate SDK: (#19)
   - Add timestamp filter to block handler.
   - Update reindex subcommand.
 
