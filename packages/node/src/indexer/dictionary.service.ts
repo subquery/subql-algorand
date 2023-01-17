@@ -280,7 +280,6 @@ export class DictionaryService implements OnApplicationShutdown {
         .sort((n1, n2) => n1 - n2);
       //TODO
       // const specVersions = Array.from(specVersionBlockHeightSet);
-      console.log(batchBlocks);
       return {
         _metadata,
         batchBlocks,
