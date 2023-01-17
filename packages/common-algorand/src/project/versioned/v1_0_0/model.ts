@@ -66,6 +66,9 @@ export class FileType {
 export class ProjectNetworkDeploymentV1_0_0 {
   @IsString()
   chainId: string;
+  @IsOptional()
+  @IsArray()
+  bypassBlocks?: (number | string)[];
 }
 
 export class ProjectNetworkV1_0_0 extends ProjectNetworkDeploymentV1_0_0 {
