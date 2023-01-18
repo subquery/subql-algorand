@@ -80,10 +80,13 @@ export function filterTransaction(
   if (!filter) return true;
   const { txType, ...filterByKey } = filter;
 
-  if (txn.txType !== txType) return false;
+  if (txType && txn.txType !== txType) return false;
 
   for (const key in filterByKey) {
-    if (filterByKey[key] !== get(txn, mappingFilterTransaction[txType][key])) {
+    if (
+      mappingFilterTransaction[txn.txType] &&
+      filterByKey[key] !== get(txn, mappingFilterTransaction[txn.txType][key])
+    ) {
       return false;
     }
   }
