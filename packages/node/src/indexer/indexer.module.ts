@@ -30,7 +30,7 @@ import { WorkerService } from './worker/worker.service';
         await apiService.init();
         return apiService;
       },
-      inject: [SubqueryProject, EventEmitter2, NodeConfig],
+      inject: ['ISubqueryProject', EventEmitter2, NodeConfig],
     },
     DictionaryService,
     SandboxService,

@@ -262,3 +262,10 @@ export async function initDbSchema(
   const modelsRelation = getAllEntitiesRelations(project.schema);
   await storeService.init(modelsRelation, schema);
 }
+
+export async function initHotSchemaReload(
+  schema: string,
+  storeService: StoreService,
+): Promise<void> {
+  await storeService.initHotSchemaReloadQueries(schema);
+}

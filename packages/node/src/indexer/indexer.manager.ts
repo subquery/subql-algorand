@@ -1,7 +1,8 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { hexToU8a, u8aEq } from '@polkadot/util';
 import {
   isRuntimeDs,
@@ -57,7 +58,7 @@ export class IndexerManager {
     private apiService: ApiService,
     private poiService: PoiService,
     private sequelize: Sequelize,
-    private project: SubqueryProject,
+    @Inject('ISubqueryProject') private project: SubqueryProject,
     private nodeConfig: NodeConfig,
     private sandboxService: SandboxService,
     private dsProcessorService: DsProcessorService,
@@ -133,7 +134,7 @@ export class IndexerManager {
         { transaction: tx },
       );
       // Db Metadata increase BlockCount, in memory ref to block-dispatcher _processedBlockCount
-      await this.storeService.incrementBlockCount(tx);
+      await this.storeService.incrementJsonbCount('processedBlockCount', tx);
 
       // Need calculate operationHash to ensure correct offset insert all time
       operationHash = this.storeService.getOperationMerkleRoot();

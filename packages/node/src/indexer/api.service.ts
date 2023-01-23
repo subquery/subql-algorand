@@ -1,7 +1,7 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { TokenHeader } from '@subql/common-algorand';
 import {
   NetworkMetadataPayload,
@@ -19,6 +19,13 @@ import algosdk, { Indexer } from 'algosdk';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import * as AlgorandUtils from '../utils/algorand';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { version: packageVersion } = require('../../package.json');
+
+const NOT_SUPPORT = (name: string) => () => {
+  throw new Error(`${name}() is not supported`);
+};
+
 const logger = getLogger('api');
 
 @Injectable()
@@ -29,7 +36,7 @@ export class ApiService {
   private fetchBlocksBatches = AlgorandUtils.fetchBlocksBatches;
 
   constructor(
-    protected project: SubqueryProject,
+    @Inject('ISubqueryProject') protected project: SubqueryProject,
     private nodeConfig: NodeConfig,
   ) {
     this.blockCache = [];
@@ -70,9 +77,11 @@ export class ApiService {
 
     if (network.chainId && network.chainId !== genesisHash) {
       const err = new Error(
-        `Network chainId doesn't match expected genesisHash. expected="${
+        `Network chainId doesn't match expected genesisHash. Your SubQuery project is expecting to index data from "${
           network.chainId ?? network.genesisHash
-        }" actual="${genesisHash}`,
+        }", however the endpoint that you are connecting to is different("${
+          this.networkMeta.genesisHash
+        }). Please check that the RPC endpoint is actually for your desired network or update the genesisHash.`,
       );
       logger.error(err, err.message);
       throw err;

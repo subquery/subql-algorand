@@ -1,6 +1,7 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { Injectable } from '@nestjs/common';
 import {
   ReaderFactory,
   ReaderOptions,
@@ -44,6 +45,7 @@ const NOT_SUPPORT = (name: string) => {
   throw new Error(`Manifest specVersion ${name}() is not supported`);
 };
 
+@Injectable()
 export class SubqueryProject {
   id: string;
   root: string;
