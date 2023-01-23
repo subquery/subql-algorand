@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.0] - 2023-01-24
+### Fixed
+- Sender filter not working with certain tx types. (#25)
+- Make `txType` filter optional. (#23)
+
+### Updated
+- Sinc with latest changes on Substrate SDK: (#22)
+  - Ability to bypass blocks
+  - Sync block-dispatcher with same structure as main SDK
+  - DictionaryService updates for useDistinct and dictionary startHeight check
+  - hotSchemaReload updates
+  - fix force-clean and reindex subcommands
+  - Update SubqueryProject to @Injectable just to match the main SDK
 
 ## [1.11.0] - 2022-11-11
 ### Updated
