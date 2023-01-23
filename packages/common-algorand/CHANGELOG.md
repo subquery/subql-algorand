@@ -8,6 +8,10 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [Unreleased]
 
+## [1.2.0] - 2023-01-24
+
+### Added
+- Ability to bypass blocks. (#22)
 
 ## [1.1.0] - 2022-11-11
 ### Added
