@@ -19,9 +19,11 @@ export const mappingFilterTransaction = {
   },
   [TransactionType.keyreg]: {
     nonParticipant: 'keyregTransaction.nonParticipation',
+    sender: 'sender',
   },
   [TransactionType.acfg]: {
     assetId: 'assetConfigTransaction.assetId',
+    sender: 'sender',
   },
   [TransactionType.axfer]: {
     assetId: 'assetTransferTransaction.assetId',
@@ -35,6 +37,7 @@ export const mappingFilterTransaction = {
   },
   [TransactionType.appl]: {
     applicationId: 'applicationTransaction.applicationId',
+    sender: 'sender',
   },
 };
 
