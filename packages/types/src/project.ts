@@ -35,6 +35,7 @@ export interface ProjectManifest {
   };
 
   dataSources: AlgorandDataSource[];
+  bypassBlocks?: number[];
 }
 
 // [startSpecVersion?, endSpecVersion?] closed range

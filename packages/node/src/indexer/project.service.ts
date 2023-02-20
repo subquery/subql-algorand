@@ -75,6 +75,7 @@ export class ProjectService {
   get isHistorical(): boolean {
     return this.storeService.historical;
   }
+
   // eslint-disable-next-line @typescript-eslint/require-await
   get metadataName(): string {
     return this.metadataRepo.tableName;
@@ -110,6 +111,7 @@ export class ProjectService {
 
       this._startHeight = await this.getStartHeight();
     } else {
+      this._schema = await this.getExistingProjectSchema();
       this.metadataRepo = await MetadataFactory(
         this.sequelize,
         this.schema,
@@ -121,7 +123,6 @@ export class ProjectService {
 
       await this.sequelize.sync();
 
-      this._schema = await this.getExistingProjectSchema();
       assert(this._schema, 'Schema should be created in main thread');
       await this.initDbSchema();
 
@@ -241,6 +242,11 @@ export class ProjectService {
     }
     if (keyValue.chain !== chain) {
       await metadataRepo.upsert({ key: 'chain', value: chain });
+    }
+
+    // If project was created before this feature, don't add the key. If it is project created after, add this key.
+    if (!keyValue.processedBlockCount && !keyValue.lastProcessedHeight) {
+      await metadataRepo.upsert({ key: 'processedBlockCount', value: 0 });
     }
 
     // If project was created before this feature, don't add the key. If it is project created after, add this key.

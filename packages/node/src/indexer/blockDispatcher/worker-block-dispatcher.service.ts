@@ -6,7 +6,6 @@ import path from 'path';
 import { Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
-import { hexToU8a, u8aEq } from '@polkadot/util';
 import {
   getLogger,
   NodeConfig,
@@ -27,6 +26,7 @@ import {
   NumFetchedBlocks,
   NumFetchingBlocks,
   GetWorkerStatus,
+  ReloadDynamicDs,
 } from '../worker/worker';
 import { BaseBlockDispatcher } from './base-block-dispatcher';
 
@@ -38,6 +38,7 @@ type IIndexerWorker = {
   numFetchedBlocks: NumFetchedBlocks;
   numFetchingBlocks: NumFetchingBlocks;
   getStatus: GetWorkerStatus;
+  reloadDynamicDs: ReloadDynamicDs;
 };
 
 type IInitIndexerWorker = IIndexerWorker & {
@@ -58,6 +59,7 @@ async function createIndexerWorker(): Promise<IndexerWorker> {
       'numFetchedBlocks',
       'numFetchingBlocks',
       'getStatus',
+      'reloadDynamicDs',
     ],
   );
 
@@ -123,7 +125,11 @@ export class WorkerBlockDispatcherService
   }
 
   enqueueBlocks(heights: number[], latestBufferHeight?: number): void {
-    if (!heights.length) return;
+    if (!!latestBufferHeight && !heights.length) {
+      this.latestBufferedHeight = latestBufferHeight;
+      return;
+    }
+
     logger.info(
       `Enqueing blocks [${heights[0]}...${last(heights)}], total ${
         heights.length
@@ -187,10 +193,6 @@ export class WorkerBlockDispatcherService
           );
         }
 
-        // logger.info(
-        //   `worker ${workerIdx} processing block ${height}, fetched blocks: ${await worker.numFetchedBlocks()}, fetching blocks: ${await worker.numFetchingBlocks()}`,
-        // );
-
         this.preProcessBlock(height);
 
         const { dynamicDsCreated, operationHash, reindexBlockHeight } =
@@ -201,6 +203,11 @@ export class WorkerBlockDispatcherService
           operationHash: Buffer.from(operationHash, 'base64'),
           reindexBlockHeight,
         });
+
+        if (dynamicDsCreated) {
+          // Ensure all workers are aware of all dynamic ds
+          await Promise.all(this.workers.map((w) => w.reloadDynamicDs()));
+        }
       } catch (e) {
         logger.error(
           e,
