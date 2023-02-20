@@ -28,7 +28,7 @@
     "@subql/apollo-links": "^0.2.1-0",
     "@subql/common": "1.5.0",
     "@subql/common-algorand": "workspace:*",
-    "@subql/node-core": "dev",
+    "@subql/node-core": "1.8.1-4",
     "@subql/types-algorand": "workspace:*",
     "@subql/utils": "1.3.1",
     "@subql/x-merkle-mountain-range": "2.0.0-0.1.2",
