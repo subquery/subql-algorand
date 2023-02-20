@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.1] - 2023-02-21
+### Updated
+- Sync with main sdk (#28)
+  - Fixes relating to dynamic datasources and workers
+
+### Fixed
+- Dependency injection issue with workers (#27)
+
 ## [1.18.0] - 2023-01-24
 ### Fixed
 - Sender filter not working with certain tx types. (#25)
