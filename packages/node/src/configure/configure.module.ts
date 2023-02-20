@@ -131,11 +131,11 @@ export class ConfigureModule {
           useValue: config,
         },
         {
-          provide: SubqueryProject,
+          provide: 'ISubqueryProject',
           useFactory: project,
         },
       ],
-      exports: [NodeConfig, SubqueryProject],
+      exports: [NodeConfig, 'ISubqueryProject'],
     };
   }
   static register(): DynamicModule {

@@ -141,7 +141,10 @@ export class BlockDispatcherService
         );
         // const blocks = await this.apiService.fetchBlocks(blockNums);
 
-        if (bufferedHeight > this._latestBufferedHeight) {
+        if (
+          bufferedHeight > this._latestBufferedHeight ||
+          this.queue.peek() < Math.min(...blockNums)
+        ) {
           logger.debug(`Queue was reset for new DS, discarding fetched blocks`);
           continue;
         }

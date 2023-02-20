@@ -25,21 +25,12 @@ import {
 } from '@subql/node-core';
 import { DictionaryQueryCondition } from '@subql/types';
 import {
-  AlgorandBlock,
   AlgorandBlockFilter,
   DictionaryQueryEntry,
 } from '@subql/types-algorand';
 import { MetaData } from '@subql/utils';
 import { Indexer } from 'algosdk';
-import {
-  filter,
-  intersection,
-  last,
-  range,
-  sortBy,
-  uniqBy,
-  without,
-} from 'lodash';
+import { range, sortBy, uniqBy, without } from 'lodash';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { calcInterval } from '../utils/algorand';
 import { isBaseHandler, isCustomHandler } from '../utils/project';
@@ -127,7 +118,6 @@ export class FetchService implements OnApplicationShutdown {
         } else {
           filterList = [handler.filter];
         }
-
         // Filter out any undefined
         filterList = filterList.filter(Boolean);
         if (!filterList.length) return [];
