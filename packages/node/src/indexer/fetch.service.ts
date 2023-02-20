@@ -204,16 +204,17 @@ export class FetchService implements OnApplicationShutdown {
     });
     await this.getLatestRound();
 
-    //  Call metadata here, other network should align with this
-    //  For substrate, we might use the specVersion metadata in future if we have same error handling as in node-core
-    const metadata = await this.dictionaryService.getMetadata();
+    if (this.project.network.dictionary) {
+      //  Call metadata here, other network should align with this
+      //  For substrate, we might use the specVersion metadata in future if we have same error handling as in node-core
+      const metadata = await this.dictionaryService.getMetadata();
+      const validChecker = this.dictionaryValidation(metadata);
 
-    const validChecker = this.dictionaryValidation(metadata);
-
-    if (validChecker) {
-      this.dictionaryService.setDictionaryStartHeight(
-        metadata._metadata.startHeight,
-      );
+      if (validChecker) {
+        this.dictionaryService.setDictionaryStartHeight(
+          metadata._metadata.startHeight,
+        );
+      }
     }
 
     await this.blockDispatcher.init(this.resetForNewDs.bind(this));

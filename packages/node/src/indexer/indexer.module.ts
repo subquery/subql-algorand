@@ -11,7 +11,6 @@ import {
 } from '@subql/node-core';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { ApiService } from './api.service';
-import { DictionaryService } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { IndexerManager } from './indexer.manager';
@@ -32,7 +31,6 @@ import { WorkerService } from './worker/worker.service';
       },
       inject: ['ISubqueryProject', EventEmitter2, NodeConfig],
     },
-    DictionaryService,
     SandboxService,
     DsProcessorService,
     DynamicDsService,

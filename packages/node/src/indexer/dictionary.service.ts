@@ -9,7 +9,7 @@ import {
   gql,
   ApolloLink,
 } from '@apollo/client/core';
-import { Injectable, OnApplicationShutdown } from '@nestjs/common';
+import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { authHttpLink } from '@subql/apollo-links';
 import {
   getLogger,
@@ -155,7 +155,7 @@ export class DictionaryService implements OnApplicationShutdown {
   protected _startHeight: number;
 
   constructor(
-    protected project: SubqueryProject,
+    @Inject('ISubqueryProject') private readonly project: SubqueryProject,
     protected readonly nodeConfig: NodeConfig,
     protected readonly metadataKeys = ['lastProcessedHeight', 'genesisHash'], // Cosmos uses chain instead of genesisHash
   ) {
