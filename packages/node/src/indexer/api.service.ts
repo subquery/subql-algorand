@@ -56,16 +56,28 @@ export class ApiService {
     let chain: string;
     const network = this.project.network;
     try {
-      token = this.project.network.apiKey ?? '';
-      const urlEndpoint = new URL(this.project.network.endpoint);
+      token = network.apiKey ?? '';
+      const urlEndpoint = new URL(network.endpoint);
       baseServer = `${urlEndpoint.protocol}//${urlEndpoint.host}${urlEndpoint.pathname}`;
+
       this.api = new algosdk.Indexer(token, baseServer, urlEndpoint.port);
       // get genesisHash in block
       const block = await this.api.lookupBlock(1).do();
-      genesisHash = block['genesis-hash'] ?? '';
-      chain = block['genesis-id'] ?? '';
+
+      genesisHash = block['genesis-hash'];
+      chain = block['genesis-id'];
+
+      if (!genesisHash) {
+        if (block.block.gh) {
+          throw new Error(
+            'An algod endpoint has been provided but only the indexer api is supported',
+          );
+        }
+        throw new Error('Unable to resolve the genesis hash');
+      }
     } catch (e) {
-      logger.error(e);
+      console.log(e);
+      logger.error(e, 'Failed to establish connection to RPC');
       process.exit(1);
     }
 
