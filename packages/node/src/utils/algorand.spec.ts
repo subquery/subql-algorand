@@ -1,9 +1,62 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { filterTransaction } from './algorand';
+import { INestApplication } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { Test } from '@nestjs/testing';
+import { NodeConfig } from '@subql/node-core';
+import { GraphQLSchema } from 'graphql';
+import { SubqueryProject } from '../configure/SubqueryProject';
+import { ApiService } from '../indexer/api.service';
+import { filterTransaction, getBlockByHeight } from './algorand';
 
+// const ENDPOINT = 'https://algoindexer.algoexplorerapi.io';
+const testNetEndpoint = 'https://algoindexer.testnet.algoexplorerapi.io';
+
+function testSubqueryProject(endpoint: string): SubqueryProject {
+  return {
+    network: {
+      endpoint,
+      dictionary: `https://api.subquery.network/sq/subquery/Algorand-Dictionary`,
+    },
+    dataSources: [],
+    id: 'test',
+    root: './',
+    schema: new GraphQLSchema({}),
+    templates: [],
+  };
+}
+
+jest.setTimeout(90000);
 describe('Algorand RPC', () => {
+  let app: INestApplication;
+
+  const prepareApiService = async (
+    endpoint: string = testNetEndpoint,
+  ): Promise<ApiService> => {
+    const module = await Test.createTestingModule({
+      providers: [
+        {
+          provide: 'ISubqueryProject',
+          useFactory: () => testSubqueryProject(endpoint),
+        },
+        NodeConfig,
+        ApiService,
+      ],
+      imports: [EventEmitterModule.forRoot()],
+    }).compile();
+
+    app = module.createNestApplication();
+    await app.init();
+    const apiService = app.get(ApiService);
+    await apiService.init();
+    return apiService;
+  };
+
+  afterAll(() => {
+    return app?.close();
+  });
+
   it('Can filter acfg with sender', () => {
     const tx = {
       assetConfigTransaction: {
@@ -53,5 +106,18 @@ describe('Algorand RPC', () => {
         sender: '7JMGBIDKQRR4MC3DNC73QU4QUNNN43VNY5RYPN2FRWEG6NXAHQMCPD4BIQ',
       }),
     ).toBe(true);
+  });
+  it('test large blocks', async () => {
+    const apiService = await prepareApiService();
+
+    const api = apiService.getApi();
+
+    const fetchBlock = async () => {
+      await getBlockByHeight(api, 27739202);
+    };
+
+    expect(fetchBlock).not.toThrow();
+    const result = await fetchBlock();
+    expect(result).toBeDefined();
   });
 });
