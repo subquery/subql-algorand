@@ -120,6 +120,7 @@ export class ConfigureModule {
         logger.error(err, 'Create Subquery project from given path failed!');
         process.exit(1);
       });
+
       return p;
     };
 
