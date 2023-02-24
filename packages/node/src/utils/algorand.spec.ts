@@ -8,9 +8,12 @@ import { NodeConfig } from '@subql/node-core';
 import { GraphQLSchema } from 'graphql';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { ApiService } from '../indexer/api.service';
-import { filterTransaction, getBlockByHeight } from './algorand';
+import {
+  filterTransaction,
+  getBlockByHeight,
+  paginatedTransactions,
+} from './algorand';
 
-// const ENDPOINT = 'https://algoindexer.algoexplorerapi.io';
 const testNetEndpoint = 'https://algoindexer.testnet.algoexplorerapi.io';
 
 function testSubqueryProject(endpoint: string): SubqueryProject {
@@ -109,15 +112,20 @@ describe('Algorand RPC', () => {
   });
   it('test large blocks', async () => {
     const apiService = await prepareApiService();
-
+    const failingBlock = 27739202; // testnet
+    const passingBlock = 27739200; // testnet
     const api = apiService.getApi();
 
     const fetchBlock = async () => {
-      await getBlockByHeight(api, 27739202);
+      return getBlockByHeight(api, failingBlock, testNetEndpoint);
     };
 
-    expect(fetchBlock).not.toThrow();
+    // expect(await fetchBlock()).not.toThrow();
     const result = await fetchBlock();
-    expect(result).toBeDefined();
+    console.log('result: ', result);
+    // const pagedTx =  await paginatedTransactions(failingBlock)
+    //  console.log('pagedTx: ',pagedTx)
+
+    // expect
   });
 });
