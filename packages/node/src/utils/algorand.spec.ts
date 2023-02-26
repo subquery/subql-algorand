@@ -120,7 +120,8 @@ describe('Algorand RPC', () => {
       return getBlockByHeight(api, failingBlock, testNetEndpoint);
     };
 
-    // expect(await fetchBlock()).not.toThrow();
+    await expect(fetchBlock).resolves.not.toThrow();
+
     const result = await fetchBlock();
     console.log('result: ', result);
     // const pagedTx =  await paginatedTransactions(failingBlock)

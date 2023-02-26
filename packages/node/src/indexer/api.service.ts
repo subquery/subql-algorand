@@ -34,6 +34,7 @@ export class ApiService {
   networkMeta: NetworkMetadataPayload;
   private blockCache: AlgorandBlock[];
   private fetchBlocksBatches = AlgorandUtils.fetchBlocksBatches;
+  private endpoint = this.project.network.endpoint;
 
   constructor(
     @Inject('ISubqueryProject') protected project: SubqueryProject,
@@ -124,6 +125,7 @@ export class ApiService {
     const fetchedBlocks = await this.fetchBlocksBatches(
       this.getApi(),
       blockNums,
+      this.endpoint,
     );
 
     blocks = [...blocks, ...fetchedBlocks];
@@ -165,6 +167,7 @@ export class ApiService {
       const fetchedBlock = await AlgorandUtils.getBlockByHeight(
         this.getApi(),
         round + 1,
+        this.endpoint,
       );
       this.blockCache.push(fetchedBlock);
 
@@ -208,6 +211,7 @@ export class SafeAPIService {
       const block = await AlgorandUtils.getBlockByHeight(
         this.indexer,
         this.height,
+        // this.
       );
       if (!block.transactions) throw new Error();
       return block.transactions;

@@ -112,7 +112,7 @@ export async function getBlockByHeight(
 
       const header = camelCaseObjectKey(await getHeaderOnly(height));
       console.log('header: ', header);
-      return paginatedTransactions(height, endpoint);
+      return combinePaginateBlock(height, endpoint);
     }
     logger.error(`failed to fetch Block at round ${height}`);
     throw error;
@@ -166,7 +166,11 @@ export async function paginatedTransactions(
       // console.log('pagination: ', result)
 
       return (
-        await paginatedTransactions(blockHeight, savedResult['next-token'])
+        await paginatedTransactions(
+          blockHeight,
+          endpoint,
+          savedResult['next-token'],
+        )
       ).concat(savedResult);
     }
     return result;
@@ -176,7 +180,7 @@ export async function paginatedTransactions(
   }
 }
 
-async function paginateBlock(
+async function combinePaginateBlock(
   blockHeight: number,
   endpoint: string,
 ): Promise<AlgorandBlock> {
