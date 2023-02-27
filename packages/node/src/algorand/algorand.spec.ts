@@ -1,6 +1,7 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import exp from 'constants';
 import { INestApplication } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
@@ -112,16 +113,14 @@ describe('Algorand RPC', () => {
     const api = apiService.api;
 
     const fetchBlock = async () => {
+      // return api.getBlockByHeight(passingBlock);
       return api.getBlockByHeight(failingBlock);
     };
 
-    await expect(fetchBlock).resolves.not.toThrow();
+    // await expect(fetchBlock).resolves.not.toThrow();
 
     const result = await fetchBlock();
-    console.log('result: ', result);
-    // const pagedTx =  await paginatedTransactions(failingBlock)
-    //  console.log('pagedTx: ',pagedTx)
-
-    // expect
+    // await expect(result).resolves.not.toThrow();
+    expect(result.transactions.length).toEqual(13916);
   });
 });

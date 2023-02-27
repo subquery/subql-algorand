@@ -15,6 +15,7 @@ export class AlgorandApi {
   private chain: string;
   api: Indexer;
   private blockCache: AlgorandBlock[];
+  private paginationLimit = 10000;
 
   constructor(private endpoint: string, private token?: string | TokenHeader) {
     this.token = token ?? '';
@@ -47,8 +48,8 @@ export class AlgorandApi {
       if (error.message.includes('Max transactions limit exceeded')) {
         logger.warn('Max transactions limit exceeded, paging transactions');
 
-        const header = camelCaseObjectKey(await this.getHeaderOnly(height));
-        console.log('header: ', header);
+        // const header = camelCaseObjectKey(await this.getHeaderOnly(height));
+        // console.log('header: ', header);
         return this.combinePaginateBlock(height);
       }
       logger.error(`failed to fetch Block at round ${height}`);
@@ -68,45 +69,42 @@ export class AlgorandApi {
           baseURL: this.endpoint,
         })
       ).data;
-      console.log('header-only: ', result);
+      // console.log('header-only: ', result);
       return result;
     } catch (e) {
-      console.error(e.message);
+      logger.error('Failed to fetch round header', e);
       throw e;
     }
   }
 
   async paginatedTransactions(
     blockHeight: number,
+    combinedTx: any[] = [],
     nextToken?: string,
   ): Promise<any> {
-    const pageLimit = 10000;
     try {
-      // const testNetEndpoint = 'https://algoindexer.testnet.algoexplorerapi.io';
       const result: { transactions: any[] } = (
         await axios({
           params: {
             round: blockHeight,
-            limit: pageLimit,
-            next: nextToken,
+            limit: this.paginationLimit,
+            next: nextToken && nextToken,
           },
           method: 'get',
           url: `/v2/transactions`,
           baseURL: this.endpoint,
         })
       ).data;
-      // greater or equal
       if (result.transactions.length > 0) {
-        const savedResult = result;
+        combinedTx.push(result.transactions);
 
-        return (
-          await this.paginatedTransactions(
-            blockHeight,
-            savedResult['next-token'],
-          )
-        ).concat(savedResult);
+        return await this.paginatedTransactions(
+          blockHeight,
+          combinedTx,
+          result['next-token'],
+        );
       }
-      return result;
+      return [].concat(...combinedTx);
     } catch (e) {
       logger.error('Failed to paginate, oh no', e);
       throw e;
