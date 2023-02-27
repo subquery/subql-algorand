@@ -22,8 +22,7 @@ import { AlgorandBlock } from '@subql/types-algorand';
 import { buildSchemaFromString } from '@subql/utils';
 import Cron from 'cron-converter';
 import { GraphQLSchema } from 'graphql';
-import { ApiService } from '../indexer/api.service';
-import { getBlockByHeight } from '../utils/algorand';
+import { AlgorandApi } from '../algorand';
 import { getProjectRoot, updateDataSourcesV1_0_0 } from '../utils/project';
 
 export type SubqlProjectDs = AlgorandDataSource & {
@@ -175,7 +174,7 @@ async function loadProjectTemplates(
 // eslint-disable-next-line @typescript-eslint/require-await
 export async function generateTimestampReferenceForBlockFilters(
   dataSources: SubqlProjectDs[],
-  api: ApiService,
+  api: AlgorandApi,
 ): Promise<SubqlProjectDs[]> {
   const cron = new Cron();
 
@@ -190,7 +189,7 @@ export async function generateTimestampReferenceForBlockFilters(
             if (handler.kind === AlgorandHandlerKind.Block) {
               if (handler.filter?.timestamp) {
                 if (!block) {
-                  block = await getBlockByHeight(api.getApi(), startBlock);
+                  block = await api.getBlockByHeight(startBlock);
 
                   timestampReference = new Date(block.timestamp);
                 }

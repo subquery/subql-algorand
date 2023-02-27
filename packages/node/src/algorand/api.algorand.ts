@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TokenHeader } from '@subql/common-algorand';
-import { getLogger } from '@subql/node-core';
-import { AlgorandBlock } from '@subql/types-algorand';
+import { delay, getLogger } from '@subql/node-core';
+import { AlgorandBlock, AlgorandTransaction } from '@subql/types-algorand';
 import algosdk, { Indexer } from 'algosdk';
 import axios from 'axios';
 import { camelCaseObjectKey } from './utils.algorand';
@@ -13,36 +13,30 @@ const logger = getLogger('api.algorand');
 export class AlgorandApi {
   private genesisHash: string;
   private chain: string;
-  private api: Indexer;
+  api: Indexer;
+  private blockCache: AlgorandBlock[];
 
   constructor(private endpoint: string, private token?: string | TokenHeader) {
-    // let token: string | TokenHeader;
-    // let baseServer: string;
-    // let genesisHash: string;
-    // let chain: string;
-
-    this.token = this.token ?? '';
+    this.token = token ?? '';
     const urlEndpoint = new URL(endpoint);
     const baseServer = `${urlEndpoint.protocol}//${urlEndpoint.host}${urlEndpoint.pathname}`;
     this.api = new algosdk.Indexer(token, baseServer, urlEndpoint.port);
-
-    // get genesisHash in block
-    // const block = await this.api.lookupBlock(1).do();
   }
 
   async init(): Promise<void> {
     // get genesisHash in block
-    const block = await this.api.lookupBlock(1).do();
+    try {
+      const block = await this.api.lookupBlock(1).do();
 
-    this.genesisHash = block['genesis-hash'] ?? '';
-    this.chain = block['genesis-id'] ?? '';
+      this.genesisHash = block['genesis-hash'] ?? '';
+      this.chain = block['genesis-id'] ?? '';
+    } catch (e) {
+      logger.error(e);
+      process.exit(1);
+    }
   }
 
-  async getBlockByHeight(
-    // api: Indexer,
-    height: number,
-    // endpoint: string,
-  ): Promise<AlgorandBlock> {
+  async getBlockByHeight(height: number): Promise<AlgorandBlock> {
     try {
       const blockInfo = await this.api.lookupBlock(height).do();
       return camelCaseObjectKey(blockInfo);
@@ -52,7 +46,7 @@ export class AlgorandApi {
 
         const header = camelCaseObjectKey(await this.getHeaderOnly(height));
         console.log('header: ', header);
-        return this.combinePaginateBlock(height, this.endpoint);
+        return this.combinePaginateBlock(height);
       }
       logger.error(`failed to fetch Block at round ${height}`);
       throw error;
@@ -61,7 +55,6 @@ export class AlgorandApi {
 
   async getHeaderOnly(block: number): Promise<any> {
     try {
-      // const testNetEndpoint = 'https://algoindexer.testnet.algoexplorerapi.io';
       const result = (
         await axios({
           params: {
@@ -82,7 +75,6 @@ export class AlgorandApi {
 
   async paginatedTransactions(
     blockHeight: number,
-    endpoint: string,
     nextToken?: string,
   ): Promise<any> {
     const pageLimit = 10000;
@@ -97,18 +89,16 @@ export class AlgorandApi {
           },
           method: 'get',
           url: `/v2/transactions`,
-          baseURL: endpoint,
+          baseURL: this.endpoint,
         })
       ).data;
       // greater or equal
       if (result.transactions.length > 0) {
         const savedResult = result;
-        // console.log('pagination: ', result)
 
         return (
           await this.paginatedTransactions(
             blockHeight,
-            endpoint,
             savedResult['next-token'],
           )
         ).concat(savedResult);
@@ -120,14 +110,11 @@ export class AlgorandApi {
     }
   }
 
-  async combinePaginateBlock(
-    blockHeight: number,
-    endpoint: string,
-  ): Promise<AlgorandBlock> {
+  async combinePaginateBlock(blockHeight: number): Promise<AlgorandBlock> {
     try {
       const [blockHeader, paginatedTransactionsResults] = await Promise.all([
         this.getHeaderOnly(blockHeight),
-        this.paginatedTransactions(blockHeight, endpoint),
+        this.paginatedTransactions(blockHeight),
       ]);
       const header = camelCaseObjectKey(blockHeader);
       header.transactions = camelCaseObjectKey(paginatedTransactionsResults);
@@ -138,20 +125,125 @@ export class AlgorandApi {
     }
   }
 
-  async fetchBlocksArray(
-    // api: Indexer,
-    blockArray: number[],
-    // endpoint: string,
-  ): Promise<any[]> {
+  async fetchBlocksArray(blockArray: number[]): Promise<any[]> {
     return Promise.all(
       blockArray.map(async (height) => this.getBlockByHeight(height)),
     );
   }
-  async fetchBlocksBatches(
-    // api: Indexer,
-    blockArray: number[],
-    // endpoint: string,
-  ): Promise<AlgorandBlock[]> {
+  async fetchBlocksBatches(blockArray: number[]): Promise<AlgorandBlock[]> {
     return this.fetchBlocksArray(blockArray);
+  }
+
+  private blockInCache(number): AlgorandBlock {
+    for (let i = 0; i < this.blockCache.length; i++) {
+      if (this.blockCache[i].round === number) {
+        const block = this.blockCache[i];
+        //remove block cache once used
+        this.blockCache.splice(i, 1);
+        return block;
+      }
+    }
+    return undefined;
+  }
+
+  getGenesisHash(): string {
+    return this.genesisHash;
+  }
+  getChainId(): string {
+    return this.chain;
+  }
+  getSafeApi(height: number): SafeAPIService {
+    return new SafeAPIService(height, this.endpoint);
+  }
+  async fetchBlocks(blockNums: number[]): Promise<AlgorandBlock[]> {
+    let blocks: AlgorandBlock[] = [];
+
+    for (let i = 0; i < blockNums.length; i++) {
+      const cached = this.blockInCache(blockNums[i]);
+      if (cached) {
+        blocks.push(cached);
+        blockNums.splice(i, 1);
+      }
+    }
+
+    const fetchedBlocks = await this.fetchBlocksBatches(blockNums);
+
+    blocks = [...blocks, ...fetchedBlocks];
+
+    blocks = await Promise.all(
+      blocks.map(async (block) => {
+        block.hash = await this.getBlockHash(block.round, blocks);
+        return block;
+      }),
+    );
+
+    return blocks;
+  }
+  private async getBlockHash(
+    round: number,
+    blocks: AlgorandBlock[],
+  ): Promise<string> {
+    for (const block of blocks) {
+      if (block.round === round + 1) {
+        return block.previousBlockHash;
+      }
+    }
+
+    try {
+      const fetchedBlock = await this.getBlockByHeight(round + 1);
+      this.blockCache.push(fetchedBlock);
+
+      return fetchedBlock.previousBlockHash;
+    } catch (e) {
+      let checkHealth = await this.api.makeHealthCheck().do();
+      let currentRound = checkHealth.round;
+      if (currentRound >= round + 1) {
+        throw e;
+      }
+      while (currentRound < round + 1) {
+        await delay(1); // eslint-disable-line @typescript-eslint/await-thenable
+        checkHealth = await this.api.makeHealthCheck().do(); // eslint-disable-line @typescript-eslint/await-thenable
+        currentRound = checkHealth.round;
+      }
+    }
+  }
+}
+
+export class SafeAPIService {
+  private _api: AlgorandApi;
+  private readonly height;
+  private readonly endpoint;
+  constructor(height: number, endpoint: string) {
+    this.api = new AlgorandApi(endpoint);
+    this.height = height;
+    this.endpoint = endpoint;
+  }
+  async getBlock(): Promise<AlgorandBlock> {
+    try {
+      const block = await this.api.getBlockByHeight(this.height);
+      if (!block.round) throw new Error();
+      return block;
+    } catch (error) {
+      throw new Error('ERROR: failed to get block from safe api service.');
+    }
+  }
+  async getTxns(): Promise<AlgorandTransaction[]> {
+    try {
+      const block = await this.api.getBlockByHeight(this.height);
+      if (!block.transactions) throw new Error();
+      return block.transactions;
+    } catch (error) {
+      throw new Error(
+        'ERROR: failed to get transactions from safe api service.',
+      );
+    }
+  }
+
+  get api(): AlgorandApi {
+    return this._api;
+  }
+
+  private set api(value: AlgorandApi) {
+    this._api = value;
   }
 }

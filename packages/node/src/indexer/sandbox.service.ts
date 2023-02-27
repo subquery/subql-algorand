@@ -5,15 +5,15 @@ import { Inject, Injectable } from '@nestjs/common';
 import { AlgorandDataSource } from '@subql/common-algorand';
 import { NodeConfig, StoreService, IndexerSandbox } from '@subql/node-core';
 import { SafeAPI } from '@subql/types-algorand';
+import { AlgorandApiService } from '../algorand';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
-import { ApiService } from './api.service';
 
 @Injectable()
 export class SandboxService {
   private processorCache: Record<string, IndexerSandbox> = {};
 
   constructor(
-    private readonly apiService: ApiService,
+    private readonly apiService: AlgorandApiService,
     private readonly storeService: StoreService,
     private readonly nodeConfig: NodeConfig,
     @Inject('ISubqueryProject') private readonly project: SubqueryProject,
@@ -37,7 +37,7 @@ export class SandboxService {
     }
     processor.freeze(api, 'api');
     if (this.nodeConfig.unsafe) {
-      processor.freeze(this.apiService.getApi(), 'unsafeApi');
+      processor.freeze(this.apiService.api, 'unsafeApi');
     }
     return processor;
   }

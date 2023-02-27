@@ -6,13 +6,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
 import { NodeConfig } from '@subql/node-core';
 import { GraphQLSchema } from 'graphql';
+import { AlgorandApiService, filterTransaction } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
-import { ApiService } from '../indexer/api.service';
-import {
-  filterTransaction,
-  getBlockByHeight,
-  paginatedTransactions,
-} from './algorand';
 
 const testNetEndpoint = 'https://algoindexer.testnet.algoexplorerapi.io';
 
@@ -36,7 +31,7 @@ describe('Algorand RPC', () => {
 
   const prepareApiService = async (
     endpoint: string = testNetEndpoint,
-  ): Promise<ApiService> => {
+  ): Promise<AlgorandApiService> => {
     const module = await Test.createTestingModule({
       providers: [
         {
@@ -44,14 +39,14 @@ describe('Algorand RPC', () => {
           useFactory: () => testSubqueryProject(endpoint),
         },
         NodeConfig,
-        ApiService,
+        AlgorandApiService,
       ],
       imports: [EventEmitterModule.forRoot()],
     }).compile();
 
     app = module.createNestApplication();
     await app.init();
-    const apiService = app.get(ApiService);
+    const apiService = app.get(AlgorandApiService);
     await apiService.init();
     return apiService;
   };
@@ -114,10 +109,10 @@ describe('Algorand RPC', () => {
     const apiService = await prepareApiService();
     const failingBlock = 27739202; // testnet
     const passingBlock = 27739200; // testnet
-    const api = apiService.getApi();
+    const api = apiService.api;
 
     const fetchBlock = async () => {
-      return getBlockByHeight(api, failingBlock, testNetEndpoint);
+      return api.getBlockByHeight(failingBlock);
     };
 
     await expect(fetchBlock).resolves.not.toThrow();

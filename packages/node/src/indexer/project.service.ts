@@ -16,6 +16,7 @@ import {
   getLogger,
   getExistingProjectSchema,
   getMetaDataInfo,
+  ApiService,
 } from '@subql/node-core';
 import { Sequelize } from 'sequelize';
 import {
@@ -25,7 +26,6 @@ import {
 } from '../configure/SubqueryProject';
 import { initDbSchema, initHotSchemaReload } from '../utils/project';
 import { reindex } from '../utils/reindex';
-import { ApiService } from './api.service';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 
@@ -45,6 +45,7 @@ export class ProjectService {
 
   constructor(
     private readonly dsProcessorService: DsProcessorService,
+    // private readonly apiService: AlgorandApiService,
     private readonly apiService: ApiService,
     private readonly poiService: PoiService,
     protected readonly mmrService: MmrService,
@@ -93,7 +94,7 @@ export class ProjectService {
 
     this.project.dataSources = await generateTimestampReferenceForBlockFilters(
       this.project.dataSources,
-      this.apiService,
+      this.apiService.api,
     );
     if (isMainThread) {
       this._schema = await this.ensureProject();

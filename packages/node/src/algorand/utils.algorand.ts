@@ -8,7 +8,7 @@ import {
   AlgorandTransactionFilter,
 } from '@subql/types-algorand';
 import { Indexer, TransactionType } from 'algosdk';
-import { get } from 'lodash';
+import { camelCase, get } from 'lodash';
 
 export function camelCaseObjectKey(object: object) {
   if (Array.isArray(object)) {

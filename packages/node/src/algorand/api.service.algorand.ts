@@ -3,9 +3,8 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { TokenHeader } from '@subql/common-algorand';
+import { ProjectNetworkV1_0_0 } from '@subql/common-algorand';
 import { ApiService, getLogger } from '@subql/node-core';
-import algosdk from 'algosdk';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { AlgorandApi } from './api.algorand';
 
@@ -22,26 +21,36 @@ export class AlgorandApiService extends ApiService {
   private _api: AlgorandApi;
 
   async init(): Promise<AlgorandApiService> {
-    let token: string | TokenHeader;
-    let baseServer: string;
-    let genesisHash: string;
-    let chain: string;
-    const network = this.project.network;
+    let network: ProjectNetworkV1_0_0;
+
     try {
-      token = this.project.network.apiKey ?? '';
-      const urlEndpoint = new URL(this.project.network.endpoint);
-      baseServer = `${urlEndpoint.protocol}//${urlEndpoint.host}${urlEndpoint.pathname}`;
-      this.api = new algosdk.Indexer(token, baseServer, urlEndpoint.port);
-      // get genesisHash in block
-      const block = await this.api.lookupBlock(1).do();
-      genesisHash = block['genesis-hash'] ?? '';
-      chain = block['genesis-id'] ?? '';
+      network = this.project.network;
     } catch (e) {
-      logger.error(e);
+      logger.error(Object.keys(e));
       process.exit(1);
     }
-
     this.api = new AlgorandApi(network.endpoint);
+    await this.api.init();
+
+    this.networkMeta = {
+      chain: this.api.getChainId(),
+      genesisHash: this.api.getGenesisHash(),
+      specName: undefined,
+    };
+
+    if (network.chainId && network.chainId !== this.api.getGenesisHash()) {
+      const err = new Error(
+        `Network chainId doesn't match expected genesisHash. Your SubQuery project is expecting to index data from "${
+          network.chainId ?? network.genesisHash
+        }", however the endpoint that you are connecting to is different("${
+          this.networkMeta.genesisHash
+        }). Please check that the RPC endpoint is actually for your desired network or update the genesisHash.`,
+      );
+      logger.error(err, err.message);
+      throw err;
+    }
+
+    return this;
   }
 
   get api(): AlgorandApi {

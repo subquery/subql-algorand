@@ -10,8 +10,8 @@ import {
   PoiService,
   NodeConfig,
 } from '@subql/node-core';
+import { AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
-import { ApiService } from './api.service';
 import {
   BlockDispatcherService,
   WorkerBlockDispatcherService,
@@ -27,7 +27,7 @@ import { SandboxService } from './sandbox.service';
 @Module({
   providers: [
     StoreService,
-    ApiService,
+    AlgorandApiService,
     IndexerManager,
     {
       provide: 'IBlockDispatcher',
@@ -35,7 +35,7 @@ import { SandboxService } from './sandbox.service';
         nodeConfig: NodeConfig,
         eventEmitter: EventEmitter2,
         projectService: ProjectService,
-        apiService: ApiService,
+        apiService: AlgorandApiService,
         indexerManager: IndexerManager,
       ) =>
         nodeConfig.workers !== undefined
@@ -55,7 +55,7 @@ import { SandboxService } from './sandbox.service';
         NodeConfig,
         EventEmitter2,
         ProjectService,
-        ApiService,
+        AlgorandApiService,
         IndexerManager,
       ],
     },

@@ -9,8 +9,8 @@ import {
   MmrService,
   NodeConfig,
 } from '@subql/node-core';
+import { AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
-import { ApiService } from './api.service';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { IndexerManager } from './indexer.manager';
@@ -23,9 +23,12 @@ import { WorkerService } from './worker/worker.service';
     IndexerManager,
     StoreService,
     {
-      provide: ApiService,
-      useFactory: async (project: SubqueryProject, nodeConfig: NodeConfig) => {
-        const apiService = new ApiService(project, nodeConfig);
+      provide: AlgorandApiService,
+      useFactory: async (
+        project: SubqueryProject,
+        eventEmitter: EventEmitter2,
+      ) => {
+        const apiService = new AlgorandApiService(project, eventEmitter);
         await apiService.init();
         return apiService;
       },

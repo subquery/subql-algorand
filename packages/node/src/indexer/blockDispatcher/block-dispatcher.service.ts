@@ -13,8 +13,7 @@ import {
   Queue,
 } from '@subql/node-core';
 import { last } from 'lodash';
-import * as AlgorandUtil from '../../utils/algorand';
-import { ApiService } from '../api.service';
+import { AlgorandApiService } from '../../algorand';
 import { IndexerManager } from '../indexer.manager';
 import { ProjectService } from '../project.service';
 import { BaseBlockDispatcher } from './base-block-dispatcher';
@@ -33,10 +32,10 @@ export class BlockDispatcherService
 
   private fetching = false;
   private isShutdown = false;
-  private fetchBlocksBatches = AlgorandUtil.fetchBlocksBatches;
+  private readonly fetchBlocksBatches;
 
   constructor(
-    private apiService: ApiService,
+    private apiService: AlgorandApiService,
     nodeConfig: NodeConfig,
     private indexerManager: IndexerManager,
     eventEmitter: EventEmitter2,
@@ -50,9 +49,13 @@ export class BlockDispatcherService
     );
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3);
 
+    this.fetchBlocksBatches = this.apiService.api.fetchBlocksBatches.bind(
+      this.apiService.api,
+    );
+
     if (this.nodeConfig.profiler) {
       this.fetchBlocksBatches = profilerWrap(
-        AlgorandUtil.fetchBlocksBatches,
+        this.fetchBlocksBatches,
         'AlgorandUtil',
         'fetchBlocksBatches',
       );
@@ -136,7 +139,7 @@ export class BlockDispatcherService
         );
 
         const blocks = await this.fetchBlocksBatches(
-          this.apiService.getApi(),
+          // this.apiService.api,
           blockNums,
         );
         // const blocks = await this.apiService.fetchBlocks(blockNums);
