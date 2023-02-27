@@ -3,7 +3,11 @@
 
 import { TokenHeader } from '@subql/common-algorand';
 import { delay, getLogger } from '@subql/node-core';
-import { AlgorandBlock, AlgorandTransaction } from '@subql/types-algorand';
+import {
+  AlgorandBlock,
+  AlgorandTransaction,
+  SafeAPI,
+} from '@subql/types-algorand';
 import algosdk, { Indexer } from 'algosdk';
 import axios from 'axios';
 import { camelCaseObjectKey } from './utils.algorand';
@@ -46,16 +50,17 @@ export class AlgorandApi {
       return camelCaseObjectKey(blockInfo);
     } catch (error) {
       if (error.message.includes('Max transactions limit exceeded')) {
-        logger.warn('Max transactions limit exceeded, paging transactions');
+        logger.warn('Max transactions limit exceeded, paginating transactions');
 
         return this.combinePaginateBlock(height);
+      } else {
+        logger.error(`failed to fetch Block at round ${height}`);
+        throw error;
       }
-      logger.error(`failed to fetch Block at round ${height}`);
-      throw error;
     }
   }
 
-  async getHeaderOnly(block: number): Promise<any> {
+  async getHeaderOnly(block: number): Promise<AlgorandBlock> {
     try {
       const result = (
         await axios({
@@ -76,11 +81,10 @@ export class AlgorandApi {
 
   async paginatedTransactions(
     blockHeight: number,
-    combinedTx: any[] = [],
     nextToken?: string,
-  ): Promise<any> {
+  ): Promise<AlgorandTransaction[]> {
     try {
-      const result: { transactions: any[] } = (
+      const result: { transactions: AlgorandTransaction[] } = (
         await axios({
           params: {
             round: blockHeight,
@@ -99,17 +103,15 @@ export class AlgorandApi {
       Hence, the condition below
        */
       if (result.transactions.length > 0) {
-        combinedTx.push(result.transactions);
-
-        return await this.paginatedTransactions(
+        const nextPage = await this.paginatedTransactions(
           blockHeight,
-          combinedTx,
           result['next-token'],
         );
+        return result.transactions.concat(nextPage);
       }
-      return [].concat(...combinedTx);
+      return result.transactions;
     } catch (e) {
-      logger.error('Failed to paginate, oh no', e);
+      logger.error(e, 'Failed to paginated transactions');
       throw e;
     }
   }
@@ -124,7 +126,7 @@ export class AlgorandApi {
       header.transactions = camelCaseObjectKey(paginatedTransactionsResults);
       return header;
     } catch (e) {
-      logger.error('Failed to paginate');
+      logger.error(`Failed to paginate round ${blockHeight}`);
       throw e;
     }
   }
@@ -145,7 +147,7 @@ export class AlgorandApi {
     return this.chain;
   }
   getSafeApi(height: number): SafeAPIService {
-    return new SafeAPIService(height, this.endpoint);
+    return new SafeAPIService(this.api, height, this.endpoint);
   }
   async fetchBlocks(blockNums: number[]): Promise<AlgorandBlock[]> {
     let blocks: AlgorandBlock[] = [];
@@ -214,12 +216,14 @@ export class AlgorandApi {
   }
 }
 
-export class SafeAPIService {
+export class SafeAPIService implements SafeAPI {
   private _api: AlgorandApi;
+  readonly indexer: Indexer;
   private readonly height;
   private readonly endpoint;
-  constructor(height: number, endpoint: string) {
+  constructor(indexer: Indexer, height: number, endpoint: string) {
     this.api = new AlgorandApi(endpoint);
+    this.indexer = indexer;
     this.height = height;
     this.endpoint = endpoint;
   }

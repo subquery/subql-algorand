@@ -219,6 +219,7 @@ export interface AlgorandBlock {
 }
 
 export type SafeAPI = {
+  indexer: Indexer;
   getBlock(): Promise<AlgorandBlock>;
   getTxns(): Promise<AlgorandTransaction[]>;
 };

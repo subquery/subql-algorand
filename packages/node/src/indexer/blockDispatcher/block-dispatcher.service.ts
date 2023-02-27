@@ -140,10 +140,7 @@ export class BlockDispatcherService
           }], total ${blockNums.length} blocks`,
         );
 
-        const blocks = await this.fetchBlocksBatches(
-          // this.apiService.api,
-          blockNums,
-        );
+        const blocks = await this.fetchBlocksBatches(blockNums);
 
         if (
           bufferedHeight > this._latestBufferedHeight ||
