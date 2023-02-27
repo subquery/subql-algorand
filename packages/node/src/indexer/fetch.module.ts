@@ -27,7 +27,18 @@ import { SandboxService } from './sandbox.service';
 @Module({
   providers: [
     StoreService,
-    AlgorandApiService,
+    {
+      provide: AlgorandApiService,
+      useFactory: async (
+        project: SubqueryProject,
+        eventEmitter: EventEmitter2,
+      ) => {
+        const apiService = new AlgorandApiService(project, eventEmitter);
+        await apiService.init();
+        return apiService;
+      },
+      inject: ['ISubqueryProject', EventEmitter2],
+    },
     IndexerManager,
     {
       provide: 'IBlockDispatcher',

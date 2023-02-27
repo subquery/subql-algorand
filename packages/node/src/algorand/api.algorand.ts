@@ -18,13 +18,16 @@ export class AlgorandApi {
 
   constructor(private endpoint: string, private token?: string | TokenHeader) {
     this.token = token ?? '';
-    const urlEndpoint = new URL(endpoint);
-    const baseServer = `${urlEndpoint.protocol}//${urlEndpoint.host}${urlEndpoint.pathname}`;
-    this.api = new algosdk.Indexer(token, baseServer, urlEndpoint.port);
+    this.blockCache = [];
   }
 
   async init(): Promise<void> {
     // get genesisHash in block
+    const urlEndpoint = new URL(this.endpoint);
+    const baseServer = `${urlEndpoint.protocol}//${urlEndpoint.host}${urlEndpoint.pathname}`;
+
+    this.api = new algosdk.Indexer(this.token, baseServer, urlEndpoint.port);
+
     try {
       const block = await this.api.lookupBlock(1).do();
 
@@ -134,18 +137,6 @@ export class AlgorandApi {
     return this.fetchBlocksArray(blockArray);
   }
 
-  private blockInCache(number): AlgorandBlock {
-    for (let i = 0; i < this.blockCache.length; i++) {
-      if (this.blockCache[i].round === number) {
-        const block = this.blockCache[i];
-        //remove block cache once used
-        this.blockCache.splice(i, 1);
-        return block;
-      }
-    }
-    return undefined;
-  }
-
   getGenesisHash(): string {
     return this.genesisHash;
   }
@@ -179,6 +170,19 @@ export class AlgorandApi {
 
     return blocks;
   }
+
+  private blockInCache(number: number): AlgorandBlock {
+    for (let i = 0; i < this.blockCache.length; i++) {
+      if (this.blockCache[i].round === number) {
+        const block = this.blockCache[i];
+        //remove block cache once used
+        this.blockCache.splice(i, 1);
+        return block;
+      }
+    }
+    return undefined;
+  }
+
   private async getBlockHash(
     round: number,
     blocks: AlgorandBlock[],

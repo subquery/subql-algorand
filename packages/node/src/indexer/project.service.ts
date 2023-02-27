@@ -16,9 +16,9 @@ import {
   getLogger,
   getExistingProjectSchema,
   getMetaDataInfo,
-  ApiService,
 } from '@subql/node-core';
 import { Sequelize } from 'sequelize';
+import { AlgorandApiService } from '../algorand';
 import {
   SubqueryProject,
   generateTimestampReferenceForBlockFilters,
@@ -45,8 +45,7 @@ export class ProjectService {
 
   constructor(
     private readonly dsProcessorService: DsProcessorService,
-    // private readonly apiService: AlgorandApiService,
-    private readonly apiService: ApiService,
+    private readonly apiService: AlgorandApiService,
     private readonly poiService: PoiService,
     protected readonly mmrService: MmrService,
     private readonly sequelize: Sequelize,

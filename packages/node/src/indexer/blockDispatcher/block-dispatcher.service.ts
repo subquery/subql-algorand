@@ -32,7 +32,7 @@ export class BlockDispatcherService
 
   private fetching = false;
   private isShutdown = false;
-  private readonly fetchBlocksBatches;
+  private fetchBlocksBatches: AlgorandApiService['api']['fetchBlocks'];
 
   constructor(
     private apiService: AlgorandApiService,
@@ -49,16 +49,18 @@ export class BlockDispatcherService
     );
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3);
 
-    this.fetchBlocksBatches = this.apiService.api.fetchBlocksBatches.bind(
+    const fetchBlocks = this.apiService.api.fetchBlocks.bind(
       this.apiService.api,
     );
 
     if (this.nodeConfig.profiler) {
       this.fetchBlocksBatches = profilerWrap(
-        this.fetchBlocksBatches,
+        fetchBlocks,
         'AlgorandUtil',
         'fetchBlocksBatches',
       );
+    } else {
+      this.fetchBlocksBatches = fetchBlocks;
     }
   }
 
@@ -142,7 +144,6 @@ export class BlockDispatcherService
           // this.apiService.api,
           blockNums,
         );
-        // const blocks = await this.apiService.fetchBlocks(blockNums);
 
         if (
           bufferedHeight > this._latestBufferedHeight ||
