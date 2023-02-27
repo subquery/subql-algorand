@@ -48,8 +48,6 @@ export class AlgorandApi {
       if (error.message.includes('Max transactions limit exceeded')) {
         logger.warn('Max transactions limit exceeded, paging transactions');
 
-        // const header = camelCaseObjectKey(await this.getHeaderOnly(height));
-        // console.log('header: ', header);
         return this.combinePaginateBlock(height);
       }
       logger.error(`failed to fetch Block at round ${height}`);
@@ -69,7 +67,6 @@ export class AlgorandApi {
           baseURL: this.endpoint,
         })
       ).data;
-      // console.log('header-only: ', result);
       return result;
     } catch (e) {
       logger.error('Failed to fetch round header', e);
@@ -95,6 +92,12 @@ export class AlgorandApi {
           baseURL: this.endpoint,
         })
       ).data;
+      /*
+      Maximum number of results to return. There could be additional pages even if the limit is not reached.
+      https://developer.algorand.org/docs/rest-apis/indexer/#get-v2transactions
+
+      Hence, the condition below
+       */
       if (result.transactions.length > 0) {
         combinedTx.push(result.transactions);
 

@@ -106,21 +106,20 @@ describe('Algorand RPC', () => {
       }),
     ).toBe(true);
   });
-  it('test large blocks', async () => {
+  it('paginate large blocks', async () => {
     const apiService = await prepareApiService();
     const failingBlock = 27739202; // testnet
     const passingBlock = 27739200; // testnet
     const api = apiService.api;
 
+    const paginateSpy = jest.spyOn(api, 'paginatedTransactions');
     const fetchBlock = async () => {
       // return api.getBlockByHeight(passingBlock);
       return api.getBlockByHeight(failingBlock);
     };
 
-    // await expect(fetchBlock).resolves.not.toThrow();
-
     const result = await fetchBlock();
-    // await expect(result).resolves.not.toThrow();
+    expect(paginateSpy).toHaveBeenCalledTimes(3);
     expect(result.transactions.length).toEqual(13916);
   });
 });
