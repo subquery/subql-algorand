@@ -147,7 +147,7 @@ export class AlgorandApi {
     return this.chain;
   }
   getSafeApi(height: number): SafeAPIService {
-    return new SafeAPIService(this.api, height, this.endpoint);
+    return new SafeAPIService(this, height, this.endpoint);
   }
   async fetchBlocks(blockNums: number[]): Promise<AlgorandBlock[]> {
     let blocks: AlgorandBlock[] = [];
@@ -217,15 +217,13 @@ export class AlgorandApi {
 }
 
 export class SafeAPIService implements SafeAPI {
-  private _api: AlgorandApi;
   readonly indexer: Indexer;
   private readonly height;
   private readonly endpoint;
-  constructor(indexer: Indexer, height: number, endpoint: string) {
-    this.api = new AlgorandApi(endpoint);
-    this.indexer = indexer;
+  constructor(private api: AlgorandApi, height: number, endpoint: string) {
     this.height = height;
     this.endpoint = endpoint;
+    this.indexer = api.api;
   }
   async getBlock(): Promise<AlgorandBlock> {
     try {
@@ -246,13 +244,5 @@ export class SafeAPIService implements SafeAPI {
         'ERROR: failed to get transactions from safe api service.',
       );
     }
-  }
-
-  get api(): AlgorandApi {
-    return this._api;
-  }
-
-  private set api(value: AlgorandApi) {
-    this._api = value;
   }
 }
