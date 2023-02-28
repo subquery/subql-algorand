@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.2] - 2023-02-28
+### Updated
+- improve error handling for endpoint errors (#31)
+
+### Fixed
+- Index large blocks (#30)
+
+
 ## [1.18.1] - 2023-02-21
 ### Updated
 - Sync with main sdk (#28)
