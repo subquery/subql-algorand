@@ -4,8 +4,7 @@
 import { threadId } from 'node:worker_threads';
 import { Injectable } from '@nestjs/common';
 import { NodeConfig, getLogger, AutoQueue } from '@subql/node-core';
-import { fetchBlocksBatches } from '../../utils/algorand';
-import { ApiService } from '../api.service';
+import { AlgorandApiService } from '../../algorand';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
 
@@ -34,7 +33,7 @@ export class WorkerService {
   private queue: AutoQueue<FetchBlockResponse>;
 
   constructor(
-    private apiService: ApiService,
+    private apiService: AlgorandApiService,
     private indexerManager: IndexerManager,
     nodeConfig: NodeConfig,
   ) {
@@ -46,7 +45,7 @@ export class WorkerService {
       return await this.queue.put(async () => {
         // If a dynamic ds is created we might be asked to fetch blocks again, use existing result
         if (!this.fetchedBlocks[height]) {
-          const [block] = await fetchBlocksBatches(this.apiService.getApi(), [
+          const [block] = await this.apiService.api.fetchBlocksBatches([
             height,
           ]);
           this.fetchedBlocks[height] = block;

@@ -4,8 +4,8 @@
 import { NestFactory } from '@nestjs/core';
 import { findAvailablePort } from '@subql/common';
 import { getLogger, NestLogger } from '@subql/node-core';
+import { AlgorandApiService } from './algorand';
 import { AppModule } from './app.module';
-import { ApiService } from './indexer/api.service';
 import { FetchService } from './indexer/fetch.service';
 import { ProjectService } from './indexer/project.service';
 import { yargsOptions } from './yargs';
@@ -49,7 +49,7 @@ export async function bootstrap() {
 
     const projectService = app.get(ProjectService);
     const fetchService = app.get(FetchService);
-    const apiService = app.get(ApiService);
+    const apiService = app.get(AlgorandApiService);
 
     // Initialise async services, we do this here rather than in factories, so we can capture one off events
     await apiService.init();

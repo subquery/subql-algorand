@@ -30,10 +30,13 @@ import {
 } from '@subql/types-algorand';
 import { Indexer } from 'algosdk';
 import { Sequelize } from 'sequelize';
+import {
+  AlgorandApiService,
+  filterBlock,
+  filterTransaction,
+} from '../algorand';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
-import * as AlgorandUtil from '../utils/algorand';
 import { yargsOptions } from '../yargs';
-import { ApiService } from './api.service';
 import {
   asSecondLayerHandlerProcessor_1_0_0,
   DsProcessorService,
@@ -54,7 +57,7 @@ export class IndexerManager {
 
   constructor(
     private storeService: StoreService,
-    private apiService: ApiService,
+    private apiService: AlgorandApiService,
     private poiService: PoiService,
     private sequelize: Sequelize,
     @Inject('ISubqueryProject') private project: SubqueryProject,
@@ -66,7 +69,7 @@ export class IndexerManager {
   ) {
     logger.info('indexer manager start');
 
-    this.api = this.apiService.getApi();
+    this.api = this.apiService.api.api;
   }
 
   @profiler(yargsOptions.argv.profiler)
@@ -98,7 +101,7 @@ export class IndexerManager {
         // eslint-disable-next-line @typescript-eslint/require-await
         async (ds: SubqlProjectDs) => {
           // Injected runtimeVersion from fetch service might be outdated
-          apiAt = apiAt ?? this.apiService.getSafeApi(blockHeight);
+          apiAt = apiAt ?? this.apiService.api.getSafeApi(blockHeight);
 
           const vm = this.sandboxService.getDsProcessor(ds, apiAt);
 
@@ -267,12 +270,9 @@ export class IndexerManager {
         (data, baseFilter) => {
           switch (kind) {
             case AlgorandHandlerKind.Block:
-              return !!AlgorandUtil.filterBlock(
-                data as AlgorandBlock,
-                baseFilter,
-              );
+              return !!filterBlock(data as AlgorandBlock, baseFilter);
             case AlgorandHandlerKind.Transaction:
-              return !!AlgorandUtil.filterTransaction(
+              return !!filterTransaction(
                 data as AlgorandTransaction,
                 baseFilter,
               );
@@ -368,6 +368,6 @@ const ProcessorTypeMap = {
   [AlgorandHandlerKind.Transaction]: isTransactionHandlerProcessor,
 };
 const FilterTypeMap = {
-  [AlgorandHandlerKind.Block]: AlgorandUtil.filterBlock,
-  [AlgorandHandlerKind.Transaction]: AlgorandUtil.filterTransaction,
+  [AlgorandHandlerKind.Block]: filterBlock,
+  [AlgorandHandlerKind.Transaction]: filterTransaction,
 };

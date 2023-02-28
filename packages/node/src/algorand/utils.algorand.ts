@@ -1,7 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getLogger } from '@subql/node-core';
 import {
   AlgorandBlock,
   AlgorandBlockFilter,
@@ -10,7 +9,27 @@ import {
 } from '@subql/types-algorand';
 import { Indexer, TransactionType } from 'algosdk';
 import { camelCase, get } from 'lodash';
-const logger = getLogger('fetch');
+
+export function camelCaseObjectKey(object: object) {
+  if (Array.isArray(object)) {
+    return object.map((v) => camelCaseObjectKey(v));
+  } else if (object !== null && object.constructor === Object) {
+    return Object.keys(object).reduce(
+      (result, key) => ({
+        ...result,
+        [camelCase(key)]: camelCaseObjectKey(object[key]),
+      }),
+      {},
+    );
+  }
+
+  return object;
+}
+
+export function calcInterval(api: Indexer): number {
+  // Pulled from https://metrics.algorand.org/#/protocol/#blocks
+  return 4300;
+}
 
 export const mappingFilterTransaction = {
   [TransactionType.pay]: {
@@ -40,22 +59,6 @@ export const mappingFilterTransaction = {
     sender: 'sender',
   },
 };
-
-export function camelCaseObjectKey(object: object) {
-  if (Array.isArray(object)) {
-    return object.map((v) => camelCaseObjectKey(v));
-  } else if (object !== null && object.constructor === Object) {
-    return Object.keys(object).reduce(
-      (result, key) => ({
-        ...result,
-        [camelCase(key)]: camelCaseObjectKey(object[key]),
-      }),
-      {},
-    );
-  }
-
-  return object;
-}
 
 export function filterBlock(
   block: AlgorandBlock,
@@ -95,38 +98,4 @@ export function filterTransaction(
   }
 
   return true;
-}
-
-export async function getBlockByHeight(
-  api: Indexer,
-  height: number,
-): Promise<AlgorandBlock> {
-  try {
-    const blockInfo = await api.lookupBlock(height).do();
-    return camelCaseObjectKey(blockInfo);
-  } catch (error) {
-    logger.error(`failed to fetch Block at round ${height}`);
-    throw error;
-  }
-}
-
-export async function fetchBlocksArray(
-  api: Indexer,
-  blockArray: number[],
-): Promise<any[]> {
-  return Promise.all(
-    blockArray.map(async (height) => getBlockByHeight(api, height)),
-  );
-}
-
-export async function fetchBlocksBatches(
-  api: Indexer,
-  blockArray: number[],
-): Promise<AlgorandBlock[]> {
-  return fetchBlocksArray(api, blockArray);
-}
-
-export function calcInterval(api: Indexer): number {
-  // Pulled from https://metrics.algorand.org/#/protocol/#blocks
-  return 4300;
 }

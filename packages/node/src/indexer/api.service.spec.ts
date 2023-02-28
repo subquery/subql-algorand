@@ -6,8 +6,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
 import { NodeConfig } from '@subql/node-core';
 import { GraphQLSchema } from 'graphql';
+import { AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
-import { ApiService } from './api.service';
 
 const ENDPOINT = 'https://algoindexer.algoexplorerapi.io';
 
@@ -35,7 +35,7 @@ describe('ApiService', () => {
 
   const prepareApiService = async (
     endpoint: string = ENDPOINT,
-  ): Promise<ApiService> => {
+  ): Promise<AlgorandApiService> => {
     const module = await Test.createTestingModule({
       providers: [
         {
@@ -43,14 +43,14 @@ describe('ApiService', () => {
           useFactory: () => testSubqueryProject(endpoint),
         },
         NodeConfig,
-        ApiService,
+        AlgorandApiService,
       ],
       imports: [EventEmitterModule.forRoot()],
     }).compile();
 
     app = module.createNestApplication();
     await app.init();
-    const apiService = app.get(ApiService);
+    const apiService = app.get(AlgorandApiService);
     await apiService.init();
     return apiService;
   };
@@ -58,20 +58,20 @@ describe('ApiService', () => {
   it('can fetch block with hash', async () => {
     const apiService = await prepareApiService();
 
-    const block = (await apiService.fetchBlocks([50000]))[0];
+    const block = (await apiService.api.fetchBlocks([50000]))[0];
 
     expect(block.hash).toEqual('Gss169f22yVUBJzbNT9qXtQukjh0tgecvapaQY5NIRg=');
   });
 
   it('waits on pending block to fetch hash', async () => {
     const apiService = await prepareApiService();
-    const api = apiService.getApi();
+    const api = apiService.api;
 
-    const checkHealth = await api.makeHealthCheck().do();
+    const checkHealth = await api.api.makeHealthCheck().do();
     const currentRound = checkHealth.round;
 
     const fetchLatestBlock = async () =>
-      (await apiService.fetchBlocks([currentRound]))[0];
+      (await apiService.api.fetchBlocks([currentRound]))[0];
 
     expect(fetchLatestBlock).not.toThrow();
 

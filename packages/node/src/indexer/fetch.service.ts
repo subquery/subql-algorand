@@ -31,10 +31,9 @@ import {
 import { MetaData } from '@subql/utils';
 import { Indexer } from 'algosdk';
 import { range, sortBy, uniqBy, without } from 'lodash';
+import { AlgorandApiService, calcInterval } from '../algorand';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
-import { calcInterval } from '../utils/algorand';
 import { isBaseHandler, isCustomHandler } from '../utils/project';
-import { ApiService } from './api.service';
 import { IBlockDispatcher } from './blockDispatcher';
 import { DictionaryService } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';
@@ -59,7 +58,7 @@ export class FetchService implements OnApplicationShutdown {
   private bypassBlocks: number[] = [];
 
   constructor(
-    private apiService: ApiService,
+    private apiService: AlgorandApiService,
     private nodeConfig: NodeConfig,
     @Inject('ISubqueryProject') private project: SubqueryProject,
     @Inject('IBlockDispatcher') private blockDispatcher: IBlockDispatcher,
@@ -82,7 +81,7 @@ export class FetchService implements OnApplicationShutdown {
   }
 
   get api(): Indexer {
-    return this.apiService.getApi();
+    return this.apiService.api.api;
   }
   async syncDynamicDatascourcesFromMeta(): Promise<void> {
     this.templateDynamicDatasouces =

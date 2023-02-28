@@ -15,9 +15,6 @@ import {
 } from '@subql/node-core';
 import chalk from 'chalk';
 import { last } from 'lodash';
-import * as AlgorandUtil from '../../utils/algorand';
-import { ApiService } from '../api.service';
-import { IndexerManager } from '../indexer.manager';
 import { ProjectService } from '../project.service';
 import {
   FetchBlock,
