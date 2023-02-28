@@ -2644,7 +2644,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/util-crypto@npm:10.2.6, @polkadot/util-crypto@npm:^10, @polkadot/util-crypto@npm:^10.2.3":
+"@polkadot/util-crypto@npm:10.2.6, @polkadot/util-crypto@npm:^10.2.3":
   version: 10.2.6
   resolution: "@polkadot/util-crypto@npm:10.2.6"
   dependencies:
@@ -3046,7 +3046,7 @@ __metadata:
     "@subql/common-algorand": "workspace:*"
     "@subql/node-core": 1.8.1-4
     "@subql/types-algorand": "workspace:*"
-    "@subql/utils": 1.3.1
+    "@subql/utils": 1.4.1
     "@subql/x-merkle-mountain-range": 2.0.0-0.1.2
     "@types/app-module-path": ^2.2.0
     "@types/express": ^4.17.13
@@ -3074,7 +3074,7 @@ __metadata:
     reflect-metadata: ^0.1.13
     rimraf: ^3.0.2
     rxjs: ^7.5.2
-    sequelize: ^6.28.0
+    sequelize: 6.28.0
     supertest: ^6.2.2
     tar: ^6.1.11
     typescript: ^4.4.4
@@ -3128,12 +3128,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/utils@npm:1.3.1":
-  version: 1.3.1
-  resolution: "@subql/utils@npm:1.3.1"
+"@subql/utils@npm:1.4.1":
+  version: 1.4.1
+  resolution: "@subql/utils@npm:1.4.1"
   dependencies:
-    "@polkadot/util": ^10
-    "@polkadot/util-crypto": ^10
+    "@polkadot/util": ^10.2.3
+    "@polkadot/util-crypto": ^10.2.3
     ansi-styles: ^6.1.0
     axios: ^0.27.1
     chalk: ^4.1.2
@@ -3144,9 +3144,9 @@ __metadata:
     pino: ^6.13.3
     rotating-file-stream: ^3.0.2
     semver: ^7.3.7
-    sequelize: 6.23.0
+    sequelize: 6.28.0
     tar: ^6.1.11
-  checksum: 5d67dfe562b2f4cc1ad15295c665ee93585aee35d16db9403502518018a9252634e69ca3613792e520e7874fac932055d466ba854abb908612d74d1565688414
+  checksum: dcda9e44acd23d68a065cab99eb8886ab04269ad914bf18e4a23463fc725ecefb5c505c1eb465c482f7d63d80a2495fe513ef67b9c71bfe31158ecbc51245bb5
   languageName: node
   linkType: hard
 
@@ -10493,13 +10493,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"retry-as-promised@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "retry-as-promised@npm:6.1.0"
-  checksum: cde3ad5c827d3f51b9161b9453dfd5eb8b8b6c22b6b405f7294eaa1939ef1966f8bd4c8a228ce2d66a24959d1dcc48b113c4c810ecdaddec2968b6d20576329d
-  languageName: node
-  linkType: hard
-
 "retry-as-promised@npm:^7.0.3":
   version: 7.0.4
   resolution: "retry-as-promised@npm:7.0.4"
@@ -10725,50 +10718,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sequelize@npm:6.23.0":
-  version: 6.23.0
-  resolution: "sequelize@npm:6.23.0"
-  dependencies:
-    "@types/debug": ^4.1.7
-    "@types/validator": ^13.7.1
-    debug: ^4.3.3
-    dottie: ^2.0.2
-    inflection: ^1.13.2
-    lodash: ^4.17.21
-    moment: ^2.29.1
-    moment-timezone: ^0.5.34
-    pg-connection-string: ^2.5.0
-    retry-as-promised: ^6.1.0
-    semver: ^7.3.5
-    sequelize-pool: ^7.1.0
-    toposort-class: ^1.0.1
-    uuid: ^8.3.2
-    validator: ^13.7.0
-    wkx: ^0.5.0
-  peerDependenciesMeta:
-    ibm_db:
-      optional: true
-    mariadb:
-      optional: true
-    mysql2:
-      optional: true
-    oracledb:
-      optional: true
-    pg:
-      optional: true
-    pg-hstore:
-      optional: true
-    snowflake-sdk:
-      optional: true
-    sqlite3:
-      optional: true
-    tedious:
-      optional: true
-  checksum: bee85b96c5520284a7bca5b5ef296a8acbe43299003e95eee89a803b2841e36f56c39cf7826f3217e5a9206095b861b64e7981a6b7da0534decf278454eb9b71
-  languageName: node
-  linkType: hard
-
-"sequelize@npm:6.28.0, sequelize@npm:^6.28.0":
+"sequelize@npm:6.28.0":
   version: 6.28.0
   resolution: "sequelize@npm:6.28.0"
   dependencies:
