@@ -254,6 +254,11 @@ export class ProjectService {
       await metadataRepo.upsert({ key: 'processedBlockCount', value: 0 });
     }
 
+    // If project was created before this feature, don't add the key. If it is project created after, add this key.
+    if (!keyValue.processedBlockCount && !keyValue.lastProcessedHeight) {
+      await metadataRepo.upsert({ key: 'processedBlockCount', value: 0 });
+    }
+
     if (keyValue.indexerNodeVersion !== packageVersion) {
       await metadataRepo.upsert({
         key: 'indexerNodeVersion',

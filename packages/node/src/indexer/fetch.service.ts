@@ -56,6 +56,7 @@ export class FetchService implements OnApplicationShutdown {
   private templateDynamicDatasouces: SubqlProjectDs[];
   private dictionaryGenesisMatches = true;
   private bypassBlocks: number[] = [];
+  private bypassBufferHeight: number;
 
   constructor(
     private apiService: AlgorandApiService,
