@@ -32,7 +32,7 @@ import { WorkerService } from './worker/worker.service';
         await apiService.init();
         return apiService;
       },
-      inject: ['ISubqueryProject', EventEmitter2, NodeConfig],
+      inject: ['ISubqueryProject', EventEmitter2],
     },
     SandboxService,
     DsProcessorService,

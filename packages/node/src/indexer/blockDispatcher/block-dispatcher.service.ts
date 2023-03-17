@@ -1,6 +1,7 @@
 // Copyright 2020-2021 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { getHeapStatistics } from 'v8';
 import { Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
@@ -11,6 +12,9 @@ import {
   profilerWrap,
   AutoQueue,
   Queue,
+  waitForBatchSize,
+  memoryLock,
+  SmartBatchService,
 } from '@subql/node-core';
 import { last } from 'lodash';
 import { AlgorandApiService } from '../../algorand';
@@ -40,12 +44,14 @@ export class BlockDispatcherService
     private indexerManager: IndexerManager,
     eventEmitter: EventEmitter2,
     projectService: ProjectService,
+    smartBatchService: SmartBatchService,
   ) {
     super(
       nodeConfig,
       eventEmitter,
       projectService,
       new Queue(nodeConfig.batchSize * 3),
+      smartBatchService,
     );
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3);
 
@@ -109,6 +115,13 @@ export class BlockDispatcherService
     this.processQueue.flush();
   }
 
+  private memoryleft(): number {
+    return (
+      this.smartBatchService.heapMemoryLimit() -
+      getHeapStatistics().used_heap_size
+    );
+  }
+
   private async fetchBlocksFromQueue(): Promise<void> {
     if (this.fetching || this.isShutdown) return;
     // Process queue is full, no point in fetching more blocks
@@ -119,7 +132,7 @@ export class BlockDispatcherService
     try {
       while (!this.isShutdown) {
         const blockNums = this.queue.takeMany(
-          Math.min(this.nodeConfig.batchSize, this.processQueue.freeSpace),
+          Math.min(this.processQueue.freeSpace, this.smartBatchSize),
         );
         // Used to compare before and after as a way to check if queue was flushed
         const bufferedHeight = this._latestBufferedHeight;
@@ -134,14 +147,26 @@ export class BlockDispatcherService
           break;
         }
 
+        if (this.memoryleft() < 0) {
+          //stop fetching until memory is freed
+          await waitForBatchSize(this.minimumHeapLimit);
+          continue;
+        }
+
         logger.info(
           `fetch block [${blockNums[0]},${
             blockNums[blockNums.length - 1]
           }], total ${blockNums.length} blocks`,
         );
 
+        await memoryLock.acquire();
         const blocks = await this.fetchBlocksBatches(blockNums);
+        memoryLock.release();
 
+        this.smartBatchService.addToSizeBuffer(blocks);
+
+        // Check if the queues have been flushed between queue.takeMany and fetchBlocksBatches resolving
+        // Peeking the queue is because the latestBufferedHeight could have regrown since fetching block
         if (
           bufferedHeight > this._latestBufferedHeight ||
           this.queue.peek() < Math.min(...blockNums)
@@ -158,6 +183,8 @@ export class BlockDispatcherService
             );
 
             await this.postProcessBlock(height, processBlockResponse);
+
+            block = null;
           } catch (e) {
             if (this.isShutdown) {
               return;

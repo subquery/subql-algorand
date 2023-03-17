@@ -2997,9 +2997,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/common@npm:1.6.1-1":
-  version: 1.6.1-1
-  resolution: "@subql/common@npm:1.6.1-1"
+"@subql/common@npm:1.7.0":
+  version: 1.7.0
+  resolution: "@subql/common@npm:1.7.0"
   dependencies:
     axios: ^0.27.2
     class-transformer: 0.5.1
@@ -3009,7 +3009,7 @@ __metadata:
     js-yaml: ^4.1.0
     reflect-metadata: ^0.1.13
     semver: ^7.3.5
-  checksum: 2daec7268e5cd3f019bbea596b8df1c5b6917db68b94e41a41a43da5d6192379881710ae2792a9a747f74101f7b129e80fcfe93993ea60e5896303d8eacf07bf
+  checksum: a76767f788e7e33fdb2984aed0ba5ede4110ce025c5decbaeb04fda0f63ce6e21e67428da93731f216fa816f6b8f6501459abdf7fc3bc46746f8f6a8b7acd144
   languageName: node
   linkType: hard
 
@@ -3044,7 +3044,7 @@ __metadata:
     "@subql/apollo-links": ^0.2.1-0
     "@subql/common": 1.5.0
     "@subql/common-algorand": "workspace:*"
-    "@subql/node-core": 1.8.1-4
+    "@subql/node-core": 1.10.1-3
     "@subql/types-algorand": "workspace:*"
     "@subql/utils": 1.4.1
     "@subql/x-merkle-mountain-range": 2.0.0-0.1.2
@@ -3085,26 +3085,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/node-core@npm:1.8.1-4":
-  version: 1.8.1-4
-  resolution: "@subql/node-core@npm:1.8.1-4"
+"@subql/node-core@npm:1.10.1-3":
+  version: 1.10.1-3
+  resolution: "@subql/node-core@npm:1.10.1-3"
   dependencies:
     "@nestjs/common": ^8.2.6
     "@nestjs/event-emitter": ^1.3.0
     "@nestjs/schedule": ^1.0.2
     "@polkadot/api": 9.11.1
     "@subql/apollo-links": 0.2.1-9
-    "@subql/common": 1.6.1-1
+    "@subql/common": 1.7.0
     "@subql/types": 1.7.1
-    "@subql/utils": 1.4.1-0
+    "@subql/utils": 1.4.1
     "@subql/x-merkle-mountain-range": ^2.0.0-0.1.2
     "@willsoto/nestjs-prometheus": ^4.4.0
+    async-lock: ^1.4.0
+    async-mutex: ^0.4.0
     lodash: ^4.17.21
     prom-client: ^14.0.1
     sequelize: 6.28.0
     vm2: ^3.9.9
     yargs: ^16.2.0
-  checksum: 0303825a3d690b7835ea142a965ba1dbbea8996e81fd2912bba1cef8fdaac3bb8d5ad640858462b1efd1a22aa0da9db34821c965819525de44c7c89d8dfc0b96
+  checksum: f6442547650a2923930274395e0885fb1e9f41fdbb3ed49e602a0aeb86397e78eb180337d49eb295fece2ef8366f6b6c352d5339953d5df42719febd1069abdb
   languageName: node
   linkType: hard
 
@@ -3147,28 +3149,6 @@ __metadata:
     sequelize: 6.28.0
     tar: ^6.1.11
   checksum: dcda9e44acd23d68a065cab99eb8886ab04269ad914bf18e4a23463fc725ecefb5c505c1eb465c482f7d63d80a2495fe513ef67b9c71bfe31158ecbc51245bb5
-  languageName: node
-  linkType: hard
-
-"@subql/utils@npm:1.4.1-0":
-  version: 1.4.1-0
-  resolution: "@subql/utils@npm:1.4.1-0"
-  dependencies:
-    "@polkadot/util": ^10.2.3
-    "@polkadot/util-crypto": ^10.2.3
-    ansi-styles: ^6.1.0
-    axios: ^0.27.1
-    chalk: ^4.1.2
-    detect-port: ^1.3.0
-    flatted: ^3.2.5
-    graphql: ^15.8.0
-    graphql-tag: ^2.12.6
-    pino: ^6.13.3
-    rotating-file-stream: ^3.0.2
-    semver: ^7.3.7
-    sequelize: 6.28.0
-    tar: ^6.1.11
-  checksum: 25440325cbf26f7ae33d95563b863802c47796445a8398948eb9f7cb8eda153b44a83750725dd993555219cadf76822c32c080b9a8c8d58d51b8712b417cc567
   languageName: node
   linkType: hard
 
@@ -4270,6 +4250,22 @@ __metadata:
   version: 2.0.0
   resolution: "astral-regex@npm:2.0.0"
   checksum: 876231688c66400473ba505731df37ea436e574dd524520294cc3bbc54ea40334865e01fa0d074d74d036ee874ee7e62f486ea38bc421ee8e6a871c06f011766
+  languageName: node
+  linkType: hard
+
+"async-lock@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "async-lock@npm:1.4.0"
+  checksum: a71ef9e50dc448a8e8dd6482494210d7b6f556d4815612b1fed5662216cd756c2c8fb9c2153a9a66ea90b36ba7fb18aa568d11813aadc23feb4c5b0b188df614
+  languageName: node
+  linkType: hard
+
+"async-mutex@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "async-mutex@npm:0.4.0"
+  dependencies:
+    tslib: ^2.4.0
+  checksum: 813a71728b35a4fbfd64dba719f04726d9133c67b577fcd951b7028c4a675a13ee34e69beb82d621f87bf81f5d4f135c4c44be0448550c7db728547244ef71fc
   languageName: node
   linkType: hard
 
@@ -9220,7 +9216,7 @@ __metadata:
   version: 3.0.0
   resolution: "native-fetch@npm:3.0.0"
   peerDependencies:
-    node-fetch: "*"
+    node-fetch: 2.6.7
   checksum: eec8cc78d6da4d0f3f56055e3e557473ac86dd35fd40053ea268d644af7b20babc891d2b53ef821b77ed2428265f60b85e49d754c555de89bfa071a743b853bb
   languageName: node
   linkType: hard
@@ -11613,6 +11609,13 @@ __metadata:
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.4.0":
+  version: 2.5.0
+  resolution: "tslib@npm:2.5.0"
+  checksum: ae3ed5f9ce29932d049908ebfdf21b3a003a85653a9a140d614da6b767a93ef94f460e52c3d787f0e4f383546981713f165037dc2274df212ea9f8a4541004e1
   languageName: node
   linkType: hard
 
