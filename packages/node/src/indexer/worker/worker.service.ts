@@ -8,9 +8,7 @@ import { AlgorandApiService } from '../../algorand';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
 
-export type FetchBlockResponse =
-  | { specVersion: number; parentHash: string }
-  | undefined;
+export type FetchBlockResponse = undefined;
 
 export type ProcessBlockResponse = {
   dynamicDsCreated: boolean;
