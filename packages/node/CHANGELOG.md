@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.0] - 2023-03-28
+### Update
+- Sync with main SDK
+
 ## [1.18.3] - 2023-03-01
 ### Fixed
 - Fixed Nest dependencies issue with IndexManger (#34)
