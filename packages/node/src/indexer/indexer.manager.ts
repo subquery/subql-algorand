@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Inject, Injectable } from '@nestjs/common';
-import { hexToU8a, u8aEq } from '@polkadot/util';
 import {
   isRuntimeDs,
   AlgorandHandlerKind,
@@ -11,14 +10,13 @@ import {
   isTransactionHandlerProcessor,
 } from '@subql/common-algorand';
 import {
-  PoiBlock,
-  StoreService,
-  PoiService,
   NodeConfig,
   IndexerSandbox,
   getLogger,
   profiler,
   profilerWrap,
+  ProcessBlockResponse,
+  IIndexerManager,
 } from '@subql/node-core';
 import {
   AlgorandBlock,
@@ -28,14 +26,12 @@ import {
   RuntimeHandlerInputMap,
   SafeAPI,
 } from '@subql/types-algorand';
-import { Indexer } from 'algosdk';
-import { Sequelize } from 'sequelize';
 import {
   AlgorandApiService,
   filterBlock,
   filterTransaction,
 } from '../algorand';
-import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import { SubqlProjectDs } from '../configure/SubqueryProject';
 import { yargsOptions } from '../yargs';
 import {
   asSecondLayerHandlerProcessor_1_0_0,
@@ -46,129 +42,73 @@ import { ProjectService } from './project.service';
 import { SandboxService } from './sandbox.service';
 import { BlockContent } from './types';
 
-const NULL_MERKEL_ROOT = hexToU8a('0x00');
-
 const logger = getLogger('indexer');
 
 @Injectable()
-export class IndexerManager {
-  private api: Indexer;
-  private filteredDataSources: SubqlProjectDs[];
-
+export class IndexerManager
+  implements IIndexerManager<BlockContent, SubqlProjectDs>
+{
   constructor(
-    private storeService: StoreService,
     private apiService: AlgorandApiService,
-    private poiService: PoiService,
-    private sequelize: Sequelize,
-    @Inject('ISubqueryProject') private project: SubqueryProject,
     private nodeConfig: NodeConfig,
     private sandboxService: SandboxService,
     private dsProcessorService: DsProcessorService,
     private dynamicDsService: DynamicDsService,
-    private projectService: ProjectService,
+    @Inject('IProjectService') private projectService: ProjectService,
   ) {
     logger.info('indexer manager start');
-
-    this.api = this.apiService.api.api;
   }
 
   @profiler(yargsOptions.argv.profiler)
-  async indexBlock(blockContent: AlgorandBlock): Promise<{
-    dynamicDsCreated: boolean;
-    operationHash: Uint8Array;
-    reindexBlockHeight: null;
-  }> {
+  async indexBlock(
+    blockContent: AlgorandBlock,
+    dataSources: SubqlProjectDs[],
+  ): Promise<ProcessBlockResponse> {
     let dynamicDsCreated = false;
     const blockHeight = blockContent.round;
-    const tx = await this.sequelize.transaction();
-    this.storeService.setTransaction(tx);
-    this.storeService.setBlockHeight(blockHeight);
 
-    let operationHash = NULL_MERKEL_ROOT;
-    let poiBlockHash: Uint8Array;
-    try {
-      this.filteredDataSources = this.filterDataSources(blockContent.round);
+    const filteredDataSources = this.filterDataSources(
+      blockHeight,
+      dataSources,
+    );
 
-      const datasources = this.filteredDataSources.concat(
-        ...(await this.dynamicDsService.getDynamicDatasources()),
-      );
+    this.assertDataSources(filteredDataSources, blockHeight);
 
-      let apiAt: SafeAPI;
+    let apiAt: SafeAPI;
 
-      await this.indexBlockData(
-        blockContent,
-        datasources,
-        // eslint-disable-next-line @typescript-eslint/require-await
-        async (ds: SubqlProjectDs) => {
-          // Injected runtimeVersion from fetch service might be outdated
-          apiAt = apiAt ?? this.apiService.api.getSafeApi(blockHeight);
+    await this.indexBlockData(
+      blockContent,
+      filteredDataSources,
+      // eslint-disable-next-line @typescript-eslint/require-await
+      async (ds: SubqlProjectDs) => {
+        // Injected runtimeVersion from fetch service might be outdated
+        apiAt = apiAt ?? this.apiService.api.getSafeApi(blockHeight);
 
-          const vm = this.sandboxService.getDsProcessor(ds, apiAt);
+        const vm = this.sandboxService.getDsProcessor(ds, apiAt);
 
-          // Inject function to create ds into vm
-          vm.freeze(
-            async (templateName: string, args?: Record<string, unknown>) => {
-              const newDs = await this.dynamicDsService.createDynamicDatasource(
-                {
-                  templateName,
-                  args,
-                  startBlock: blockHeight,
-                },
-                tx,
-              );
+        // Inject function to create ds into vm
+        vm.freeze(
+          async (templateName: string, args?: Record<string, unknown>) => {
+            const newDs = await this.dynamicDsService.createDynamicDatasource({
+              templateName,
+              args,
+              startBlock: blockHeight,
+            });
 
-              // Push the newly created dynamic ds to be processed this block on any future extrinsics/events
-              datasources.push(newDs);
-              dynamicDsCreated = true;
-            },
-            'createDynamicDatasource',
-          );
+            // Push the newly created dynamic ds to be processed this block on any future extrinsics/events
+            filteredDataSources.push(newDs);
+            dynamicDsCreated = true;
+          },
+          'createDynamicDatasource',
+        );
 
-          return vm;
-        },
-      );
-
-      await this.storeService.setMetadataBatch(
-        [
-          { key: 'lastProcessedHeight', value: blockHeight },
-          { key: 'lastProcessedTimestamp', value: Date.now() },
-        ],
-        { transaction: tx },
-      );
-      // Db Metadata increase BlockCount, in memory ref to block-dispatcher _processedBlockCount
-      await this.storeService.incrementJsonbCount('processedBlockCount', tx);
-
-      // Need calculate operationHash to ensure correct offset insert all time
-      operationHash = this.storeService.getOperationMerkleRoot();
-      if (this.nodeConfig.proofOfIndex) {
-        //check if operation is null, then poi will not be inserted
-        if (!u8aEq(operationHash, NULL_MERKEL_ROOT)) {
-          const poiBlock = PoiBlock.create(
-            blockHeight,
-            blockContent.round.toString(),
-            operationHash,
-            await this.poiService.getLatestPoiBlockHash(),
-            this.project.id,
-          );
-          poiBlockHash = poiBlock.hash;
-          await this.storeService.setPoi(poiBlock, { transaction: tx });
-          this.poiService.setLatestPoiBlockHash(poiBlockHash);
-          await this.storeService.setMetadataBatch(
-            [{ key: 'lastPoiHeight', value: blockHeight }],
-            { transaction: tx },
-          );
-        }
-      }
-    } catch (e) {
-      await tx.rollback();
-      throw e;
-    }
-
-    await tx.commit();
+        return vm;
+      },
+    );
 
     return {
       dynamicDsCreated,
-      operationHash,
+      blockHash: blockContent.hash,
       reindexBlockHeight: null,
     };
   }
@@ -178,8 +118,13 @@ export class IndexerManager {
     logger.info('indexer manager started');
   }
 
-  private filterDataSources(nextProcessingHeight: number): SubqlProjectDs[] {
-    let filteredDs = this.projectService.dataSources.filter(
+  private filterDataSources(
+    nextProcessingHeight: number,
+    dataSources: SubqlProjectDs[],
+  ): SubqlProjectDs[] {
+    let filteredDs: SubqlProjectDs[];
+
+    filteredDs = dataSources.filter(
       (ds) => ds.startBlock <= nextProcessingHeight,
     );
 
@@ -192,7 +137,7 @@ export class IndexerManager {
       if (isCustomDs(ds)) {
         return this.dsProcessorService
           .getDsProcessor(ds)
-          .dsFilterProcessor(ds, this.api);
+          .dsFilterProcessor(ds, this.apiService.api.api);
       } else {
         return true;
       }
@@ -203,6 +148,16 @@ export class IndexerManager {
       process.exit(1);
     }
     return filteredDs;
+  }
+
+  private assertDataSources(ds: SubqlProjectDs[], blockHeight: number) {
+    if (!ds.length) {
+      logger.error(
+        `Your start block is greater than the current indexed block height in your database. Either change your startBlock (project.yaml) to <= ${blockHeight}
+         or delete your database and start again from the currently specified startBlock`,
+      );
+      process.exit(1);
+    }
   }
 
   private async indexBlockData(
@@ -343,7 +298,7 @@ export class IndexerManager {
         input: data,
         ds,
         filter: handler.filter,
-        api: this.api,
+        api: this.apiService.api.api,
         assets,
       })
       .catch((e) => {

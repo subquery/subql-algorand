@@ -1,7 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import exp from 'constants';
 import { INestApplication } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
@@ -15,6 +14,7 @@ const testNetEndpoint = 'https://algoindexer.testnet.algoexplorerapi.io';
 function testSubqueryProject(endpoint: string): SubqueryProject {
   return {
     network: {
+      chainId: '',
       endpoint,
       dictionary: `https://api.subquery.network/sq/subquery/Algorand-Dictionary`,
     },

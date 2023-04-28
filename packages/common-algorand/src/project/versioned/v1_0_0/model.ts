@@ -72,9 +72,9 @@ export class ProjectNetworkDeploymentV1_0_0 {
 }
 
 export class ProjectNetworkV1_0_0 extends ProjectNetworkDeploymentV1_0_0 {
-  @IsString()
-  @IsNotEmpty()
-  endpoint: string;
+  @IsString({each: true})
+  @IsOptional()
+  endpoint?: string | string[];
 
   @IsString()
   @IsOptional()
@@ -86,7 +86,7 @@ export class ProjectNetworkV1_0_0 extends ProjectNetworkDeploymentV1_0_0 {
 
   @IsStringOrObject()
   @IsOptional()
-  apiKey: string | TokenHeader;
+  apiKey?: string | TokenHeader;
 }
 
 function validateObject(object: any, errorMessage = 'failed to validate object.'): void {

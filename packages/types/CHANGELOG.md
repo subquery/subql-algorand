@@ -15,7 +15,6 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
   - Add `count` to `Store` interface
   - Support for `bypassBlocks`
 
-
 ## [1.5.0] - 2023-01-24
 ### Added
 * Add `count` function to get the number of entities (#22)
@@ -23,7 +22,7 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [1.4.0] - 2022-11-11
 ### Changed
-- Sync changes from main SDK, update `AlgorandBlockFilter` include timestamp.  
+- Sync changes from main SDK, update `AlgorandBlockFilter` include timestamp.
 
 ## [1.3.0] - 2022-09-02
 

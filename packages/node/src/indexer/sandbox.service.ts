@@ -1,10 +1,16 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { isMainThread } from 'worker_threads';
 import { Inject, Injectable } from '@nestjs/common';
 import { AlgorandDataSource } from '@subql/common-algorand';
-import { NodeConfig, StoreService, IndexerSandbox } from '@subql/node-core';
-import { SafeAPI } from '@subql/types-algorand';
+import {
+  NodeConfig,
+  StoreService,
+  IndexerSandbox,
+  hostStoreToStore,
+} from '@subql/node-core';
+import { SafeAPI, Store } from '@subql/types-algorand';
 import { AlgorandApiService } from '../algorand';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 
@@ -20,15 +26,19 @@ export class SandboxService {
   ) {}
 
   getDsProcessor(ds: SubqlProjectDs, api: SafeAPI): IndexerSandbox {
+    const store: Store = isMainThread
+      ? this.storeService.getStore()
+      : hostStoreToStore((global as any).host); // Provided in worker.ts
+
     const entry = this.getDataSourceEntry(ds);
     let processor = this.processorCache[entry];
     if (!processor) {
       processor = new IndexerSandbox(
         {
           // api: await this.apiService.getPatchedApi(),
-          store: this.storeService.getStore(),
+          store,
           root: this.project.root,
-          script: ds.mapping.entryScript,
+          // script: ds.mapping.entryScript,
           entry,
         },
         this.nodeConfig,
