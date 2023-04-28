@@ -3017,7 +3017,7 @@ __metadata:
     "@types/tar": ^6.1.1
     "@types/yargs": ^16.0.4
     "@willsoto/nestjs-prometheus": ^4.4.0
-    algosdk: ^1.19.0
+    algosdk: ^2.2.0
     app-module-path: ^2.2.0
     axios: ^1.3.4
     cron-converter: ^1.0.2
@@ -3086,9 +3086,9 @@ __metadata:
   resolution: "@subql/types-algorand@workspace:packages/types"
   dependencies:
     "@types/app-module-path": ^2.2.0
-    algosdk: ^1.19.0
+    algosdk: ^2.2.0
   peerDependencies:
-    algosdk: ^1.19.0
+    algosdk: ^2.2.0
   languageName: unknown
   linkType: soft
 
@@ -3990,25 +3990,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"algosdk@npm:^1.19.0":
-  version: 1.19.0
-  resolution: "algosdk@npm:1.19.0"
+"algosdk@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "algosdk@npm:2.2.0"
   dependencies:
     algo-msgpack-with-bigint: ^2.1.1
-    buffer: ^6.0.2
-    fsevents: 2.1.2
+    buffer: ^6.0.3
+    cross-fetch: ^3.1.5
     hi-base32: ^0.5.1
     js-sha256: ^0.9.0
     js-sha3: ^0.8.0
     js-sha512: ^0.8.0
     json-bigint: ^1.0.0
-    superagent: ^6.1.0
     tweetnacl: ^1.0.3
     vlq: ^2.0.4
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  checksum: e7503171a587cab6816459cb68b37e2e8a8b9fd253d02843026bc14120f883be593cdfd55ba490ca57cb2399ffaaf68a4704d3e9a7a19dbf97fb094514a5abfe
+  checksum: 789ecdec4c43c60c032a48ac19cce88dfc0b9f3ad6bf165eb71a6e9fa8f39d44553d9d67b8c45814a306dd9df0b2d45c16cf00d40154aa286457fd36cf875890
   languageName: node
   linkType: hard
 
@@ -4653,7 +4649,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buffer@npm:^6.0.1, buffer@npm:^6.0.2, buffer@npm:^6.0.3":
+"buffer@npm:^6.0.1, buffer@npm:^6.0.3":
   version: 6.0.3
   resolution: "buffer@npm:6.0.3"
   dependencies:
@@ -5089,7 +5085,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookiejar@npm:^2.1.2, cookiejar@npm:^2.1.3":
+"cookiejar@npm:^2.1.3":
   version: 2.1.3
   resolution: "cookiejar@npm:2.1.3"
   checksum: 88259983ebc52ceb23cdacfa48762b6a518a57872eff1c7ed01d214fff5cf492e2660d7d5c04700a28f1787a76811df39e8639f8e17670b3cf94ecd86e161f07
@@ -5173,6 +5169,15 @@ __metadata:
   dependencies:
     moment-timezone: ^0.5.x
   checksum: 9df2d2e24684e1ebce37e3e29c183b1dfecf7adb5fb16f84435014e7205926fc9868e9bfacfa5f7b93c556c9f4a6fbcce5fde9bee1306d20bc848568bb587791
+  languageName: node
+  linkType: hard
+
+"cross-fetch@npm:^3.1.5":
+  version: 3.1.5
+  resolution: "cross-fetch@npm:3.1.5"
+  dependencies:
+    node-fetch: 2.6.7
+  checksum: f6b8c6ee3ef993ace6277fd789c71b6acf1b504fd5f5c7128df4ef2f125a429e29cd62dc8c127523f04a5f2fa4771ed80e3f3d9695617f441425045f505cf3bb
   languageName: node
   linkType: hard
 
@@ -6260,7 +6265,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-safe-stringify@npm:2.1.1, fast-safe-stringify@npm:^2.0.7, fast-safe-stringify@npm:^2.0.8, fast-safe-stringify@npm:^2.1.1":
+"fast-safe-stringify@npm:2.1.1, fast-safe-stringify@npm:^2.0.8, fast-safe-stringify@npm:^2.1.1":
   version: 2.1.1
   resolution: "fast-safe-stringify@npm:2.1.1"
   checksum: a851cbddc451745662f8f00ddb622d6766f9bd97642dabfd9a405fb0d646d69fc0b9a1243cbf67f5f18a39f40f6fa821737651ff1bceeba06c9992ca2dc5bd3d
@@ -6428,13 +6433,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"formidable@npm:^1.2.2":
-  version: 1.2.6
-  resolution: "formidable@npm:1.2.6"
-  checksum: 2b68ed07ba88302b9c63f8eda94f19a460cef6017bfda48348f09f41d2a36660c9353137991618e0e4c3db115b41e4b8f6fa63bc973b7a7c91dec66acdd02a56
-  languageName: node
-  linkType: hard
-
 "formidable@npm:^2.0.1":
   version: 2.0.1
   resolution: "formidable@npm:2.0.1"
@@ -6488,31 +6486,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fsevents@npm:2.1.2":
-  version: 2.1.2
-  resolution: "fsevents@npm:2.1.2"
-  dependencies:
-    node-gyp: latest
-  checksum: 63fe1ba77b63d5da5dde6112c5f0eb161b9d18a61427a8a49d661eeed080189d99e8f9da11bb6b75ecd5129a69edc5757d60a4eb0bbada6de68d5156c382c5e1
-  conditions: os=darwin
-  languageName: node
-  linkType: hard
-
 "fsevents@npm:^2.3.2, fsevents@npm:~2.3.2":
   version: 2.3.2
   resolution: "fsevents@npm:2.3.2"
   dependencies:
     node-gyp: latest
   checksum: 97ade64e75091afee5265e6956cb72ba34db7819b4c3e94c431d4be2b19b8bb7a2d4116da417950c3425f17c8fe693d25e20212cac583ac1521ad066b77ae31f
-  conditions: os=darwin
-  languageName: node
-  linkType: hard
-
-"fsevents@patch:fsevents@2.1.2#~builtin<compat/fsevents>":
-  version: 2.1.2
-  resolution: "fsevents@patch:fsevents@npm%3A2.1.2#~builtin<compat/fsevents>::version=2.1.2&hash=18f3a7"
-  dependencies:
-    node-gyp: latest
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -8830,7 +8809,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime@npm:2.6.0, mime@npm:^2.4.6":
+"mime@npm:2.6.0":
   version: 2.6.0
   resolution: "mime@npm:2.6.0"
   bin:
@@ -10076,7 +10055,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:^6.10.3, qs@npm:^6.9.4":
+"qs@npm:^6.10.3":
   version: 6.11.0
   resolution: "qs@npm:6.11.0"
   dependencies:
@@ -11096,25 +11075,6 @@ __metadata:
     typescript: ^4.9.5
   languageName: unknown
   linkType: soft
-
-"superagent@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "superagent@npm:6.1.0"
-  dependencies:
-    component-emitter: ^1.3.0
-    cookiejar: ^2.1.2
-    debug: ^4.1.1
-    fast-safe-stringify: ^2.0.7
-    form-data: ^3.0.0
-    formidable: ^1.2.2
-    methods: ^1.1.2
-    mime: ^2.4.6
-    qs: ^6.9.4
-    readable-stream: ^3.6.0
-    semver: ^7.3.2
-  checksum: 32ca1bc9805679cddeffdf5cf369da47359a0d38ee45ea668bba4116e17c247739e4084db9cc88217dd594a816e766a3dbf2431de017fbac0bc80efd6af30c1d
-  languageName: node
-  linkType: hard
 
 "superagent@npm:^8.0.0":
   version: 8.0.0

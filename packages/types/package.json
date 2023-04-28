@@ -16,10 +16,10 @@
     "/dist"
   ],
   "peerDependencies": {
-    "algosdk": "^1.19.0"
+    "algosdk": "^2.2.0"
   },
   "devDependencies": {
     "@types/app-module-path": "^2.2.0",
-    "algosdk": "^1.19.0"
+    "algosdk": "^2.2.0"
   }
 }
