@@ -30,8 +30,6 @@ import { DynamicDsService } from './dynamic-ds.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: packageVersion } = require('../../package.json');
 
-const DEFAULT_DB_SCHEMA = 'public';
-
 const logger = getLogger('Project');
 
 @Injectable()
@@ -133,16 +131,10 @@ export class ProjectService implements IProjectService<SubqlProjectDs> {
   }
 
   private async createProjectSchema(): Promise<string> {
-    let schema: string;
-    if (this.nodeConfig.localMode) {
-      // create tables in default schema if local mode is enabled
-      schema = DEFAULT_DB_SCHEMA;
-    } else {
-      schema = this.nodeConfig.dbSchema;
-      const schemas = await this.sequelize.showAllSchemas(undefined);
-      if (!(schemas as unknown as string[]).includes(schema)) {
-        await this.sequelize.createSchema(`"${schema}"`, undefined);
-      }
+    const schema = this.nodeConfig.dbSchema;
+    const schemas = await this.sequelize.showAllSchemas(undefined);
+    if (!(schemas as unknown as string[]).includes(schema)) {
+      await this.sequelize.createSchema(`"${schema}"`, undefined);
     }
 
     return schema;

@@ -3004,7 +3004,7 @@ __metadata:
     "@nestjs/testing": ^8.2.6
     "@subql/common": ^2.0.0
     "@subql/common-algorand": "workspace:*"
-    "@subql/node-core": ^2.0.1
+    "@subql/node-core": ^2.0.2
     "@subql/types-algorand": "workspace:*"
     "@subql/utils": ^2.0.0
     "@subql/x-merkle-mountain-range": 2.0.0-0.1.2
@@ -3044,9 +3044,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/node-core@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@subql/node-core@npm:2.0.1"
+"@subql/node-core@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "@subql/node-core@npm:2.0.2"
   dependencies:
     "@nestjs/common": ^8.2.6
     "@nestjs/event-emitter": ^1.3.0
@@ -3068,7 +3068,7 @@ __metadata:
     source-map: ^0.7.4
     vm2: ^3.9.9
     yargs: ^16.2.0
-  checksum: 2c8def7312d64d24dea31d0c4f82e624458f5f08e97541c0cddfd740a373b71876ebbb18fe0a2200944101e5985de847e6331e0226983ed61e8dcfa91f628abf
+  checksum: e7eb2a506ef83bf39ffd8221589f683240df4c4cd26a0483684bf4a3324e8b8cd8e40cf249ec660880fbb48574d26a1ccd253c88845f714f688b8e209dbe4ecc
   languageName: node
   linkType: hard
 
