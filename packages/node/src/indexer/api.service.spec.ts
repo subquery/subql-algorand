@@ -16,7 +16,7 @@ function testSubqueryProject(endpoint: string): SubqueryProject {
     network: {
       endpoint,
       dictionary: `https://api.subquery.network/sq/subquery/Algorand-Dictionary`,
-      chainId: '',
+      chainId: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
     },
     dataSources: [],
     id: 'test',
