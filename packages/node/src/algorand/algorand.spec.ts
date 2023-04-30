@@ -4,7 +4,7 @@
 import { INestApplication } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
-import { NodeConfig } from '@subql/node-core';
+import { ConnectionPoolService, NodeConfig } from '@subql/node-core';
 import { GraphQLSchema } from 'graphql';
 import { AlgorandApiService, filterTransaction } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -14,7 +14,7 @@ const testNetEndpoint = 'https://algoindexer.testnet.algoexplorerapi.io';
 function testSubqueryProject(endpoint: string): SubqueryProject {
   return {
     network: {
-      chainId: '',
+      chainId: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
       endpoint,
       dictionary: `https://api.subquery.network/sq/subquery/Algorand-Dictionary`,
     },
@@ -40,6 +40,7 @@ describe('Algorand RPC', () => {
           useFactory: () => testSubqueryProject(endpoint),
         },
         NodeConfig,
+        ConnectionPoolService,
         AlgorandApiService,
       ],
       imports: [EventEmitterModule.forRoot()],
