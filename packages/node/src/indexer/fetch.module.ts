@@ -10,8 +10,10 @@ import {
   PoiService,
   NodeConfig,
   SmartBatchService,
+  ConnectionPoolService,
+  StoreCacheService,
 } from '@subql/node-core';
-import { AlgorandApiService } from '../algorand';
+import { AlgorandApiConnection, AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import {
   BlockDispatcherService,
@@ -28,6 +30,8 @@ import { SandboxService } from './sandbox.service';
 @Module({
   providers: [
     StoreService,
+    StoreCacheService,
+    ConnectionPoolService,
     {
       provide: SmartBatchService,
       useFactory: (nodeConfig: NodeConfig) => {
@@ -39,13 +43,18 @@ import { SandboxService } from './sandbox.service';
       provide: AlgorandApiService,
       useFactory: async (
         project: SubqueryProject,
+        connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
         eventEmitter: EventEmitter2,
       ) => {
-        const apiService = new AlgorandApiService(project, eventEmitter);
+        const apiService = new AlgorandApiService(
+          project,
+          connectionPoolService,
+          eventEmitter,
+        );
         await apiService.init();
         return apiService;
       },
-      inject: ['ISubqueryProject', EventEmitter2],
+      inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
     },
     IndexerManager,
     {
@@ -57,6 +66,11 @@ import { SandboxService } from './sandbox.service';
         apiService: AlgorandApiService,
         indexerManager: IndexerManager,
         smartBatchService: SmartBatchService,
+        storeService: StoreService,
+        storeCacheService: StoreCacheService,
+        poiService: PoiService,
+        project: SubqueryProject,
+        dynamicDsService: DynamicDsService,
       ) =>
         nodeConfig.workers !== undefined
           ? new WorkerBlockDispatcherService(
@@ -64,6 +78,11 @@ import { SandboxService } from './sandbox.service';
               eventEmitter,
               projectService,
               smartBatchService,
+              storeService,
+              storeCacheService,
+              poiService,
+              project,
+              dynamicDsService,
             )
           : new BlockDispatcherService(
               apiService,
@@ -72,14 +91,24 @@ import { SandboxService } from './sandbox.service';
               eventEmitter,
               projectService,
               smartBatchService,
+              storeService,
+              storeCacheService,
+              poiService,
+              project,
+              dynamicDsService,
             ),
       inject: [
         NodeConfig,
         EventEmitter2,
-        ProjectService,
+        'IProjectService',
         AlgorandApiService,
         IndexerManager,
         SmartBatchService,
+        StoreService,
+        StoreCacheService,
+        PoiService,
+        'ISubqueryProject',
+        DynamicDsService,
       ],
     },
     FetchService,
@@ -98,8 +127,11 @@ import { SandboxService } from './sandbox.service';
     DynamicDsService,
     PoiService,
     MmrService,
-    ProjectService,
+    {
+      useClass: ProjectService,
+      provide: 'IProjectService',
+    },
   ],
-  exports: [StoreService, MmrService],
+  exports: [StoreService, MmrService, StoreCacheService],
 })
 export class FetchModule {}

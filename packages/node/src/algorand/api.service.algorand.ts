@@ -4,21 +4,30 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ProjectNetworkV1_0_0 } from '@subql/common-algorand';
-import { ApiService, getLogger } from '@subql/node-core';
+import {
+  ApiService,
+  ConnectionPoolService,
+  getLogger,
+  IndexerEvent,
+  NetworkMetadataPayload,
+} from '@subql/node-core';
+import { AlgorandBlock } from '@subql/types-algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { AlgorandApi } from './api.algorand';
+import { AlgorandApiConnection } from './api.connection';
 
 const logger = getLogger('api');
 
 @Injectable()
 export class AlgorandApiService extends ApiService {
+  networkMeta: NetworkMetadataPayload;
   constructor(
     @Inject('ISubqueryProject') project: SubqueryProject,
+    private connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
     private eventEmitter: EventEmitter2,
   ) {
     super(project);
   }
-  private _api: AlgorandApi;
 
   async init(): Promise<AlgorandApiService> {
     let network: ProjectNetworkV1_0_0;
@@ -29,35 +38,83 @@ export class AlgorandApiService extends ApiService {
       logger.error(Object.keys(e));
       process.exit(1);
     }
-    this.api = new AlgorandApi(network.endpoint);
-    await this.api.init();
 
-    this.networkMeta = {
-      chain: this.api.getChainId(),
-      genesisHash: this.api.getGenesisHash(),
-      specName: undefined,
-    };
+    const endpoints = Array.isArray(network.endpoint)
+      ? network.endpoint
+      : [network.endpoint];
 
-    if (network.chainId && network.chainId !== this.api.getGenesisHash()) {
-      const err = new Error(
-        `Network chainId doesn't match expected genesisHash. Your SubQuery project is expecting to index data from "${
-          network.chainId ?? network.genesisHash
-        }", however the endpoint that you are connecting to is different("${
-          this.networkMeta.genesisHash
-        }). Please check that the RPC endpoint is actually for your desired network or update the genesisHash.`,
-      );
-      logger.error(err, err.message);
-      throw err;
-    }
+    const connections = await Promise.all(
+      endpoints.map(async (endpoint, i) => {
+        const connection = await AlgorandApiConnection.create(endpoint);
+
+        const { api } = connection;
+
+        this.eventEmitter.emit(IndexerEvent.ApiConnected, {
+          value: 1,
+          apiIndex: i,
+          endpoint: endpoint,
+        });
+
+        // api.on('connected', () => {
+        //   this.eventEmitter.emit(IndexerEvent.ApiConnected, {
+        //     value: 1,
+        //     apiIndex: i,
+        //     endpoint: endpoint,
+        //   });
+        // });
+        // api.on('disconnected', () => {
+        //   this.eventEmitter.emit(IndexerEvent.ApiConnected, {
+        //     value: 0,
+        //     apiIndex: i,
+        //     endpoint: endpoint,
+        //   });
+        //   void this.connectionPoolService.handleApiDisconnects(i, endpoint);
+        // });
+        if (!this.networkMeta) {
+          this.networkMeta = {
+            chain: api.getChainId(),
+            genesisHash: api.getGenesisHash(),
+            specName: undefined,
+          };
+        }
+
+        if (network.chainId !== api.getGenesisHash()) {
+          throw this.metadataMismatchError(
+            'ChainId',
+            network.chainId,
+            api.getGenesisHash(),
+          );
+        }
+
+        return connection;
+      }),
+    );
+
+    this.connectionPoolService.addBatchToConnections(connections);
 
     return this;
   }
 
   get api(): AlgorandApi {
-    return this._api;
+    return this.connectionPoolService.api.api;
   }
 
-  private set api(value: AlgorandApi) {
-    this._api = value;
+  async fetchBlocks(batch: number[]): Promise<AlgorandBlock[]> {
+    return this.fetchBlocksGeneric<AlgorandBlock>(
+      () => (b: number[]) => this.api.fetchBlocks(b),
+      batch,
+    );
+  }
+
+  private metadataMismatchError(
+    metadata: string,
+    expected: string,
+    actual: string,
+  ): Error {
+    return Error(
+      `Value of ${metadata} does not match across all endpoints. Please check that your endpoints are for the same network.\n
+       Expected: ${expected}
+       Actual: ${actual}`,
+    );
   }
 }

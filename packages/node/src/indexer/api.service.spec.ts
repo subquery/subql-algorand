@@ -4,7 +4,7 @@
 import { INestApplication } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
-import { NodeConfig } from '@subql/node-core';
+import { ConnectionPoolService, NodeConfig } from '@subql/node-core';
 import { GraphQLSchema } from 'graphql';
 import { AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -16,6 +16,7 @@ function testSubqueryProject(endpoint: string): SubqueryProject {
     network: {
       endpoint,
       dictionary: `https://api.subquery.network/sq/subquery/Algorand-Dictionary`,
+      chainId: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
     },
     dataSources: [],
     id: 'test',
@@ -42,6 +43,7 @@ describe('ApiService', () => {
           provide: 'ISubqueryProject',
           useFactory: () => testSubqueryProject(endpoint),
         },
+        ConnectionPoolService,
         NodeConfig,
         AlgorandApiService,
       ],

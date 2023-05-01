@@ -2,17 +2,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { threadId } from 'node:worker_threads';
-import { Injectable } from '@nestjs/common';
-import { NodeConfig, getLogger, AutoQueue } from '@subql/node-core';
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  NodeConfig,
+  getLogger,
+  AutoQueue,
+  memoryLock,
+  IProjectService,
+} from '@subql/node-core';
 import { AlgorandApiService } from '../../algorand';
+import { SubqlProjectDs } from '../../configure/SubqueryProject';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
 
-export type FetchBlockResponse = undefined;
+export type FetchBlockResponse = { parentHash: string } | undefined;
 
 export type ProcessBlockResponse = {
   dynamicDsCreated: boolean;
-  operationHash: string; // Base64 encoded u8a array
+  blockHash: string;
   reindexBlockHeight: number;
 };
 
@@ -35,6 +42,8 @@ export class WorkerService {
   constructor(
     private apiService: AlgorandApiService,
     private indexerManager: IndexerManager,
+    @Inject('IProjectService')
+    private projectService: IProjectService<SubqlProjectDs>,
     nodeConfig: NodeConfig,
   ) {
     this.queue = new AutoQueue(undefined, nodeConfig.batchSize);
@@ -45,17 +54,25 @@ export class WorkerService {
       return await this.queue.put(async () => {
         // If a dynamic ds is created we might be asked to fetch blocks again, use existing result
         if (!this.fetchedBlocks[height]) {
-          const [block] = await this.apiService.api.fetchBlocksBatches([
-            height,
-          ]);
+          if (memoryLock.isLocked()) {
+            const start = Date.now();
+            await memoryLock.waitForUnlock();
+            const end = Date.now();
+            logger.debug(`memory lock wait time: ${end - start}ms`);
+          }
+
+          const [block] = await this.apiService.fetchBlocks([height]);
           this.fetchedBlocks[height] = block;
         }
 
-        return undefined;
+        const block = this.fetchedBlocks[height];
+        // Return info to get the runtime version, this lets the worker thread know
+        return {
+          parentHash: block.previousBlockHash,
+        };
       });
     } catch (e) {
       logger.error(e, `Failed to fetch block ${height}`);
-      // throw e;
     }
   }
 
@@ -70,16 +87,15 @@ export class WorkerService {
 
       delete this.fetchedBlocks[height];
 
-      const response = await this.indexerManager.indexBlock(block);
-
-      this._isIndexing = false;
-      return {
-        ...response,
-        operationHash: Buffer.from(response.operationHash).toString('base64'),
-      };
+      return await this.indexerManager.indexBlock(
+        block,
+        await this.projectService.getAllDataSources(height),
+      );
     } catch (e) {
       logger.error(e, `Failed to index block ${height}: ${e.stack}`);
       throw e;
+    } finally {
+      this._isIndexing = false;
     }
   }
 

@@ -22,12 +22,16 @@ import { getHeapStatistics } from 'v8';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
-  registerWorker,
+  waitForBatchSize,
+  WorkerHost,
   getLogger,
   NestLogger,
-  waitForBatchSize,
+  hostStoreKeys,
+  HostStore,
+  hostDynamicDsKeys,
+  HostDynamicDS,
 } from '@subql/node-core';
-import { DynamicDsService } from '../dynamic-ds.service';
+import { SubqlProjectDs } from '../../configure/SubqueryProject';
 import { IndexerManager } from '../indexer.manager';
 import { WorkerModule } from './worker.module';
 import {
@@ -38,7 +42,6 @@ import {
 } from './worker.service';
 let app: INestApplication;
 let workerService: WorkerService;
-let dynamicDsService: DynamicDsService;
 
 const logger = getLogger(`worker #${threadId}`);
 
@@ -60,7 +63,6 @@ async function initWorker(): Promise<void> {
     await indexerManager.start();
 
     workerService = app.get(WorkerService);
-    dynamicDsService = app.get(DynamicDsService);
   } catch (e) {
     console.log('Failed to start worker', e);
     logger.error(e, 'Failed to start worker');
@@ -108,37 +110,52 @@ async function getMemoryLeft(): Promise<number> {
   return totalHeap - heapUsed;
 }
 
-async function waitForWorkerBatchSize(heapSizeInBytes) {
+async function waitForWorkerBatchSize(heapSizeInBytes: number): Promise<void> {
   await waitForBatchSize(heapSizeInBytes);
 }
 
-async function reloadDynamicDs(): Promise<void> {
-  return dynamicDsService.reloadDynamicDatasources();
-}
-
 // Register these functions to be exposed to worker host
-registerWorker({
-  initWorker,
-  fetchBlock,
-  processBlock,
-  numFetchedBlocks,
-  numFetchingBlocks,
-  getStatus,
-  getMemoryLeft,
-  waitForWorkerBatchSize,
-  reloadDynamicDs,
-});
+(global as any).host = WorkerHost.create<
+  HostStore & HostDynamicDS<SubqlProjectDs>,
+  IInitIndexerWorker
+>(
+  [...hostStoreKeys, ...hostDynamicDsKeys],
+  {
+    initWorker,
+    fetchBlock,
+    processBlock,
+    numFetchedBlocks,
+    numFetchingBlocks,
+    getStatus,
+    getMemoryLeft,
+    waitForWorkerBatchSize,
+  },
+  logger,
+);
 
 // Export types to be used on the parent
-export type InitWorker = typeof initWorker;
-export type FetchBlock = typeof fetchBlock;
-export type ProcessBlock = typeof processBlock;
-export type NumFetchedBlocks = typeof numFetchedBlocks;
-export type NumFetchingBlocks = typeof numFetchingBlocks;
-export type GetWorkerStatus = typeof getStatus;
-export type GetMemoryLeft = typeof getMemoryLeft;
-export type waitForWorkerBatchSize = typeof waitForWorkerBatchSize;
-export type ReloadDynamicDs = typeof reloadDynamicDs;
+type InitWorker = typeof initWorker;
+type FetchBlock = typeof fetchBlock;
+type ProcessBlock = typeof processBlock;
+type NumFetchedBlocks = typeof numFetchedBlocks;
+type NumFetchingBlocks = typeof numFetchingBlocks;
+type GetWorkerStatus = typeof getStatus;
+type GetMemoryLeft = typeof getMemoryLeft;
+type WaitForWorkerBatchSize = typeof waitForWorkerBatchSize;
+
+export type IIndexerWorker = {
+  processBlock: ProcessBlock;
+  fetchBlock: FetchBlock;
+  numFetchedBlocks: NumFetchedBlocks;
+  numFetchingBlocks: NumFetchingBlocks;
+  getStatus: GetWorkerStatus;
+  getMemoryLeft: GetMemoryLeft;
+  waitForWorkerBatchSize: WaitForWorkerBatchSize;
+};
+
+export type IInitIndexerWorker = IIndexerWorker & {
+  initWorker: InitWorker;
+};
 
 process.on('uncaughtException', (e) => {
   logger.error(e, 'Uncaught Exception');

@@ -6,8 +6,7 @@ import { isMainThread } from 'worker_threads';
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
-  MetadataFactory,
-  MetadataRepo,
+  IProjectService,
   NodeConfig,
   IndexerEvent,
   StoreService,
@@ -15,7 +14,6 @@ import {
   MmrService,
   getLogger,
   getExistingProjectSchema,
-  getMetaDataInfo,
 } from '@subql/node-core';
 import { Sequelize } from 'sequelize';
 import { AlgorandApiService } from '../algorand';
@@ -32,14 +30,11 @@ import { DynamicDsService } from './dynamic-ds.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: packageVersion } = require('../../package.json');
 
-const DEFAULT_DB_SCHEMA = 'public';
-
 const logger = getLogger('Project');
 
 @Injectable()
-export class ProjectService {
+export class ProjectService implements IProjectService<SubqlProjectDs> {
   private _schema: string;
-  private metadataRepo: MetadataRepo;
   private _startHeight: number;
   private _blockOffset: number;
 
@@ -60,10 +55,6 @@ export class ProjectService {
     return this._schema;
   }
 
-  get dataSources(): SubqlProjectDs[] {
-    return this.project.dataSources;
-  }
-
   get blockOffset(): number {
     return this._blockOffset;
   }
@@ -76,12 +67,6 @@ export class ProjectService {
     return this.storeService.historical;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  get metadataName(): string {
-    return this.metadataRepo.tableName;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/require-await
   private async getExistingProjectSchema(): Promise<string> {
     return getExistingProjectSchema(this.nodeConfig, this.sequelize);
   }
@@ -90,7 +75,6 @@ export class ProjectService {
     // Used to load assets into DS-processor, has to be done in any thread
     await this.dsProcessorService.validateProjectCustomDataSources();
     // Do extra work on main thread to setup stuff
-
     this.project.dataSources = await generateTimestampReferenceForBlockFilters(
       this.project.dataSources,
       this.apiService.api,
@@ -98,28 +82,30 @@ export class ProjectService {
     if (isMainThread) {
       this._schema = await this.ensureProject();
       await this.initDbSchema();
-      this.metadataRepo = await this.ensureMetadata();
-      this.dynamicDsService.init(this.metadataRepo);
+      await this.ensureMetadata();
+      this.dynamicDsService.init(this.storeService.storeCache.metadata);
 
       await this.initHotSchemaReload();
 
       if (this.nodeConfig.proofOfIndex) {
         const blockOffset = await this.getMetadataBlockOffset();
         void this.setBlockOffset(Number(blockOffset));
-        await this.poiService.init(this.schema);
+        await this.poiService.init();
       }
 
       this._startHeight = await this.getStartHeight();
+
+      if (this.nodeConfig.unfinalizedBlocks && !this.isHistorical) {
+        logger.error(
+          'Unfinalized blocks cannot be enabled without historical. You will need to reindex your project to enable historical',
+        );
+        process.exit(1);
+      }
+
+      // Flush any pending operations to setup DB
+      await this.storeService.storeCache.flushCache(true);
     } else {
       this._schema = await this.getExistingProjectSchema();
-      this.metadataRepo = await MetadataFactory(
-        this.sequelize,
-        this.schema,
-        this.nodeConfig.multiChain,
-        this.project.network.chainId,
-      );
-
-      this.dynamicDsService.init(this.metadataRepo);
 
       await this.sequelize.sync();
 
@@ -127,7 +113,7 @@ export class ProjectService {
       await this.initDbSchema();
 
       if (this.nodeConfig.proofOfIndex) {
-        await this.poiService.init(this.schema);
+        await this.poiService.init();
       }
     }
   }
@@ -145,16 +131,10 @@ export class ProjectService {
   }
 
   private async createProjectSchema(): Promise<string> {
-    let schema: string;
-    if (this.nodeConfig.localMode) {
-      // create tables in default schema if local mode is enabled
-      schema = DEFAULT_DB_SCHEMA;
-    } else {
-      schema = this.nodeConfig.dbSchema;
-      const schemas = await this.sequelize.showAllSchemas(undefined);
-      if (!(schemas as unknown as string[]).includes(schema)) {
-        await this.sequelize.createSchema(`"${schema}"`, undefined);
-      }
+    const schema = this.nodeConfig.dbSchema;
+    const schemas = await this.sequelize.showAllSchemas(undefined);
+    if (!(schemas as unknown as string[]).includes(schema)) {
+      await this.sequelize.createSchema(`"${schema}"`, undefined);
     }
 
     return schema;
@@ -167,13 +147,8 @@ export class ProjectService {
     await initDbSchema(this.project, this.schema, this.storeService);
   }
 
-  private async ensureMetadata(): Promise<MetadataRepo> {
-    const metadataRepo = await MetadataFactory(
-      this.sequelize,
-      this.schema,
-      this.nodeConfig.multiChain,
-      this.project.network.chainId,
-    );
+  private async ensureMetadata(): Promise<void> {
+    const metadata = this.storeService.storeCache.metadata;
 
     this.eventEmitter.emit(
       IndexerEvent.NetworkMetadata,
@@ -188,110 +163,66 @@ export class ProjectService {
       'specName',
       'genesisHash',
       'startHeight',
-      'chainId',
       'processedBlockCount',
       'lastFinalizedVerifiedHeight',
       'schemaMigrationCount',
-      'bypassBlocks',
     ] as const;
 
-    const entries = await metadataRepo.findAll({
-      where: {
-        key: keys,
-      },
-    });
+    const existing = await metadata.findMany(keys);
 
-    const keyValue = entries.reduce((arr, curr) => {
-      arr[curr.key] = curr.value;
-      return arr;
-    }, {} as { [key in typeof keys[number]]: string | boolean | number });
-
-    const { chain, genesisHash } = this.apiService.networkMeta;
+    const { chain, genesisHash, specName } = this.apiService.networkMeta;
 
     if (this.project.runner) {
       const { node, query } = this.project.runner;
-      await Promise.all([
-        metadataRepo.upsert({
-          key: 'runnerNode',
-          value: node.name,
-        }),
-        metadataRepo.upsert({
-          key: 'runnerNodeVersion',
-          value: node.version,
-        }),
-        metadataRepo.upsert({
-          key: 'runnerQuery',
-          value: query.name,
-        }),
-        metadataRepo.upsert({
-          key: 'runnerQueryVersion',
-          value: query.version,
-        }),
+
+      metadata.setBulk([
+        { key: 'runnerNode', value: node.name },
+        { key: 'runnerNodeVersion', value: node.version },
+        { key: 'runnerQuery', value: query.name },
+        { key: 'runnerQueryVersion', value: query.version },
       ]);
     }
-
-    if (!keyValue.genesisHash) {
-      await metadataRepo.upsert({ key: 'genesisHash', value: genesisHash });
+    if (!existing.genesisHash) {
+      metadata.set('genesisHash', genesisHash);
     } else {
       // Check if the configured genesisHash matches the currently stored genesisHash
       assert(
         // Configured project yaml genesisHash only exists in specVersion v0.2.0, fallback to api fetched genesisHash on v0.0.1
-        (this.project.network.chainId ?? genesisHash) === keyValue.genesisHash,
+        (this.project.network.chainId ?? genesisHash) === existing.genesisHash,
         'Specified project manifest chain id / genesis hash does not match database stored genesis hash, consider cleaning project schema using --force-clean',
       );
     }
-    if (keyValue.chain !== chain) {
-      await metadataRepo.upsert({ key: 'chain', value: chain });
+    if (existing.chain !== chain) {
+      metadata.set('chain', chain);
+    }
+
+    if (existing.specName !== specName) {
+      metadata.set('specName', specName);
     }
 
     // If project was created before this feature, don't add the key. If it is project created after, add this key.
-    if (!keyValue.processedBlockCount && !keyValue.lastProcessedHeight) {
-      await metadataRepo.upsert({ key: 'processedBlockCount', value: 0 });
+    if (!existing.processedBlockCount && !existing.lastProcessedHeight) {
+      metadata.set('processedBlockCount', 0);
     }
 
-    // If project was created before this feature, don't add the key. If it is project created after, add this key.
-    if (!keyValue.processedBlockCount && !keyValue.lastProcessedHeight) {
-      await metadataRepo.upsert({ key: 'processedBlockCount', value: 0 });
+    if (existing.indexerNodeVersion !== packageVersion) {
+      metadata.set('indexerNodeVersion', packageVersion);
+    }
+    if (!existing.schemaMigrationCount) {
+      metadata.set('schemaMigrationCount', 0);
     }
 
-    // If project was created before this feature, don't add the key. If it is project created after, add this key.
-    if (!keyValue.processedBlockCount && !keyValue.lastProcessedHeight) {
-      await metadataRepo.upsert({ key: 'processedBlockCount', value: 0 });
+    if (!existing.startHeight) {
+      metadata.set('startHeight', this.getStartBlockFromDataSources());
     }
-
-    if (keyValue.indexerNodeVersion !== packageVersion) {
-      await metadataRepo.upsert({
-        key: 'indexerNodeVersion',
-        value: packageVersion,
-      });
-    }
-    if (!keyValue.schemaMigrationCount) {
-      await metadataRepo.upsert({ key: 'schemaMigrationCount', value: 0 });
-    }
-
-    if (!keyValue.startHeight) {
-      await metadataRepo.upsert({
-        key: 'startHeight',
-        value: this.getStartBlockFromDataSources(),
-      });
-    }
-
-    return metadataRepo;
   }
 
-  async upsertMetadataBlockOffset(height: number): Promise<void> {
-    await this.metadataRepo.upsert({
-      key: 'blockOffset',
-      value: height,
-    });
+  private async getMetadataBlockOffset(): Promise<number | undefined> {
+    return this.storeService.storeCache.metadata.find('blockOffset');
   }
 
-  async getMetadataBlockOffset(): Promise<number | undefined> {
-    return getMetaDataInfo(this.metadataRepo, 'blockOffset');
-  }
-
-  async getLastProcessedHeight(): Promise<number | undefined> {
-    return getMetaDataInfo(this.metadataRepo, 'lastProcessedHeight');
+  private async getLastProcessedHeight(): Promise<number | undefined> {
+    return this.storeService.storeCache.metadata.find('lastProcessedHeight');
   }
 
   private async getStartHeight(): Promise<number> {
@@ -308,7 +239,7 @@ export class ProjectService {
 
   async setBlockOffset(offset: number): Promise<void> {
     if (
-      this._blockOffset ||
+      this._blockOffset !== undefined ||
       offset === null ||
       offset === undefined ||
       isNaN(offset)
@@ -317,19 +248,10 @@ export class ProjectService {
     }
     logger.info(`set blockOffset to ${offset}`);
     this._blockOffset = offset;
-    return this.mmrService
-      .syncFileBaseFromPoi(this.schema, offset)
-      .catch((err) => {
-        logger.error(err, 'failed to sync poi to mmr');
-        process.exit(1);
-      });
-  }
-  async getProcessedBlockCount(): Promise<number> {
-    const res = await this.metadataRepo.findOne({
-      where: { key: 'processedBlockCount' },
+    return this.mmrService.syncFileBaseFromPoi(offset).catch((err) => {
+      logger.error(err, 'failed to sync poi to mmr');
+      process.exit(1);
     });
-
-    return res?.value as number | undefined;
   }
 
   private getStartBlockFromDataSources() {
@@ -359,6 +281,14 @@ export class ProjectService {
       this.mmrService,
       this.sequelize,
       /* Not providing force clean service, it should never be needed */
+    );
+  }
+
+  async getAllDataSources(blockHeight: number): Promise<SubqlProjectDs[]> {
+    const dynamicDs = await this.dynamicDsService.getDynamicDatasources();
+
+    return [...this.project.dataSources, ...dynamicDs].filter(
+      (ds) => ds.startBlock <= blockHeight,
     );
   }
 }

@@ -30,7 +30,7 @@ export interface ProjectManifestV1_0_0 extends IAlgorandProjectManifest {
   };
 
   network: {
-    endpoint?: string;
+    endpoint?: string | string[];
     dictionary?: string;
     chainId: string;
   };

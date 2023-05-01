@@ -19,9 +19,7 @@ import { SubqueryProject } from './SubqueryProject';
 
 const logger = getLogger('configure');
 
-const YargsNameMapping: Record<string, string> = {
-  local: 'localMode',
-};
+const YargsNameMapping: Record<string, string> = {};
 
 type Args = typeof yargsOptions.argv['argv'];
 
@@ -108,7 +106,7 @@ export class ConfigureModule {
         config.subquery,
         omitBy<AlgorandProjectNetworkConfig>(
           {
-            endpoint: config.networkEndpoint,
+            endpoint: config.networkEndpoints,
             dictionary: config.networkDictionary,
           },
           isNil,
@@ -170,7 +168,7 @@ export class ConfigureModule {
         argv.subquery,
         omitBy<AlgorandProjectNetworkConfig>(
           {
-            endpoint: config.networkEndpoint,
+            endpoint: config.networkEndpoints,
             dictionary: config.networkDictionary,
           },
           isNil,
