@@ -54,8 +54,6 @@ export class BlockDispatcherService
       project,
       dynamicDsService,
       async (blockNums: number[]): Promise<AlgorandBlock[]> => {
-        // If specVersion not changed, a known overallSpecVer will be pass in
-        // Otherwise use api to fetch runtimes
         return this.apiService.fetchBlocks(blockNums);
       },
     );
