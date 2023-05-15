@@ -3,29 +3,30 @@
 
 import { isMainThread } from 'worker_threads';
 import { Inject, Injectable } from '@nestjs/common';
-import { AlgorandDataSource } from '@subql/common-algorand';
+import { BaseDataSource } from '@subql/common';
 import {
+  hostStoreToStore,
+  IndexerSandbox,
+  ISubqueryProject,
   NodeConfig,
   StoreService,
-  IndexerSandbox,
-  hostStoreToStore,
 } from '@subql/node-core';
-import { SafeAPI, Store } from '@subql/types-algorand';
+import { Store } from '@subql/types';
 import { AlgorandApiService } from '../algorand';
-import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 
+/* It would be nice to move this to node core but need to find a way to inject other things into the sandbox */
 @Injectable()
-export class SandboxService {
+export class SandboxService<Api> {
   private processorCache: Record<string, IndexerSandbox> = {};
 
   constructor(
     private readonly apiService: AlgorandApiService,
     private readonly storeService: StoreService,
     private readonly nodeConfig: NodeConfig,
-    @Inject('ISubqueryProject') private readonly project: SubqueryProject,
+    @Inject('ISubqueryProject') private readonly project: ISubqueryProject,
   ) {}
 
-  getDsProcessor(ds: SubqlProjectDs, api: SafeAPI): IndexerSandbox {
+  getDsProcessor(ds: BaseDataSource, api: Api): IndexerSandbox {
     const store: Store = isMainThread
       ? this.storeService.getStore()
       : hostStoreToStore((global as any).host); // Provided in worker.ts
@@ -35,11 +36,10 @@ export class SandboxService {
     if (!processor) {
       processor = new IndexerSandbox(
         {
-          // api: await this.apiService.getPatchedApi(),
           store,
           root: this.project.root,
-          // script: ds.mapping.entryScript,
           entry,
+          chainId: this.project.network.chainId,
         },
         this.nodeConfig,
       );
@@ -49,10 +49,11 @@ export class SandboxService {
     if (this.nodeConfig.unsafe) {
       processor.freeze(this.apiService.api, 'unsafeApi');
     }
+    processor.freeze(this.project.network.chainId, 'chainId');
     return processor;
   }
 
-  private getDataSourceEntry(ds: AlgorandDataSource): string {
+  private getDataSourceEntry(ds: BaseDataSource): string {
     return ds.mapping.file;
   }
 }

@@ -5,6 +5,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   NodeConfig,
   StoreService,
+  getLogger,
   TestingService as BaseTestingService,
 } from '@subql/node-core';
 import { Sequelize } from 'sequelize';
@@ -12,6 +13,8 @@ import { AlgorandApiService } from '../algorand';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { IndexerManager } from '../indexer/indexer.manager';
 import { BlockContent } from '../indexer/types';
+
+const logger = getLogger('subql-testing');
 
 @Injectable()
 export class TestingService extends BaseTestingService<

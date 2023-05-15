@@ -30,7 +30,7 @@ Options:
        [string] [required] [default: process.cwd()]
       --subquery-name       Name of the subquery project   [deprecated] [string]
   -c, --config              Specify configuration file                  [string]
-      --local               Use local mode                [deprecated] [boolean]
+      --local               Use local mode                [deprecated] [boolean]                              [boolean]
       --db-schema           Db schema name of the project               [string]
       --unsafe              Allows usage of any built-in module within the
                             sandbox                                    [boolean]
