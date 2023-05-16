@@ -16,6 +16,7 @@ import {
   HostStore,
   HostDynamicDS,
   WorkerBlockDispatcher,
+  IUnfinalizedBlocksService,
 } from '@subql/node-core';
 import { Store } from '@subql/types';
 import {
@@ -23,7 +24,10 @@ import {
   SubqueryProject,
 } from '../../configure/SubqueryProject';
 import { DynamicDsService } from '../dynamic-ds.service';
+import { BlockContent } from '../types';
+import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
 import { IIndexerWorker, IInitIndexerWorker } from '../worker/worker';
+import { HostUnfinalizedBlocks } from '../worker/worker.unfinalizedBlocks.service';
 
 type IndexerWorker = IIndexerWorker & {
   terminate: () => Promise<number>;
@@ -32,10 +36,11 @@ type IndexerWorker = IIndexerWorker & {
 async function createIndexerWorker(
   store: Store,
   dynamicDsService: IDynamicDsService<SubqlProjectDs>,
+  unfinalizedBlocksService: IUnfinalizedBlocksService<BlockContent>,
 ): Promise<IndexerWorker> {
   const indexerWorker = Worker.create<
     IInitIndexerWorker,
-    HostDynamicDS<SubqlProjectDs> & HostStore
+    HostDynamicDS<SubqlProjectDs> & HostStore & HostUnfinalizedBlocks
   >(
     path.resolve(__dirname, '../../../dist/indexer/worker/worker.js'),
     [
@@ -61,6 +66,10 @@ async function createIndexerWorker(
         dynamicDsService.createDynamicDatasource.bind(dynamicDsService),
       dynamicDsGetDynamicDatasources:
         dynamicDsService.getDynamicDatasources.bind(dynamicDsService),
+      unfinalizedBlocksProcess:
+        unfinalizedBlocksService.processUnfinalizedBlockHeader.bind(
+          unfinalizedBlocksService,
+        ),
     },
   );
 
@@ -84,6 +93,7 @@ export class WorkerBlockDispatcherService
     poiService: PoiService,
     @Inject('ISubqueryProject') project: SubqueryProject,
     dynamicDsService: DynamicDsService,
+    unfinalizedBlocksService: UnfinalizedBlocksService,
   ) {
     super(
       nodeConfig,
@@ -95,7 +105,12 @@ export class WorkerBlockDispatcherService
       poiService,
       project,
       dynamicDsService,
-      () => createIndexerWorker(storeService.getStore(), dynamicDsService),
+      () =>
+        createIndexerWorker(
+          storeService.getStore(),
+          dynamicDsService,
+          unfinalizedBlocksService,
+        ),
     );
   }
 

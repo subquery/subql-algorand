@@ -73,6 +73,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         poiService: PoiService,
         project: SubqueryProject,
         dynamicDsService: DynamicDsService,
+        unfinalizedBlocksService: UnfinalizedBlocksService,
       ) =>
         nodeConfig.workers !== undefined
           ? new WorkerBlockDispatcherService(
@@ -85,6 +86,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               poiService,
               project,
               dynamicDsService,
+              unfinalizedBlocksService,
             )
           : new BlockDispatcherService(
               apiService,
@@ -111,6 +113,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         PoiService,
         'ISubqueryProject',
         DynamicDsService,
+        UnfinalizedBlocksService,
       ],
     },
     FetchService,
