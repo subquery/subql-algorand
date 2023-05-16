@@ -14,7 +14,7 @@ import { BlockContent } from './types';
 export function algorandBlockToHeader(block: BlockContent): Header {
   return {
     blockHeight: block.round,
-    blockHash: block.hash,
+    blockHash: block.round.toString(),
     parentHash: block.previousBlockHash,
   };
 }

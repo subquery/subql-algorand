@@ -4,8 +4,6 @@
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import {
   NodeConfig,
-  timeout,
-  getLogger,
   DictionaryService as CoreDictionaryService,
 } from '@subql/node-core';
 import { SubqueryProject } from '../configure/SubqueryProject';
