@@ -8,5 +8,6 @@ declare global {
   const api: SafeAPI;
   const logger: Pino.Logger;
   const store: Store;
+  const chainId: string;
   const createDynamicDatasource: DynamicDatasourceCreator;
 }

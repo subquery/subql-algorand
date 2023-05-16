@@ -28,7 +28,6 @@
   "references": [
     {"path": "packages/common-algorand"},
     {"path": "packages/node"},
-    {"path": "packages/node-core"},
     {"path": "packages/types"},
   ],
   "include": ["packages/**/*"],

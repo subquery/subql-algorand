@@ -9,14 +9,13 @@ import {
   StoreService,
   getExistingProjectSchema,
   CacheMetadataModel,
+  initDbSchema,
+  ForceCleanService,
+  reindex,
 } from '@subql/node-core';
 import { Sequelize } from 'sequelize';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { DynamicDsService } from '../indexer/dynamic-ds.service';
-import { initDbSchema } from '../utils/project';
-import { reindex } from '../utils/reindex';
-
-import { ForceCleanService } from './forceClean.service';
 
 const logger = getLogger('Reindex');
 
@@ -47,6 +46,12 @@ export class ReindexService {
     this.metadataRepo = this.storeService.storeCache.metadata;
 
     this.dynamicDsService.init(this.metadataRepo);
+  }
+
+  async getTargetHeightWithUnfinalizedBlocks(
+    inputHeight: number,
+  ): Promise<number> {
+    return Promise.resolve(inputHeight);
   }
 
   private async getExistingProjectSchema(): Promise<string> {
@@ -92,12 +97,13 @@ export class ReindexService {
       targetBlockHeight,
       lastProcessedHeight,
       this.storeService,
+      undefined,
       this.dynamicDsService,
       this.mmrService,
       this.sequelize,
       this.forceCleanService,
     );
 
-    await this.storeService.storeCache.flushCache();
+    await this.storeService.storeCache.flushCache(true, true);
   }
 }
