@@ -27,6 +27,7 @@ import { DynamicDsService } from '../dynamic-ds.service';
 import { BlockContent } from '../types';
 import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
 import { IIndexerWorker, IInitIndexerWorker } from '../worker/worker';
+import { HostUnfinalizedBlocks } from '../worker/worker.unfinalizedBlocks.service';
 
 type IndexerWorker = IIndexerWorker & {
   terminate: () => Promise<number>;
@@ -39,7 +40,7 @@ async function createIndexerWorker(
 ): Promise<IndexerWorker> {
   const indexerWorker = Worker.create<
     IInitIndexerWorker,
-    HostDynamicDS<SubqlProjectDs> & HostStore
+    HostDynamicDS<SubqlProjectDs> & HostStore & HostUnfinalizedBlocks
   >(
     path.resolve(__dirname, '../../../dist/indexer/worker/worker.js'),
     [
