@@ -1,6 +1,6 @@
 {
   "name": "@subql/node-algorand",
-  "version": "2.0.1-1",
+  "version": "2.1.0",
   "description": "",
   "author": "Ian He",
   "license": "Apache-2.0",
@@ -26,7 +26,7 @@
     "@nestjs/schedule": "^1.0.2",
     "@subql/common": "^2.0.0",
     "@subql/common-algorand": "workspace:*",
-    "@subql/node-core": "^2.2.0",
+    "@subql/node-core": "^2.2.1",
     "@subql/types-algorand": "workspace:*",
     "@subql/utils": "^2.0.0",
     "@subql/x-merkle-mountain-range": "2.0.0-0.1.2",
@@ -63,6 +63,5 @@
   "files": [
     "/dist",
     "/bin"
-  ],
-  "stableVersion": "2.0.1-0"
+  ]
 }
