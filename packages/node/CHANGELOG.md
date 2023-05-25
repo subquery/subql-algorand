@@ -5,17 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.3.0] - 2023-05-26
 ### Changed
 - Update to Node 18
+- Update to latest node-core
 
 ## [2.1.0] - 2023-05-17
 ### Added
 - Support for unfinalized blocks with workers
-### Updated
+
+### Changed
 - Sync with main SDK
 
 ## [2.0.0] - 2023-05-01
-- Major release for 2.0.0, align with other SDK versions
 ### Added
 - Added Database cache feature, this significantly improve indexing performance
   - Data flush to database when number of records reaches `--store-cache-threshold` value (default is 1000), this reduces number of transactions to database in order to save time.
@@ -26,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Run the testing service using the command: `subql-node-algorand test`.
 
 ## [1.19.0] - 2023-03-28
-### Update
+### Changed
 - Sync with main SDK
 
 ## [1.18.3] - 2023-03-01
@@ -34,15 +37,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed Nest dependencies issue with IndexManger (#34)
 
 ## [1.18.2] - 2023-02-28
-### Updated
+### Changed
 - improve error handling for endpoint errors (#31)
 
 ### Fixed
 - Index large blocks (#30)
 
-
 ## [1.18.1] - 2023-02-21
-### Updated
+### Changed
 - Sync with main sdk (#28)
   - Fixes relating to dynamic datasources and workers
 
@@ -54,7 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sender filter not working with certain tx types. (#25)
 - Make `txType` filter optional. (#23)
 
-### Updated
+### Changed
 - Sinc with latest changes on Substrate SDK: (#22)
   - Ability to bypass blocks
   - Sync block-dispatcher with same structure as main SDK
@@ -64,13 +66,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Update SubqueryProject to @Injectable just to match the main SDK
 
 ## [1.11.0] - 2022-11-11
-### Updated
+### Changed
 - Sync with latest changes on Substrate SDK: (#19)
   - Add timestamp filter to block handler.
   - Update reindex subcommand.
 
 ## [1.10.0] - 2022-10-12
-### Updated
+### Changed
 - Sync with latest changes on Substrate SDK:
   - Remove deprecated subqueries table
   - New reindex and force-clean subcommands.
@@ -87,7 +89,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed indexing stop processing blocks.
 
 ## [1.6.1] - 2022-08-09
-
 ### Fixed
 - Filtering issues with transaction handlers. (#9)
 
@@ -95,10 +96,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-
-Initial Algorand support.
-
-[Unreleased]: https://github.com/subquery/subql/compare/node/v1.9.0...HEAD
-[1.9.0]: https://github.com/subquery/subql/compare/node/v1.6.1.../node/v1.9.0
-[1.6.1]: https://github.com/subquery/subql/compare/node/v1.6.0.../node/v1.6.1
-[1.6.0]: https://github.com/subquery/subql/compare/node/v1.6.0
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/subquery/subql-algorand/compare/v2.1.0...v2.3.0
+[2.1.0]: https://github.com/subquery/subql-algorand/node/v2.0.0.../node/v2.1.0
+[2.0.0]: https://github.com/subquery/subql-algorand/node/v.1.19.0../node/v2.0.0
+[1.19.0]: https://github.com/subquery/subql-algorand/node/v1.18.3.../node/v1.19.0
+[1.18.3]: https://github.com/subquery/subql-algorand/node/v1.18.2.../node/v1.18.3
+[1.18.2]: https://github.com/subquery/subql-algorand/node/v1.18.1.../node/v1.18.2
+[1.18.1]: https://github.com/subquery/subql-algorand/node/v1.18.0.../node/v1.18.1
+[1.18.0]: https://github.com/subquery/subql-algorand/node/v1.11.0.../node/v1.18.0
+[1.11.0]: https://github.com/subquery/subql-algorand/node/v1.10.0.../node/v1.11.0
+[1.10.0]: https://github.com/subquery/subql-algorand/node/v1.9.0.../node/v1.10.0
+[1.9.0]: https://github.com/subquery/subql-algorand/compare/node/v1.6.1.../node/v1.9.0
+[1.6.1]: https://github.com/subquery/subql-algorand/compare/node/v1.6.0.../node/v1.6.1
+[1.6.0]: https://github.com/subquery/subql-algorand/compare/node/v1.6.0
