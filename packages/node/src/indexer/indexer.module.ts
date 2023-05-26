@@ -45,7 +45,7 @@ import { WorkerService } from './worker/worker.service';
         await apiService.init();
         return apiService;
       },
-      inject: ['ISubqueryProject', EventEmitter2, ConnectionPoolService],
+      inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
     },
     SandboxService,
     DsProcessorService,
