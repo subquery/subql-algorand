@@ -4,12 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-All logs must start with the format: [x.y.z] - yyyy-mm-dd
-
 ## [Unreleased]
 
+## [2.2.0] - 2023-06-02
+### Changed
+- update common package (#49)
+
 ## [2.1.0] - 2023-05-17
-### Updated
+### Changed
 - Sync with main SDK
 
 ## [2.0.0] - 2023-05-01
@@ -17,7 +19,6 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 - Sync with main SDK for 2.0 release
 
 ## [1.2.0] - 2023-01-24
-
 ### Added
 - Ability to bypass blocks. (#22)
 
@@ -26,13 +27,15 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 - Added timestamp to BlockFilter. (#19)
 
 ## [1.0.1] - 2022-08-09
-### Fixes
+### Fixed
 - Fixed `assetId` on transaction filter being validated as a string. (#9)
 
 ## [1.0.0] - 2022-08-04
-
-Initial Algorand support
-
-[Unreleased]: https://github.com/subquery/subql/compare/common-algorand/v1.0.1...HEAD
-[1.0.1]: https://github.com/subquery/subql/compare/common-algorand/v1.0.0...common-algorand/v1.0.1
-[1.0.0]: https://github.com/subquery/subql/compare/common-algorand/v1.0.0
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/common-algorand/2.2.0...HEAD
+[2.2.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/2.1.0...common-algorand/2.2.0
+[2.1.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/2.0.0...common-algorand/2.1.0
+[2.0.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/1.2.0...common-algorand/2.0.0
+[1.2.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/1.1.0...common-algorand/1.2.0
+[1.1.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/1.0.1...common-algorand/1.1.0
+[1.0.1]: https://github.com/subquery/subql-algorand/compare/common-algorand/v1.0.0...common-algorand/v1.0.1
+[1.0.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/v1.0.0

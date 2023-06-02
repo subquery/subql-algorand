@@ -1,6 +1,6 @@
 {
   "name": "@subql/node-algorand",
-  "version": "2.3.2-0",
+  "version": "2.5.0",
   "description": "",
   "author": "Ian He",
   "license": "Apache-2.0",
@@ -62,6 +62,5 @@
   "files": [
     "/dist",
     "/bin"
-  ],
-  "stableVersion": "2.3.1"
+  ]
 }
