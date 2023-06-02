@@ -83,7 +83,7 @@ export class IndexerManager extends BaseIndexerManager<
   protected isCustomDs = isCustomDs;
   protected updateCustomProcessor = asSecondLayerHandlerProcessor_1_0_0;
 
-  @profiler(yargsOptions.argv.profiler)
+  @profiler()
   async indexBlock(
     block: BlockContent,
     dataSources: AlgorandDataSource[],
