@@ -295,7 +295,7 @@ export const yargsOptions = yargs(hideBin(process.argv))
       describe: 'Store MMR in either a file or a postgres DB',
       type: 'string',
       choices: ['file', 'postgres'],
-      default: 'file',
+      default: 'postgres',
     },
     'query-limit': {
       demandOption: false,
