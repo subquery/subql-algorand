@@ -1,6 +1,6 @@
 {
   "name": "@subql/node-algorand",
-  "version": "2.5.1-0",
+  "version": "2.5.1",
   "description": "",
   "author": "Ian He",
   "license": "Apache-2.0",
@@ -26,7 +26,7 @@
     "@nestjs/schedule": "^1.0.2",
     "@subql/common": "^2.2.0",
     "@subql/common-algorand": "workspace:*",
-    "@subql/node-core": "^2.4.3",
+    "@subql/node-core": "^2.4.4",
     "@subql/types-algorand": "workspace:*",
     "@willsoto/nestjs-prometheus": "^4.4.0",
     "algosdk": "^2.2.0",
@@ -62,6 +62,5 @@
   "files": [
     "/dist",
     "/bin"
-  ],
-  "stableVersion": "2.5.0"
+  ]
 }
