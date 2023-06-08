@@ -24,8 +24,7 @@ jobs:
       run: yarn pretty-quick --check --pattern 'packages/*/src/**/*' --branch origin/main
     - name: lint
       run: yarn lint
-    - name: test
-      run: yarn test:docker
+
   coverage:
         name: Coverage report
         runs-on: ubuntu-latest
