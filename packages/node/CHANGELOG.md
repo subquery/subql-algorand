@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.1] - 2023-06-08
+### Fixed
+- Sync with node-core 2.4.4, fixed various issue for mmr
+
 ## [2.5.0] - 2023-06-02
 ### Fixed
 - Updated dependencies with fixes and ported over relevant fixes from main sdk (#49)
@@ -104,7 +108,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node/2.5.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node/v2.5.1...HEAD
+[2.5.1]: https://github.com/subquery/subql-algorand/compare/nodev2.5.0...node/v2.5.1
 [2.5.0]: https://github.com/subquery/subql-algorand/compare/node/2.3.1...node/2.5.0
 [2.3.1]: https://github.com/subquery/subql-algorand/compare/node/2.3.0...node/2.3.1
 [2.3.0]: https://github.com/subquery/subql-algorand/compare/node/2.1.0...node/2.3.0
