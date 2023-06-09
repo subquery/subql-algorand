@@ -8,7 +8,7 @@ import {
   getLogger,
   TestingService as BaseTestingService,
 } from '@subql/node-core';
-import { Sequelize } from 'sequelize';
+import { Sequelize } from '@subql/x-sequelize';
 import { AlgorandApiService } from '../algorand';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { IndexerManager } from '../indexer/indexer.manager';
