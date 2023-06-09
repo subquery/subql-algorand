@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { getLogger, MmrService, StoreService } from '@subql/node-core';
-import { Sequelize } from 'sequelize';
+import { Sequelize } from '@subql/x-sequelize';
 import { DynamicDsService } from '../indexer/dynamic-ds.service';
 import { ForceCleanService } from '../subcommands/forceClean.service';
 

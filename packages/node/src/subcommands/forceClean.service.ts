@@ -11,7 +11,7 @@ import {
   getEnumDeprecated,
 } from '@subql/node-core';
 import { getAllEntitiesRelations } from '@subql/utils';
-import { QueryTypes, Sequelize } from 'sequelize';
+import { QueryTypes, Sequelize } from '@subql/x-sequelize';
 import { SubqueryProject } from '../configure/SubqueryProject';
 
 const logger = getLogger('Force-clean');

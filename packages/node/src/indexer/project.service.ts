@@ -11,7 +11,7 @@ import {
   NodeConfig,
 } from '@subql/node-core';
 import { AlgorandDataSource } from '@subql/types-algorand';
-import { Sequelize } from 'sequelize';
+import { Sequelize } from '@subql/x-sequelize';
 import { AlgorandApiService } from '../algorand';
 import {
   SubqueryProject,
