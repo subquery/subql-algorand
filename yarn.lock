@@ -2812,7 +2812,7 @@ __metadata:
     "@nestjs/testing": ^8.2.6
     "@subql/common": ^2.2.1
     "@subql/common-algorand": "workspace:*"
-    "@subql/node-core": ^2.4.5
+    "@subql/node-core": ^2.4.6-0
     "@subql/types-algorand": "workspace:*"
     "@subql/x-sequelize": 6.32.0-0.0.2
     "@types/express": ^4.17.13
@@ -2844,9 +2844,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/node-core@npm:^2.4.5":
-  version: 2.4.5
-  resolution: "@subql/node-core@npm:2.4.5"
+"@subql/node-core@npm:^2.4.6-0":
+  version: 2.4.6-0
+  resolution: "@subql/node-core@npm:2.4.6-0"
   dependencies:
     "@nestjs/common": ^8.2.6
     "@nestjs/event-emitter": ^1.3.0
@@ -2871,7 +2871,7 @@ __metadata:
     tar: ^6.1.11
     vm2: ^3.9.19
     yargs: ^16.2.0
-  checksum: 606795b1113defad7bd15be0fe87b96efeac9391b36286adce6c19ac928bae11f43783c1164a8b61fb1a0263c1d846fd36e121cdac3945c87d69024aa8744e41
+  checksum: 5c0979ce40bdd8825eb397ec7447907fc95ed229a75607f06d15cca16f0a4467c3ea49163c91058ea4f56c141daa5c64523d4cea1fac3af911f45d22b9f40d3e
   languageName: node
   linkType: hard
 

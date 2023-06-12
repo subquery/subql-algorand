@@ -10,7 +10,6 @@ import {
   StoreService,
   NodeConfig,
 } from '@subql/node-core';
-import { AlgorandDataSource } from '@subql/types-algorand';
 import { Sequelize } from '@subql/x-sequelize';
 import { AlgorandApiService } from '../algorand';
 import {
@@ -26,7 +25,10 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
 const { version: packageVersion } = require('../../package.json');
 
 @Injectable()
-export class ProjectService extends BaseProjectService<SubqlProjectDs> {
+export class ProjectService extends BaseProjectService<
+  AlgorandApiService,
+  SubqlProjectDs
+> {
   protected packageVersion = packageVersion;
 
   constructor(

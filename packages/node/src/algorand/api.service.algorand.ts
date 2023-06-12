@@ -13,20 +13,25 @@ import {
 } from '@subql/node-core';
 import { AlgorandBlock } from '@subql/types-algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
-import { AlgorandApi } from './api.algorand';
+import { BlockContent } from '../indexer/types';
+import { AlgorandApi, SafeAPIService } from './api.algorand';
 import { AlgorandApiConnection } from './api.connection';
 
 const logger = getLogger('api');
 
 @Injectable()
-export class AlgorandApiService extends ApiService {
+export class AlgorandApiService extends ApiService<
+  AlgorandApi,
+  SafeAPIService,
+  BlockContent
+> {
   networkMeta: NetworkMetadataPayload;
   constructor(
-    @Inject('ISubqueryProject') project: SubqueryProject,
-    private connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
+    @Inject('ISubqueryProject') private project: SubqueryProject,
+    connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
     private eventEmitter: EventEmitter2,
   ) {
-    super(project);
+    super(connectionPoolService);
   }
 
   async init(): Promise<AlgorandApiService> {
@@ -43,11 +48,16 @@ export class AlgorandApiService extends ApiService {
       ? network.endpoint
       : [network.endpoint];
 
-    const connections = await Promise.all(
-      endpoints.map(async (endpoint, i) => {
-        const connection = await AlgorandApiConnection.create(endpoint);
+    const endpointToApiIndex: Record<string, AlgorandApiConnection> = {};
 
-        const { api } = connection;
+    await Promise.all(
+      endpoints.map(async (endpoint, i) => {
+        const connection = await AlgorandApiConnection.create(
+          endpoint,
+          this.fetchBlockBatches,
+        );
+
+        const api = connection.unsafeApi;
 
         this.eventEmitter.emit(IndexerEvent.ApiConnected, {
           value: 1,
@@ -71,11 +81,7 @@ export class AlgorandApiService extends ApiService {
         //   void this.connectionPoolService.handleApiDisconnects(i, endpoint);
         // });
         if (!this.networkMeta) {
-          this.networkMeta = {
-            chain: api.getChainId(),
-            genesisHash: api.getGenesisHash(),
-            specName: undefined,
-          };
+          this.networkMeta = connection.networkMeta;
         }
 
         if (network.chainId !== api.getGenesisHash()) {
@@ -86,24 +92,17 @@ export class AlgorandApiService extends ApiService {
           );
         }
 
-        return connection;
+        endpointToApiIndex[endpoint] = connection;
       }),
     );
 
-    this.connectionPoolService.addBatchToConnections(connections);
+    this.connectionPoolService.addBatchToConnections(endpointToApiIndex);
 
     return this;
   }
 
   get api(): AlgorandApi {
-    return this.connectionPoolService.api.api;
-  }
-
-  async fetchBlocks(batch: number[]): Promise<AlgorandBlock[]> {
-    return this.fetchBlocksGeneric<AlgorandBlock>(
-      () => (b: number[]) => this.api.fetchBlocks(b),
-      batch,
-    );
+    return this.unsafeApi;
   }
 
   private metadataMismatchError(
@@ -116,5 +115,12 @@ export class AlgorandApiService extends ApiService {
        Expected: ${expected}
        Actual: ${actual}`,
     );
+  }
+
+  async fetchBlockBatches(
+    api: AlgorandApi,
+    blocks: number[],
+  ): Promise<BlockContent[]> {
+    return api.fetchBlocks(blocks);
   }
 }

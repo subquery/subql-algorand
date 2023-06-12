@@ -28,6 +28,7 @@ import {
   SafeAPI,
 } from '@subql/types-algorand';
 import {
+  AlgorandApi,
   AlgorandApiService,
   SafeAPIService,
   filterBlock,
@@ -49,9 +50,10 @@ const logger = getLogger('indexer');
 
 @Injectable()
 export class IndexerManager extends BaseIndexerManager<
-  AlgorandApiService,
   SafeAPIService,
+  AlgorandApi,
   BlockContent,
+  AlgorandApiService,
   AlgorandDataSource,
   AlgorandCustomDataSource,
   typeof FilterTypeMap,
