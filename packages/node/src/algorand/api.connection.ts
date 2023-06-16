@@ -43,7 +43,7 @@ export class AlgorandApiConnection
   }
 
   safeApi(height: number): SafeAPIService {
-    throw new Error(`Not Implemented`);
+    return this.unsafeApi.getSafeApi(height);
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
