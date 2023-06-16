@@ -26,7 +26,7 @@
     "@nestjs/schedule": "^1.0.2",
     "@subql/common": "^2.2.1",
     "@subql/common-algorand": "workspace:*",
-    "@subql/node-core": "^2.4.6-0",
+    "@subql/node-core": "^2.5.0",
     "@subql/types-algorand": "workspace:*",
     "@subql/x-sequelize": "6.32.0-0.0.2",
     "@willsoto/nestjs-prometheus": "^4.4.0",
