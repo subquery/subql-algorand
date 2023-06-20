@@ -34,6 +34,55 @@ export class AlgorandApiService extends ApiService<
     super(connectionPoolService);
   }
 
+  async connectWithRetry(
+    endpoint: string,
+    index: number,
+    maxRetries: number,
+    retryInterval: number,
+  ): Promise<void> {
+    let retries = 0;
+
+    const tryConnect = async () => {
+      try {
+        const connection = await AlgorandApiConnection.create(
+          endpoint,
+          this.fetchBlockBatches,
+        );
+        const api = connection.unsafeApi;
+
+        if (!this.networkMeta) {
+          this.networkMeta = connection.networkMeta;
+        }
+
+        if (this.project.network.chainId !== api.getGenesisHash()) {
+          throw this.metadataMismatchError(
+            'ChainId',
+            this.project.network.chainId,
+            api.getGenesisHash(),
+          );
+        }
+
+        this.connectionPoolService.addToConnections(connection, endpoint);
+      } catch (error) {
+        if (retries < maxRetries) {
+          retries++;
+          logger.warn(
+            `Failed to start up endpoint ${endpoint} (retry ${retries}/${maxRetries}): ${error.message}`,
+          );
+          setTimeout(() => {
+            tryConnect();
+          }, retryInterval);
+        } else {
+          logger.error(
+            `Failed to start up endpoint ${endpoint} after ${maxRetries} retries: ${error.message}`,
+          );
+        }
+      }
+    };
+
+    await tryConnect();
+  }
+
   async init(): Promise<AlgorandApiService> {
     let network: ProjectNetworkV1_0_0;
 
@@ -48,55 +97,18 @@ export class AlgorandApiService extends ApiService<
       ? network.endpoint
       : [network.endpoint];
 
-    const endpointToApiIndex: Record<string, AlgorandApiConnection> = {};
+    const maxRetries = 3;
+    const retryInterval = 30000; // 30 seconds
+    const connectionPromises: Promise<void>[] = [];
 
-    await Promise.all(
-      endpoints.map(async (endpoint, i) => {
-        const connection = await AlgorandApiConnection.create(
-          endpoint,
-          this.fetchBlockBatches,
-        );
+    endpoints.forEach((endpoint, i) => {
+      connectionPromises.push(
+        this.connectWithRetry(endpoint, i, maxRetries, retryInterval),
+      );
+    });
 
-        const api = connection.unsafeApi;
-
-        this.eventEmitter.emit(IndexerEvent.ApiConnected, {
-          value: 1,
-          apiIndex: i,
-          endpoint: endpoint,
-        });
-
-        // api.on('connected', () => {
-        //   this.eventEmitter.emit(IndexerEvent.ApiConnected, {
-        //     value: 1,
-        //     apiIndex: i,
-        //     endpoint: endpoint,
-        //   });
-        // });
-        // api.on('disconnected', () => {
-        //   this.eventEmitter.emit(IndexerEvent.ApiConnected, {
-        //     value: 0,
-        //     apiIndex: i,
-        //     endpoint: endpoint,
-        //   });
-        //   void this.connectionPoolService.handleApiDisconnects(i, endpoint);
-        // });
-        if (!this.networkMeta) {
-          this.networkMeta = connection.networkMeta;
-        }
-
-        if (network.chainId !== api.getGenesisHash()) {
-          throw this.metadataMismatchError(
-            'ChainId',
-            network.chainId,
-            api.getGenesisHash(),
-          );
-        }
-
-        endpointToApiIndex[endpoint] = connection;
-      }),
-    );
-
-    this.connectionPoolService.addBatchToConnections(endpointToApiIndex);
+    // Wait for at least one successful connection before proceeding
+    await Promise.race(connectionPromises);
 
     return this;
   }
