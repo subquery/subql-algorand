@@ -9,7 +9,7 @@ import { GraphQLSchema } from 'graphql';
 import { AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
 
-const ENDPOINT = 'https://algoindexer.algoexplorerapi.io';
+const ENDPOINT = 'https://mainnet-idx.algonode.cloud/';
 
 function testSubqueryProject(endpoint: string): SubqueryProject {
   return {

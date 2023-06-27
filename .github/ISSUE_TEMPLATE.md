@@ -1,8 +1,7 @@
 ### Prerequisites
 
 * [ ] Are you running the latest version(s)?
-* [ ] Did you check the [debugging guide](https://doc.subquery.network/academy/tutorials_examples/debug-projects.html#how-to-debug-a-subquery-project)?
-* [ ] Did you check the [FAQs](https://doc.subquery.network/faqs/faqs.html) and [Discussions](https://github.com/subquery/subql/discussions)?
+* [ ] Have you searched the [documentation for your issue](https://academy.subquery.network/)?
 * [ ] Are you reporting to the correct repository?
 * [ ] Did you search for an existing issue or pull request?
 
