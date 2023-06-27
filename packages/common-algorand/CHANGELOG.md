@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2023-06-27
+### Changed
+- Update @subql/common dependency (#62)
+
 ## [2.2.1] - 2023-06-09
 ### Changed
 - Update common
@@ -35,7 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `assetId` on transaction filter being validated as a string. (#9)
 
 ## [1.0.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/common-algorand/2.2.1...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/common-algorand/2.3.0...HEAD
+[2.3.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/2.2.1...common-algorand/2.3.0
 [2.2.1]: https://github.com/subquery/subql-algorand/compare/common-algorand/2.2.0...common-algorand/2.2.1
 [2.2.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/2.1.0...common-algorand/2.2.0
 [2.1.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/2.0.0...common-algorand/2.1.0

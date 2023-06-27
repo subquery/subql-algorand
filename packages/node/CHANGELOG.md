@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] - 2023-06-27
+### Changed
+- Sync with main sdk and update deps (#62)
+
+### Added
+- Multiple endpoint improvements (#56)
+
 ## [2.5.2] - 2023-06-09
 ### Fixed
 - POI block hash encoding
@@ -112,21 +119,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node/2.5.2...HEAD
-[2.5.2]: https://github.com/subquery/subql-algorand/compare/node/2.5.1...node/2.5.2
-[2.5.1]: https://github.com/subquery/subql-algorand/compare/nodev2.5.0...node/2.5.1
-[2.5.0]: https://github.com/subquery/subql-algorand/compare/node/2.3.1...node/2.5.0
-[2.3.1]: https://github.com/subquery/subql-algorand/compare/node/2.3.0...node/2.3.1
-[2.3.0]: https://github.com/subquery/subql-algorand/compare/node/2.1.0...node/2.3.0
-[2.1.0]: https://github.com/subquery/subql-algorand/node/v2.0.0.../node/v2.1.0
-[2.0.0]: https://github.com/subquery/subql-algorand/node/v.1.19.0../node/v2.0.0
-[1.19.0]: https://github.com/subquery/subql-algorand/node/v1.18.3.../node/v1.19.0
-[1.18.3]: https://github.com/subquery/subql-algorand/node/v1.18.2.../node/v1.18.3
-[1.18.2]: https://github.com/subquery/subql-algorand/node/v1.18.1.../node/v1.18.2
-[1.18.1]: https://github.com/subquery/subql-algorand/node/v1.18.0.../node/v1.18.1
-[1.18.0]: https://github.com/subquery/subql-algorand/node/v1.11.0.../node/v1.18.0
-[1.11.0]: https://github.com/subquery/subql-algorand/node/v1.10.0.../node/v1.11.0
-[1.10.0]: https://github.com/subquery/subql-algorand/node/v1.9.0.../node/v1.10.0
-[1.9.0]: https://github.com/subquery/subql-algorand/compare/node/v1.6.1.../node/v1.9.0
-[1.6.1]: https://github.com/subquery/subql-algorand/compare/node/v1.6.0.../node/v1.6.1
-[1.6.0]: https://github.com/subquery/subql-algorand/compare/node/v1.6.0
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.8.0...HEAD
+[2.8.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.5.2...node-algorand/2.8.0
+[2.5.2]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.5.1...node-algorand/2.5.2
+[2.5.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.5.0...node-algorand/2.5.1
+[2.5.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.3.1...node-algorand/2.5.0
+[2.3.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.3.0...node-algorand/2.3.1
+[2.3.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.1.0...node-algorand/2.3.0
+[2.1.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.0.0...node-algorand/2.1.0
+[2.0.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/.1.19.0..node-algorand/2.0.0
+[1.19.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.18.3...node-algorand/1.19.0
+[1.18.3]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.18.2...node-algorand/1.18.3
+[1.18.2]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.18.1...node-algorand/1.18.2
+[1.18.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.18.0...node-algorand/1.18.1
+[1.18.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.11.0...node-algorand/1.18.0
+[1.11.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.10.0...node-algorand/1.11.0
+[1.10.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.9.0...node-algorand/1.10.0
+[1.9.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.6.1...node-algorand/1.9.0
+[1.6.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.6.0...node-algorand/1.6.1
+[1.6.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/1.6.0
