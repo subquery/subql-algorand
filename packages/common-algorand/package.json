@@ -1,6 +1,6 @@
 {
   "name": "@subql/common-algorand",
-  "version": "2.2.2-1",
+  "version": "2.3.0",
   "description": "",
   "scripts": {
     "build": "rm -rf dist && tsc -b",
@@ -32,6 +32,5 @@
     "@types/js-yaml": "^4.0.4",
     "@types/pino": "^6.3.12",
     "@types/semver": "^7"
-  },
-  "stableVersion": "2.2.2-0"
+  }
 }
