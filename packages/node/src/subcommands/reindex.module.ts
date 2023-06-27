@@ -8,6 +8,7 @@ import {
   DbModule,
   ForceCleanService,
   MmrService,
+  PgMmrCacheService,
   StoreCacheService,
   StoreService,
 } from '@subql/node-core';
@@ -23,6 +24,7 @@ import { ReindexService } from './reindex.service';
     StoreService,
     ReindexService,
     MmrService,
+    PgMmrCacheService,
     ForceCleanService,
     DynamicDsService,
     DsProcessorService,

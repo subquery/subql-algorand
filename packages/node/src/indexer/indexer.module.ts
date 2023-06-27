@@ -12,6 +12,7 @@ import {
   ConnectionPoolService,
   StoreCacheService,
   WorkerDynamicDsService,
+  PgMmrCacheService,
 } from '@subql/node-core';
 import { AlgorandApiService, AlgorandApiConnection } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -60,6 +61,7 @@ import { WorkerService } from './worker/worker.service';
     },
     PoiService,
     MmrService,
+    PgMmrCacheService,
     {
       provide: 'IProjectService',
       useClass: ProjectService,
