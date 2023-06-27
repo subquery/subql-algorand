@@ -33,15 +33,10 @@ export class AlgorandApi {
 
     this.api = new algosdk.Indexer(this.token, baseServer, urlEndpoint.port);
 
-    try {
-      const block = await this.api.lookupBlock(1).do();
+    const block = await this.api.lookupBlock(1).do();
 
-      this.genesisHash = block['genesis-hash'] ?? '';
-      this.chain = block['genesis-id'] ?? '';
-    } catch (e) {
-      logger.error(e);
-      process.exit(1);
-    }
+    this.genesisHash = block['genesis-hash'] ?? '';
+    this.chain = block['genesis-id'] ?? '';
   }
 
   async getBlockByHeight(height: number): Promise<AlgorandBlock> {

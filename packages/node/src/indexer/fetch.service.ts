@@ -40,6 +40,7 @@ const INTERVAL_PERCENT = 0.9;
 
 @Injectable()
 export class FetchService extends BaseFetchService<
+  AlgorandApiService,
   AlgorandDataSource,
   IAlgorandBlockDispatcher,
   DictionaryService
@@ -70,7 +71,7 @@ export class FetchService extends BaseFetchService<
   }
 
   get api(): AlgorandApi {
-    return this.apiService.api;
+    return this.apiService.unsafeApi;
   }
 
   buildDictionaryQueryEntries(startBlock: number): DictionaryQueryEntry[] {

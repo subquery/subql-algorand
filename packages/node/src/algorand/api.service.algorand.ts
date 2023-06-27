@@ -13,20 +13,74 @@ import {
 } from '@subql/node-core';
 import { AlgorandBlock } from '@subql/types-algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
-import { AlgorandApi } from './api.algorand';
+import { BlockContent } from '../indexer/types';
+import { AlgorandApi, SafeAPIService } from './api.algorand';
 import { AlgorandApiConnection } from './api.connection';
 
 const logger = getLogger('api');
 
 @Injectable()
-export class AlgorandApiService extends ApiService {
+export class AlgorandApiService extends ApiService<
+  AlgorandApi,
+  SafeAPIService,
+  BlockContent
+> {
   networkMeta: NetworkMetadataPayload;
   constructor(
-    @Inject('ISubqueryProject') project: SubqueryProject,
-    private connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
+    @Inject('ISubqueryProject') private project: SubqueryProject,
+    connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
     private eventEmitter: EventEmitter2,
   ) {
-    super(project);
+    super(connectionPoolService);
+  }
+
+  async connectWithRetry(
+    endpoint: string,
+    index: number,
+    maxRetries: number,
+    retryInterval: number,
+  ): Promise<void> {
+    let retries = 0;
+
+    const tryConnect = async () => {
+      try {
+        const connection = await AlgorandApiConnection.create(
+          endpoint,
+          this.fetchBlockBatches,
+        );
+        const api = connection.unsafeApi;
+
+        if (!this.networkMeta) {
+          this.networkMeta = connection.networkMeta;
+        }
+
+        if (this.project.network.chainId !== api.getGenesisHash()) {
+          throw this.metadataMismatchError(
+            'ChainId',
+            this.project.network.chainId,
+            api.getGenesisHash(),
+          );
+        }
+
+        this.connectionPoolService.addToConnections(connection, endpoint);
+      } catch (error) {
+        if (retries < maxRetries) {
+          retries++;
+          logger.warn(
+            `Failed to start up endpoint ${endpoint} (retry ${retries}/${maxRetries}): ${error.message}`,
+          );
+          setTimeout(() => {
+            tryConnect();
+          }, retryInterval);
+        } else {
+          logger.error(
+            `Failed to start up endpoint ${endpoint} after ${maxRetries} retries: ${error.message}`,
+          );
+        }
+      }
+    };
+
+    await tryConnect();
   }
 
   async init(): Promise<AlgorandApiService> {
@@ -43,67 +97,24 @@ export class AlgorandApiService extends ApiService {
       ? network.endpoint
       : [network.endpoint];
 
-    const connections = await Promise.all(
-      endpoints.map(async (endpoint, i) => {
-        const connection = await AlgorandApiConnection.create(endpoint);
+    const maxRetries = 3;
+    const retryInterval = 30000; // 30 seconds
+    const connectionPromises: Promise<void>[] = [];
 
-        const { api } = connection;
+    endpoints.forEach((endpoint, i) => {
+      connectionPromises.push(
+        this.connectWithRetry(endpoint, i, maxRetries, retryInterval),
+      );
+    });
 
-        this.eventEmitter.emit(IndexerEvent.ApiConnected, {
-          value: 1,
-          apiIndex: i,
-          endpoint: endpoint,
-        });
-
-        // api.on('connected', () => {
-        //   this.eventEmitter.emit(IndexerEvent.ApiConnected, {
-        //     value: 1,
-        //     apiIndex: i,
-        //     endpoint: endpoint,
-        //   });
-        // });
-        // api.on('disconnected', () => {
-        //   this.eventEmitter.emit(IndexerEvent.ApiConnected, {
-        //     value: 0,
-        //     apiIndex: i,
-        //     endpoint: endpoint,
-        //   });
-        //   void this.connectionPoolService.handleApiDisconnects(i, endpoint);
-        // });
-        if (!this.networkMeta) {
-          this.networkMeta = {
-            chain: api.getChainId(),
-            genesisHash: api.getGenesisHash(),
-            specName: undefined,
-          };
-        }
-
-        if (network.chainId !== api.getGenesisHash()) {
-          throw this.metadataMismatchError(
-            'ChainId',
-            network.chainId,
-            api.getGenesisHash(),
-          );
-        }
-
-        return connection;
-      }),
-    );
-
-    this.connectionPoolService.addBatchToConnections(connections);
+    // Wait for at least one successful connection before proceeding
+    await Promise.race(connectionPromises);
 
     return this;
   }
 
   get api(): AlgorandApi {
-    return this.connectionPoolService.api.api;
-  }
-
-  async fetchBlocks(batch: number[]): Promise<AlgorandBlock[]> {
-    return this.fetchBlocksGeneric<AlgorandBlock>(
-      () => (b: number[]) => this.api.fetchBlocks(b),
-      batch,
-    );
+    return this.unsafeApi;
   }
 
   private metadataMismatchError(
@@ -116,5 +127,12 @@ export class AlgorandApiService extends ApiService {
        Expected: ${expected}
        Actual: ${actual}`,
     );
+  }
+
+  async fetchBlockBatches(
+    api: AlgorandApi,
+    blocks: number[],
+  ): Promise<BlockContent[]> {
+    return api.fetchBlocks(blocks);
   }
 }
