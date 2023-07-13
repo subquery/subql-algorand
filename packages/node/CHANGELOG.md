@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Sync with @node/core, various improvements for POI feature
+### Changed
+- Update node-core and add `store-cache-upper-limit` flag 
+
 ## [2.8.0] - 2023-06-27
 ### Changed
 - Sync with main sdk and update deps (#62)

@@ -8,11 +8,11 @@ import {
   StoreService,
   PoiService,
   MmrService,
-  NodeConfig,
   ConnectionPoolService,
   StoreCacheService,
   WorkerDynamicDsService,
   PgMmrCacheService,
+  MmrQueryService,
 } from '@subql/node-core';
 import { AlgorandApiService, AlgorandApiConnection } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -62,12 +62,13 @@ import { WorkerService } from './worker/worker.service';
     PoiService,
     MmrService,
     PgMmrCacheService,
+    MmrQueryService,
     {
       provide: 'IProjectService',
       useClass: ProjectService,
     },
     WorkerService,
   ],
-  exports: [StoreService, MmrService],
+  exports: [StoreService, MmrService, MmrQueryService],
 })
 export class IndexerModule {}

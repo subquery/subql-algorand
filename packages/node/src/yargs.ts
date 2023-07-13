@@ -339,6 +339,12 @@ export const yargsOptions = yargs(hideBin(process.argv))
       describe: 'Store get cache size for each model',
       type: 'number',
     },
+    'store-cache-upper-limit': {
+      demandOption: false,
+      describe:
+        'Defines the upper limit to the store cache size. When this limit is reached indexing will wait for the cache to be flushed before continuing.',
+      type: 'number',
+    },
     'store-cache-async': {
       demandOption: false,
       describe:
