@@ -8,9 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [Unreleased]
+### Added
+- Add `block` to `AlgorandTransaction` (#67)
+- Add `getTransactionsByGroup` to `AlgorandBlock` (#67)
+- Add `applicationArgs` to `AlgorandTransactionFilter` (#67)
 
 ## [2.1.0] - 2023-05-17
-### Updated
+### Changed
 - Sync with main SDK
 
 ## [2.0.0] - 2023-05-01
@@ -18,15 +22,14 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 - Sync with main SDK for 2.0 release
 
 ## [1.6.0] - 2023-02-21
-### Updated
+### Changed
 - Sync with main sdk
   - Add `count` to `Store` interface
   - Support for `bypassBlocks`
 
 ## [1.5.0] - 2023-01-24
 ### Added
-* Add `count` function to get the number of entities (#22)
-
+- Add `count` function to get the number of entities (#22)
 
 ## [1.4.0] - 2022-11-11
 ### Changed
@@ -40,13 +43,21 @@ Sync changes from main SDK:
 - Added `bulkUpdate` and `bulkGet` to the injected store. This can be used to optimise handlers and speed up indexing.
 
 ## [1.2.1] - 2022-08-04
+### Fixed
 No Changes, fixing build issue
 
 ## [1.2.0] - 2022-08-04
+### Changed
 Initial Algorand support
 
-[Unreleased]: https://github.com/subquery/subql/compare/types/v1.3.0...HEAD
-[1.2.1]: https://github.com/subquery/subql/compare/types/v1.2.1...types/v1.3.0
-[1.2.1]: https://github.com/subquery/subql/compare/types/v1.2.0...types/v1.2.1
-[1.2.0]: https://github.com/subquery/subql/compare/types/v1.2.0
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/types/2.1.0...HEAD
+[2.1.0]: https://github.com/subquery/subql-algorand/compare/types/2.0.0...types/2.1.0
+[2.0.0]: https://github.com/subquery/subql-algorand/compare/types/1.6.0...types/2.0.0
+[1.6.0]: https://github.com/subquery/subql-algorand/compare/types/1.5.0...types/1.6.0
+[1.5.0]: https://github.com/subquery/subql-algorand/compare/types/1.4.0...types/1.5.0
+[1.4.0]: https://github.com/subquery/subql-algorand/compare/types/1.3.0...types/1.4.0
+[1.3.0]: https://github.com/subquery/subql-algorand/compare/types/1.2.1...types/1.3.0
+[1.2.1]: https://github.com/subquery/subql-algorand/compare/types/1.2.1...types/1.3.0
+[1.2.1]: https://github.com/subquery/subql-algorand/compare/types/1.2.0...types/1.2.1
+[1.2.0]: https://github.com/subquery/subql-algorand/tag/types/1.2.0
 
