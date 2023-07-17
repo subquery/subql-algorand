@@ -59,6 +59,7 @@ export interface AlgorandTransactionFilter {
   newFreezeStatus?: boolean;
   address?: string;
   applicationId?: number;
+  applicationArgs?: string[];
 }
 
 export type AlgorandBlockHandler = AlgorandCustomHandler<AlgorandHandlerKind.Block, AlgorandBlockFilter>;

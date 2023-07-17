@@ -116,13 +116,13 @@ export class FetchService extends BaseFetchService<
             break;
           case AlgorandHandlerKind.Transaction:
             filterList.forEach((f) => {
-              const conditions: DictionaryQueryCondition[] = Object.entries(
-                f,
-              ).map(([field, value]) => ({
-                field,
-                value,
-                matcher: 'equalTo',
-              }));
+              const conditions: DictionaryQueryCondition[] = Object.entries(f)
+                .filter(([field]) => field !== 'applicationArgs') // Dictionary doesn't support applciation args
+                .map(([field, value]) => ({
+                  field,
+                  value,
+                  matcher: 'equalTo',
+                }));
               queryEntries.push({
                 entity: 'transactions',
                 conditions,

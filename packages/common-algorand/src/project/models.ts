@@ -85,6 +85,11 @@ export class TransactionFilter implements AlgorandTransactionFilter {
   @IsOptional()
   @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.appl)
   applicationId?: number;
+
+  @IsString()
+  @IsOptional()
+  @ValidateIf((o: TransactionFilter) => o.txType === TransactionType.appl)
+  applicationArgs?: string[];
 }
 
 export class BlockHandler implements AlgorandBlockHandler {

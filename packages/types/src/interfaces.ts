@@ -202,6 +202,7 @@ export interface AlgorandTransaction {
   senderRewards?: number;
   signature?: TransactionSignature;
   txType: TransactionType;
+  block: AlgorandBlock;
 }
 
 export interface AlgorandBlock {
@@ -218,6 +219,7 @@ export interface AlgorandBlock {
   txnCounter?: number;
   upgradeState?: BlockUpgradeState;
   upgradeVote?: BlockUpgradeVote;
+  getTransactionsByGroup: (groupId: string) => AlgorandTransaction[];
 }
 
 export type SafeAPI = {
