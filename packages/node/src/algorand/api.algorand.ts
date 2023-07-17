@@ -134,15 +134,15 @@ export class AlgorandApi {
       ...block,
       getTransactionsByGroup: (groupId: string) =>
         transactions.filter((tx) => tx.group === groupId),
-      toJSON(): string {
-        return JSON.stringify(omit(this, ['getTransactionsByGroup', 'toJSON']));
+      toJSON() {
+        return omit(this, ['getTransactionsByGroup', 'toJSON']);
       },
     };
     const transactions = newBlock.transactions.map((tx) => ({
       ...tx,
       block: newBlock,
-      toJSON(): string {
-        return JSON.stringify(omit(this, ['block', 'toJSON']));
+      toJSON() {
+        return omit(this, ['block', 'toJSON']);
       },
     }));
 

@@ -145,6 +145,8 @@ describe('Algorand RPC', () => {
     // We can stringify the objects
     expect(() => JSON.stringify(block)).not.toThrow();
     expect(() => JSON.stringify(block.transactions[13])).not.toThrow();
+
+    expect(JSON.parse(JSON.stringify(block)).round).toEqual(block.round);
   });
 
   it('can get the grouped transactions within a block', async () => {

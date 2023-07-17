@@ -80,24 +80,24 @@ export function filterBlockModulo(
   return block.round % modulo === 0;
 }
 
-function txComparator(a: any, b: any): boolean {
-  if (Array.isArray(a)) {
-    for (let i = 0; i < a.length; i++) {
-      const valA = a[i];
-      const valB = b[i];
+function txComparator(filter: any, data: any): boolean {
+  if (Array.isArray(filter)) {
+    for (let i = 0; i < filter.length; i++) {
+      const valFilter = filter[i];
+      const valData = data[i];
 
-      if (valA === null) {
+      if (valFilter === null) {
         continue;
       }
 
-      if (valA !== valB) {
+      if (valFilter !== valData) {
         return false;
       }
     }
     return true;
   }
 
-  return a === b;
+  return filter === data;
 }
 
 export function filterTransaction(
