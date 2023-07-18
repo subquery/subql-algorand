@@ -4,17 +4,25 @@
 import { INestApplication } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
-import { ConnectionPoolService, NodeConfig } from '@subql/node-core';
+import {
+  ApiService,
+  ConnectionPoolService,
+  NodeConfig,
+} from '@subql/node-core';
 import { GraphQLSchema } from 'graphql';
 import { AlgorandApiService, filterTransaction } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
 
-const testNetEndpoint = 'https://algoindexer.testnet.algoexplorerapi.io';
+const mainnetEndpoint = 'https://mainnet-idx.algonode.cloud/';
+const testnetEndpoint = 'https://testnet-idx.algonode.cloud';
 
-function testSubqueryProject(endpoint: string): SubqueryProject {
+const mainnetChainId = 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=';
+const testnetChainId = 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=';
+
+function testSubqueryProject(endpoint: string, chainId): SubqueryProject {
   return {
     network: {
-      chainId: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
+      chainId,
       endpoint,
       dictionary: `https://api.subquery.network/sq/subquery/Algorand-Dictionary`,
     },
@@ -26,34 +34,36 @@ function testSubqueryProject(endpoint: string): SubqueryProject {
   };
 }
 
+export const prepareApiService = async (
+  endpoint: string = mainnetEndpoint,
+  chainId: string = mainnetChainId,
+): Promise<[INestApplication, AlgorandApiService]> => {
+  const module = await Test.createTestingModule({
+    providers: [
+      {
+        provide: 'ISubqueryProject',
+        useFactory: () => testSubqueryProject(endpoint, chainId),
+      },
+      NodeConfig,
+      ConnectionPoolService,
+      AlgorandApiService,
+    ],
+    imports: [EventEmitterModule.forRoot()],
+  }).compile();
+
+  const app = module.createNestApplication();
+  await app.init();
+  const apiService = app.get(AlgorandApiService);
+  await apiService.init();
+  return [app, apiService];
+};
+
 jest.setTimeout(90000);
 describe('Algorand RPC', () => {
   let app: INestApplication;
+  let apiService: ApiService;
 
-  const prepareApiService = async (
-    endpoint: string = testNetEndpoint,
-  ): Promise<AlgorandApiService> => {
-    const module = await Test.createTestingModule({
-      providers: [
-        {
-          provide: 'ISubqueryProject',
-          useFactory: () => testSubqueryProject(endpoint),
-        },
-        NodeConfig,
-        ConnectionPoolService,
-        AlgorandApiService,
-      ],
-      imports: [EventEmitterModule.forRoot()],
-    }).compile();
-
-    app = module.createNestApplication();
-    await app.init();
-    const apiService = app.get(AlgorandApiService);
-    await apiService.init();
-    return apiService;
-  };
-
-  afterAll(() => {
+  afterEach(() => {
     return app?.close();
   });
 
@@ -107,20 +117,45 @@ describe('Algorand RPC', () => {
       }),
     ).toBe(true);
   });
-  it('paginate large blocks', async () => {
-    const apiService = await prepareApiService();
+
+  // This is failing since switching from algo explorer api. This is due to a node configuration limit
+  it.skip('paginate large blocks', async () => {
+    [app, apiService] = await prepareApiService(
+      testnetEndpoint,
+      testnetChainId,
+    );
     const failingBlock = 27739202; // testnet
     const passingBlock = 27739200; // testnet
     const api = apiService.api;
 
     const paginateSpy = jest.spyOn(api, 'paginatedTransactions');
-    const fetchBlock = async () => {
-      // return api.getBlockByHeight(passingBlock);
-      return api.getBlockByHeight(failingBlock);
-    };
-
-    const result = await fetchBlock();
+    const result = await api.getBlockByHeight(failingBlock)();
     expect(paginateSpy).toHaveBeenCalledTimes(3);
     expect(result.transactions.length).toEqual(13916);
+  });
+
+  it('can stringify blocks and transactions with circular references', async () => {
+    [app, apiService] = await prepareApiService();
+
+    const block = await apiService.api.getBlockByHeight(30478896);
+
+    // The circular ref
+    expect(block.transactions[13].block).toBeDefined();
+
+    // We can stringify the objects
+    expect(() => JSON.stringify(block)).not.toThrow();
+    expect(() => JSON.stringify(block.transactions[13])).not.toThrow();
+
+    expect(JSON.parse(JSON.stringify(block)).round).toEqual(block.round);
+  });
+
+  it('can get the grouped transactions within a block', async () => {
+    [app, apiService] = await prepareApiService();
+
+    const block = await apiService.api.getBlockByHeight(30478896);
+
+    const groupTx = block.getTransactionsByGroup(block.transactions[13].group);
+
+    expect(groupTx.length).toEqual(3);
   });
 });

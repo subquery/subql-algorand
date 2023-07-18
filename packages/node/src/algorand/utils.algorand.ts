@@ -28,7 +28,7 @@ export function camelCaseObjectKey(object: object) {
 
 export function calcInterval(api: Indexer): number {
   // Pulled from https://metrics.algorand.org/#/protocol/#blocks
-  return 4300;
+  return 3300;
 }
 
 export const mappingFilterTransaction = {
@@ -56,6 +56,7 @@ export const mappingFilterTransaction = {
   },
   [TransactionType.appl]: {
     applicationId: 'applicationTransaction.applicationId',
+    applicationArgs: 'applicationTransaction.applicationArgs',
     sender: 'sender',
   },
 };
@@ -79,6 +80,26 @@ export function filterBlockModulo(
   return block.round % modulo === 0;
 }
 
+function txComparator(filter: any, data: any): boolean {
+  if (Array.isArray(filter)) {
+    for (let i = 0; i < filter.length; i++) {
+      const valFilter = filter[i];
+      const valData = data[i];
+
+      if (valFilter === null) {
+        continue;
+      }
+
+      if (valFilter !== valData) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  return filter === data;
+}
+
 export function filterTransaction(
   txn: AlgorandTransaction,
   filter?: AlgorandTransactionFilter,
@@ -91,7 +112,11 @@ export function filterTransaction(
   for (const key in filterByKey) {
     if (
       mappingFilterTransaction[txn.txType] &&
-      filterByKey[key] !== get(txn, mappingFilterTransaction[txn.txType][key])
+      !txComparator(
+        filterByKey[key],
+        get(txn, mappingFilterTransaction[txn.txType][key]),
+      )
+      // filterByKey[key] !== get(txn, mappingFilterTransaction[txn.txType][key])
     ) {
       return false;
     }

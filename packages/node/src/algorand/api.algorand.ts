@@ -10,6 +10,7 @@ import {
 } from '@subql/types-algorand';
 import algosdk, { Indexer } from 'algosdk';
 import axios from 'axios';
+import { omit } from 'lodash';
 import { camelCaseObjectKey } from './utils.algorand';
 
 const logger = getLogger('api.algorand');
@@ -42,7 +43,7 @@ export class AlgorandApi {
   async getBlockByHeight(height: number): Promise<AlgorandBlock> {
     try {
       const blockInfo = await this.api.lookupBlock(height).do();
-      return camelCaseObjectKey(blockInfo);
+      return this.constructBlock(camelCaseObjectKey(blockInfo));
     } catch (error) {
       if (error.message.includes('Max transactions limit exceeded')) {
         logger.warn('Max transactions limit exceeded, paginating transactions');
@@ -117,13 +118,38 @@ export class AlgorandApi {
         this.getHeaderOnly(blockHeight),
         this.paginatedTransactions(blockHeight),
       ]);
-      const header = camelCaseObjectKey(blockHeader);
-      header.transactions = camelCaseObjectKey(paginatedTransactionsResults);
-      return header;
+
+      return this.constructBlock({
+        ...camelCaseObjectKey(blockHeader),
+        transactions: camelCaseObjectKey(paginatedTransactionsResults),
+      });
     } catch (e) {
       logger.error(`Failed to paginate round ${blockHeight}`);
       throw e;
     }
+  }
+
+  private constructBlock(block: AlgorandBlock): AlgorandBlock {
+    const newBlock = {
+      ...block,
+      getTransactionsByGroup: (groupId: string) =>
+        transactions.filter((tx) => tx.group === groupId),
+      toJSON() {
+        return omit(this, ['getTransactionsByGroup', 'toJSON']);
+      },
+    };
+    const transactions = newBlock.transactions.map((tx) => ({
+      ...tx,
+      block: newBlock,
+      toJSON() {
+        return omit(this, ['block', 'toJSON']);
+      },
+    }));
+
+    // Update transactions
+    newBlock.transactions = transactions;
+
+    return newBlock;
   }
 
   async fetchBlocksArray(blockArray: number[]): Promise<any[]> {
