@@ -1,6 +1,6 @@
 {
   "name": "@subql/types-algorand",
-  "version": "2.1.0",
+  "version": "2.1.1-0",
   "description": "",
   "homepage": "https://github.com/subquery/subql",
   "repository": "github:subquery/subql-algorand",
@@ -21,5 +21,6 @@
   "devDependencies": {
     "@types/app-module-path": "^2.2.0",
     "algosdk": "^2.2.0"
-  }
+  },
+  "stableVersion": "2.1.0"
 }
