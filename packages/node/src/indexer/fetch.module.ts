@@ -4,7 +4,8 @@
 import { Module } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
-  BenchmarkService,
+  PoiBenchmarkService,
+  IndexingBenchmarkService,
   MmrService,
   StoreService,
   PoiService,
@@ -13,6 +14,7 @@ import {
   ConnectionPoolService,
   StoreCacheService,
   PgMmrCacheService,
+  MmrQueryService,
 } from '@subql/node-core';
 import { AlgorandApiConnection, AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -118,19 +120,21 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
       ],
     },
     FetchService,
-    BenchmarkService,
+    IndexingBenchmarkService,
+    PoiBenchmarkService,
     DictionaryService,
     SandboxService,
     DsProcessorService,
     DynamicDsService,
     PoiService,
     MmrService,
+    MmrQueryService,
     PgMmrCacheService,
     {
       useClass: ProjectService,
       provide: 'IProjectService',
     },
   ],
-  exports: [StoreService, MmrService, StoreCacheService],
+  exports: [StoreService, MmrService, StoreCacheService, MmrQueryService],
 })
 export class FetchModule {}

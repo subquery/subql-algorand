@@ -70,6 +70,8 @@ export class AlgorandApiConnection
       formatted_error = AlgorandApiConnection.handleDisconnectionError(e);
     } else if (e.message.startsWith(`Rate Limited at endpoint`)) {
       formatted_error = AlgorandApiConnection.handleRateLimitError(e);
+    } else if (e.message.includes(`Exceeded max limit of`)) {
+      formatted_error = AlgorandApiConnection.handleLargeResponseError(e);
     } else {
       formatted_error = new ApiConnectionError(
         e.name,
@@ -101,6 +103,16 @@ export class AlgorandApiConnection
       'ConnectionError',
       e.message,
       ApiErrorType.Connection,
+    );
+  }
+
+  static handleLargeResponseError(e: Error): ApiConnectionError {
+    const newMessage = `Oversized RPC node response. This issue is related to the network's RPC nodes configuration, not your application. You may report it to the network's maintainers or try a different RPC node.\n\n${e.message}`;
+
+    return new ApiConnectionError(
+      'RpcInternalError',
+      newMessage,
+      ApiErrorType.Default,
     );
   }
 }
