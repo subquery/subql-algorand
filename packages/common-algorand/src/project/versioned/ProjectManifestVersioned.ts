@@ -1,5 +1,5 @@
-// Copyright 2020-2022 OnFinality Limited authors & contributors
-// SPDX-License-Identifier: Apache-2.0
+// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// SPDX-License-Identifier: GPL-3.0
 
 import {AlgorandDataSource} from '@subql/types-algorand';
 import {plainToClass} from 'class-transformer';
@@ -13,7 +13,7 @@ const ALGORAND_SUPPORTED_VERSIONS = {
 
 type Versions = keyof typeof ALGORAND_SUPPORTED_VERSIONS;
 
-type ProjectManifestImpls = InstanceType<typeof ALGORAND_SUPPORTED_VERSIONS[Versions]>;
+type ProjectManifestImpls = InstanceType<(typeof ALGORAND_SUPPORTED_VERSIONS)[Versions]>;
 
 export function manifestIsV1_0_0(manifest: IAlgorandProjectManifest): manifest is ProjectManifestV1_0_0Impl {
   return manifest.specVersion === '1.0.0';

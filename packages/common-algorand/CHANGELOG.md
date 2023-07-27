@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add `applicationArgs` to `AlgorandTransactionFilter` (#67)
 
+### Changed
+- Update license to GPL-3.0
+
 ## [2.3.0] - 2023-06-27
 ### Changed
 - Update @subql/common dependency (#62)
