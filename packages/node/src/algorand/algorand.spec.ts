@@ -7,6 +7,7 @@ import { Test } from '@nestjs/testing';
 import {
   ApiService,
   ConnectionPoolService,
+  ConnectionPoolStateManager,
   NodeConfig,
 } from '@subql/node-core';
 import { GraphQLSchema } from 'graphql';
@@ -45,6 +46,7 @@ export const prepareApiService = async (
         useFactory: () => testSubqueryProject(endpoint, chainId),
       },
       NodeConfig,
+      ConnectionPoolStateManager,
       ConnectionPoolService,
       AlgorandApiService,
     ],
