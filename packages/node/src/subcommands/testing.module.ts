@@ -10,6 +10,7 @@ import {
   NodeConfig,
   PoiService,
   StoreService,
+  TestRunner,
 } from '@subql/node-core';
 import { AlgorandApiConnection, AlgorandApiService } from '../algorand';
 import { ConfigureModule } from '../configure/configure.module';
@@ -20,6 +21,7 @@ import { FetchModule } from '../indexer/fetch.module';
 import { IndexerManager } from '../indexer/indexer.manager';
 import { ProjectService } from '../indexer/project.service';
 import { SandboxService } from '../indexer/sandbox.service';
+import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
 import { MetaModule } from '../meta/meta.module';
 import { TestingService } from './testing.service';
 
@@ -33,6 +35,7 @@ import { TestingService } from './testing.service';
     DsProcessorService,
     DynamicDsService,
     ProjectService,
+    UnfinalizedBlocksService,
     ConnectionPoolService,
     {
       provide: 'IProjectService',
@@ -57,10 +60,20 @@ import { TestingService } from './testing.service';
     },
     IndexerManager,
     SchedulerRegistry,
+    TestRunner,
+    {
+      provide: 'IApi',
+      useClass: AlgorandApiService,
+    },
+    {
+      provide: 'IIndexerManager',
+      useClass: IndexerManager,
+    },
   ],
 
   imports: [MetaModule, FetchModule],
   controllers: [],
+  exports: [TestRunner],
 })
 export class TestingFeatureModule {}
 

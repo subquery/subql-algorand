@@ -4,7 +4,11 @@
 import { INestApplication } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
-import { ConnectionPoolService, NodeConfig } from '@subql/node-core';
+import {
+  ConnectionPoolService,
+  ConnectionPoolStateManager,
+  NodeConfig,
+} from '@subql/node-core';
 import { GraphQLSchema } from 'graphql';
 import { AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -43,6 +47,7 @@ describe('ApiService', () => {
           provide: 'ISubqueryProject',
           useFactory: () => testSubqueryProject(endpoint),
         },
+        ConnectionPoolStateManager,
         ConnectionPoolService,
         NodeConfig,
         AlgorandApiService,

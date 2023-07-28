@@ -17,8 +17,12 @@ import {
   HostDynamicDS,
   WorkerBlockDispatcher,
   IUnfinalizedBlocksService,
+  HostConnectionPoolState,
+  ConnectionPoolStateManager,
+  connectionPoolStateHostFunctions,
 } from '@subql/node-core';
 import { Store } from '@subql/types';
+import { AlgorandApiConnection } from '../../algorand';
 import {
   SubqlProjectDs,
   SubqueryProject,
@@ -37,11 +41,16 @@ async function createIndexerWorker(
   store: Store,
   dynamicDsService: IDynamicDsService<SubqlProjectDs>,
   unfinalizedBlocksService: IUnfinalizedBlocksService<BlockContent>,
+  connectionPoolState: ConnectionPoolStateManager<AlgorandApiConnection>,
   root: string,
 ): Promise<IndexerWorker> {
   const indexerWorker = Worker.create<
     IInitIndexerWorker,
-    HostDynamicDS<SubqlProjectDs> & HostStore & HostUnfinalizedBlocks
+    // HostDynamicDS<SubqlProjectDs> & HostStore & HostUnfinalizedBlocks
+    HostDynamicDS<SubqlProjectDs> &
+      HostStore &
+      HostUnfinalizedBlocks &
+      HostConnectionPoolState<AlgorandApiConnection>
   >(
     path.resolve(__dirname, '../../../dist/indexer/worker/worker.js'),
     [
@@ -71,6 +80,7 @@ async function createIndexerWorker(
         unfinalizedBlocksService.processUnfinalizedBlockHeader.bind(
           unfinalizedBlocksService,
         ),
+      ...connectionPoolStateHostFunctions(connectionPoolState),
     },
     root,
   );
@@ -96,6 +106,7 @@ export class WorkerBlockDispatcherService
     @Inject('ISubqueryProject') project: SubqueryProject,
     dynamicDsService: DynamicDsService,
     unfinalizedBlocksService: UnfinalizedBlocksService,
+    connectionPoolState: ConnectionPoolStateManager<AlgorandApiConnection>,
   ) {
     super(
       nodeConfig,
@@ -112,6 +123,7 @@ export class WorkerBlockDispatcherService
           storeService.getStore(),
           dynamicDsService,
           unfinalizedBlocksService,
+          connectionPoolState,
           project.root,
         ),
     );

@@ -15,6 +15,7 @@ import {
   StoreCacheService,
   PgMmrCacheService,
   MmrQueryService,
+  ConnectionPoolStateManager,
 } from '@subql/node-core';
 import { AlgorandApiConnection, AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -62,6 +63,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
       inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
     },
     IndexerManager,
+    ConnectionPoolStateManager,
     {
       provide: 'IBlockDispatcher',
       useFactory: (
@@ -77,6 +79,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         project: SubqueryProject,
         dynamicDsService: DynamicDsService,
         unfinalizedBlocksService: UnfinalizedBlocksService,
+        connectionPoolState: ConnectionPoolStateManager<AlgorandApiConnection>,
       ) =>
         nodeConfig.workers !== undefined
           ? new WorkerBlockDispatcherService(
@@ -90,6 +93,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               project,
               dynamicDsService,
               unfinalizedBlocksService,
+              connectionPoolState,
             )
           : new BlockDispatcherService(
               apiService,
@@ -117,9 +121,11 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         'ISubqueryProject',
         DynamicDsService,
         UnfinalizedBlocksService,
+        ConnectionPoolStateManager,
       ],
     },
     FetchService,
+    ConnectionPoolService,
     IndexingBenchmarkService,
     PoiBenchmarkService,
     DictionaryService,
