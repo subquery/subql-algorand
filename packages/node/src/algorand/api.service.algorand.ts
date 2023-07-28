@@ -62,7 +62,7 @@ export class AlgorandApiService extends ApiService<
           );
         }
 
-        this.connectionPoolService.addToConnections(connection, endpoint);
+        await this.connectionPoolService.addToConnections(connection, endpoint);
       } catch (error) {
         if (retries < maxRetries) {
           retries++;
