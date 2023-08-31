@@ -16,7 +16,7 @@
     "@subql/common": "^2.4.0",
     "@subql/types-algorand": "workspace:*",
     "class-transformer": "0.4.0",
-    "class-validator": "^0.13.2",
+    "class-validator": "^0.14.0",
     "fs-extra": "^10.1.0",
     "ipfs-http-client": "^52.0.3",
     "js-yaml": "^4.1.0",
