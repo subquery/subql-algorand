@@ -6,6 +6,7 @@ import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule, SchedulerRegistry } from '@nestjs/schedule';
 import {
   ConnectionPoolService,
+  ConnectionPoolStateManager,
   DbModule,
   NodeConfig,
   PoiService,
@@ -36,6 +37,7 @@ import { TestingService } from './testing.service';
     DynamicDsService,
     ProjectService,
     UnfinalizedBlocksService,
+    ConnectionPoolStateManager,
     ConnectionPoolService,
     {
       provide: 'IProjectService',

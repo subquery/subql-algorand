@@ -10,13 +10,13 @@ import {
   BaseProjectService,
   StoreService,
   NodeConfig,
+  IProjectUpgradeService,
 } from '@subql/node-core';
 import { Sequelize } from '@subql/x-sequelize';
 import { AlgorandApiService } from '../algorand';
 import {
   SubqueryProject,
-  generateTimestampReferenceForBlockFilters,
-  SubqlProjectDs,
+  AlgorandProjectDs,
 } from '../configure/SubqueryProject';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
@@ -28,7 +28,7 @@ const { version: packageVersion } = require('../../package.json');
 @Injectable()
 export class ProjectService extends BaseProjectService<
   AlgorandApiService,
-  SubqlProjectDs
+  AlgorandProjectDs
 > {
   protected packageVersion = packageVersion;
 
@@ -40,6 +40,8 @@ export class ProjectService extends BaseProjectService<
     mmrQueryService: MmrQueryService,
     sequelize: Sequelize,
     @Inject('ISubqueryProject') project: SubqueryProject,
+    @Inject('IProjectUpgradeService')
+    protected readonly projectUpgradeService: IProjectUpgradeService<SubqueryProject>,
     storeService: StoreService,
     nodeConfig: NodeConfig,
     dynamicDsService: DynamicDsService,
@@ -54,6 +56,7 @@ export class ProjectService extends BaseProjectService<
       mmrQueryService,
       sequelize,
       project,
+      projectUpgradeService,
       storeService,
       nodeConfig,
       dynamicDsService,
@@ -62,13 +65,14 @@ export class ProjectService extends BaseProjectService<
     );
   }
 
-  protected async generateTimestampReferenceForBlockFilters(
-    ds: SubqlProjectDs[],
-  ): Promise<SubqlProjectDs[]> {
-    return generateTimestampReferenceForBlockFilters(ds, this.apiService.api);
+  protected async getBlockTimestamp(height: number): Promise<Date> {
+    const block = await this.apiService.api.getBlockByHeight(height);
+
+    return new Date(block.timestamp);
   }
 
-  protected getStartBlockDatasources(): SubqlProjectDs[] {
-    return this.project.dataSources;
+  protected onProjectChange(project: SubqueryProject): void | Promise<void> {
+    // TODO update this when implementing skipBlock feature for Eth
+    // this.apiService.updateBlockFetching();
   }
 }

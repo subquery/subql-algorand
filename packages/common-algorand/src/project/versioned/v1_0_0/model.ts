@@ -4,6 +4,8 @@
 import {
   BaseMapping,
   NodeSpec,
+  ParentProject,
+  ParentProjectModel,
   ProjectManifestBaseImpl,
   QuerySpec,
   RunnerQueryBaseModel,
@@ -30,7 +32,7 @@ import {IsStringOrObject} from '../../validation/is-string-or-object.validation'
 import {
   CustomDataSourceTemplate,
   CustomDataSourceV1_0_0,
-  ProjectManifestV1_0_0,
+  AlgorandProjectManifestV1_0_0,
   RuntimeDataSourceTemplate,
   RuntimeDataSourceV1_0_0,
 } from './types';
@@ -175,11 +177,16 @@ export class DeploymentV1_0_0 {
     keepDiscriminatorProperty: true,
   })
   templates?: (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[];
+
+  @IsOptional()
+  @IsObject()
+  @Type(() => ParentProjectModel)
+  parent?: ParentProject;
 }
 
 export class ProjectManifestV1_0_0Impl
   extends ProjectManifestBaseImpl<DeploymentV1_0_0>
-  implements ProjectManifestV1_0_0
+  implements AlgorandProjectManifestV1_0_0
 {
   @Equals('1.0.0')
   specVersion: string;
@@ -228,6 +235,11 @@ export class ProjectManifestV1_0_0Impl
   runner: RunnerSpecs;
 
   private _deployment: DeploymentV1_0_0;
+
+  @IsOptional()
+  @IsObject()
+  @Type(() => ParentProjectModel)
+  parent?: ParentProject;
 
   toDeployment(): string {
     return yaml.dump(this._deployment, {

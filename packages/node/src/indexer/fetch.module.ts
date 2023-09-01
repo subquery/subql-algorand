@@ -16,6 +16,7 @@ import {
   PgMmrCacheService,
   MmrQueryService,
   ConnectionPoolStateManager,
+  IProjectUpgradeService,
 } from '@subql/node-core';
 import { AlgorandApiConnection, AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -70,6 +71,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         nodeConfig: NodeConfig,
         eventEmitter: EventEmitter2,
         projectService: ProjectService,
+        projectUpgradeService: IProjectUpgradeService,
         apiService: AlgorandApiService,
         indexerManager: IndexerManager,
         smartBatchService: SmartBatchService,
@@ -86,6 +88,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               nodeConfig,
               eventEmitter,
               projectService,
+              projectUpgradeService,
               smartBatchService,
               storeService,
               storeCacheService,
@@ -101,6 +104,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               indexerManager,
               eventEmitter,
               projectService,
+              projectUpgradeService,
               smartBatchService,
               storeService,
               storeCacheService,
@@ -112,6 +116,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         NodeConfig,
         EventEmitter2,
         'IProjectService',
+        'IProjectUpgradeService',
         AlgorandApiService,
         IndexerManager,
         SmartBatchService,

@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {TemplateBase} from '@subql/common';
+import {ProjectManifestV1_0_0, TemplateBase} from '@subql/common';
 import {
   AlgorandCustomDataSource,
   AlgorandDataSource,
@@ -10,7 +10,6 @@ import {
   AlgorandMapping,
   AlgorandRuntimeDataSource,
 } from '@subql/types-algorand';
-import {IAlgorandProjectManifest} from '../../types';
 
 export interface SubqlMappingV1_0_0<T extends AlgorandHandler> extends AlgorandMapping<T> {
   file: string;
@@ -22,21 +21,10 @@ export type CustomDataSourceV1_0_0 = AlgorandCustomDataSource;
 export interface RuntimeDataSourceTemplate extends Omit<RuntimeDataSourceV1_0_0, 'name'>, TemplateBase {}
 export interface CustomDataSourceTemplate extends Omit<CustomDataSourceV1_0_0, 'name'>, TemplateBase {}
 
-export interface ProjectManifestV1_0_0 extends IAlgorandProjectManifest {
-  name: string;
-  version: string;
-  schema: {
-    file: string;
-  };
-
-  network: {
-    endpoint?: string | string[];
-    dictionary?: string;
-    chainId: string;
-  };
-
-  dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[];
-}
+export type AlgorandProjectManifestV1_0_0 = ProjectManifestV1_0_0<
+  RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0,
+  RuntimeDataSourceTemplate | CustomDataSourceTemplate
+>;
 
 export function isRuntimeDataSourceV1_0_0(dataSource: AlgorandDataSource): dataSource is RuntimeDataSourceV1_0_0 {
   return dataSource.kind === AlgorandDataSourceKind.Runtime && !!(dataSource as RuntimeDataSourceV1_0_0).mapping.file;

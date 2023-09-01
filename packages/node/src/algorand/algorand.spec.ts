@@ -32,7 +32,7 @@ function testSubqueryProject(endpoint: string, chainId): SubqueryProject {
     root: './',
     schema: new GraphQLSchema({}),
     templates: [],
-  };
+  } as any;
 }
 
 export const prepareApiService = async (

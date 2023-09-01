@@ -8,10 +8,8 @@ import {
   ApiService,
   ConnectionPoolService,
   getLogger,
-  IndexerEvent,
   NetworkMetadataPayload,
 } from '@subql/node-core';
-import { AlgorandBlock } from '@subql/types-algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { BlockContent } from '../indexer/types';
 import { AlgorandApi, SafeAPIService } from './api.algorand';
@@ -23,7 +21,7 @@ const logger = getLogger('api');
 export class AlgorandApiService extends ApiService<
   AlgorandApi,
   SafeAPIService,
-  BlockContent
+  BlockContent[]
 > {
   networkMeta: NetworkMetadataPayload;
   constructor(

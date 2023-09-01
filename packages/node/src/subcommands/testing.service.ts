@@ -10,7 +10,10 @@ import {
   TestRunner,
 } from '@subql/node-core';
 import { AlgorandApi, AlgorandApiService, SafeAPIService } from '../algorand';
-import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import {
+  AlgorandProjectDs,
+  SubqueryProject,
+} from '../configure/SubqueryProject';
 import { IndexerManager } from '../indexer/indexer.manager';
 import { ProjectService } from '../indexer/project.service';
 import { BlockContent } from '../indexer/types';
@@ -21,7 +24,7 @@ export class TestingService extends BaseTestingService<
   AlgorandApi,
   SafeAPIService,
   BlockContent,
-  SubqlProjectDs
+  AlgorandProjectDs
 > {
   constructor(
     nodeConfig: NodeConfig,
@@ -31,7 +34,7 @@ export class TestingService extends BaseTestingService<
   }
 
   async getTestRunner(): Promise<
-    TestRunner<AlgorandApi, SafeAPIService, BlockContent, SubqlProjectDs>
+    TestRunner<AlgorandApi, SafeAPIService, BlockContent, AlgorandProjectDs>
   > {
     const testContext = await NestFactory.createApplicationContext(
       TestingModule,

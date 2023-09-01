@@ -26,5 +26,4 @@ export interface AlgorandProjectNetworkConfig extends ProjectNetworkConfig {
   genesisHash?: string;
   chainId?: string;
   apiKey?: string | TokenHeader;
-  bypassBlocks?: (number | string)[];
 }

@@ -27,7 +27,7 @@ function testSubqueryProject(endpoint: string): SubqueryProject {
     root: './',
     schema: new GraphQLSchema({}),
     templates: [],
-  };
+  } as any;
 }
 
 jest.setTimeout(90000);

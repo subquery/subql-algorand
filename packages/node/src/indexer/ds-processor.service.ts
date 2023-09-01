@@ -1,8 +1,6 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import fs from 'fs';
-import path from 'path';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   isCustomDs,

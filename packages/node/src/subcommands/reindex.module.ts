@@ -9,6 +9,7 @@ import {
   ForceCleanService,
   MmrService,
   PgMmrCacheService,
+  ReindexService,
   StoreCacheService,
   StoreService,
 } from '@subql/node-core';
@@ -16,7 +17,6 @@ import { AlgorandApiService } from '../algorand';
 import { ConfigureModule } from '../configure/configure.module';
 import { DsProcessorService } from '../indexer/ds-processor.service';
 import { DynamicDsService } from '../indexer/dynamic-ds.service';
-import { ReindexService } from './reindex.service';
 
 @Module({
   providers: [
