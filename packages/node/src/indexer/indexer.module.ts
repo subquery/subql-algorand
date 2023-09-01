@@ -7,12 +7,9 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   StoreService,
   PoiService,
-  MmrService,
   ConnectionPoolService,
   StoreCacheService,
   WorkerDynamicDsService,
-  PgMmrCacheService,
-  MmrQueryService,
   ConnectionPoolStateManager,
   WorkerConnectionPoolStateManager,
 } from '@subql/node-core';
@@ -71,15 +68,12 @@ import { WorkerService } from './worker/worker.service';
       },
     },
     PoiService,
-    MmrService,
-    PgMmrCacheService,
-    MmrQueryService,
     {
       provide: 'IProjectService',
       useClass: ProjectService,
     },
     WorkerService,
   ],
-  exports: [StoreService, MmrService, MmrQueryService],
+  exports: [StoreService],
 })
 export class IndexerModule {}

@@ -5,8 +5,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   PoiService,
-  MmrService,
-  MmrQueryService,
   BaseProjectService,
   StoreService,
   NodeConfig,
@@ -36,8 +34,6 @@ export class ProjectService extends BaseProjectService<
     dsProcessorService: DsProcessorService,
     apiService: AlgorandApiService,
     poiService: PoiService,
-    mmrService: MmrService,
-    mmrQueryService: MmrQueryService,
     sequelize: Sequelize,
     @Inject('ISubqueryProject') project: SubqueryProject,
     @Inject('IProjectUpgradeService')
@@ -52,8 +48,6 @@ export class ProjectService extends BaseProjectService<
       dsProcessorService,
       apiService,
       poiService,
-      mmrService,
-      mmrQueryService,
       sequelize,
       project,
       projectUpgradeService,

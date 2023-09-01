@@ -7,8 +7,6 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import {
   DbModule,
   ForceCleanService,
-  MmrService,
-  PgMmrCacheService,
   ReindexService,
   StoreCacheService,
   StoreService,
@@ -23,8 +21,6 @@ import { DynamicDsService } from '../indexer/dynamic-ds.service';
     StoreCacheService,
     StoreService,
     ReindexService,
-    MmrService,
-    PgMmrCacheService,
     ForceCleanService,
     DynamicDsService,
     DsProcessorService,
