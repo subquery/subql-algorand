@@ -3,13 +3,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ProjectNetworkV1_0_0 } from '@subql/common-algorand';
-import {
-  ApiService,
-  ConnectionPoolService,
-  getLogger,
-  NetworkMetadataPayload,
-} from '@subql/node-core';
+import { ApiService, ConnectionPoolService, getLogger } from '@subql/node-core';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { BlockContent } from '../indexer/types';
 import { AlgorandApi, SafeAPIService } from './api.algorand';
