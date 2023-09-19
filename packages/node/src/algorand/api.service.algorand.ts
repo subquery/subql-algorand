@@ -23,66 +23,16 @@ export class AlgorandApiService extends ApiService<
   SafeAPIService,
   BlockContent[]
 > {
-  networkMeta: NetworkMetadataPayload;
   constructor(
     @Inject('ISubqueryProject') private project: SubqueryProject,
     connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
-    private eventEmitter: EventEmitter2,
+    eventEmitter: EventEmitter2,
   ) {
-    super(connectionPoolService);
-  }
-
-  async connectWithRetry(
-    endpoint: string,
-    index: number,
-    maxRetries: number,
-    retryInterval: number,
-  ): Promise<void> {
-    let retries = 0;
-
-    const tryConnect = async () => {
-      try {
-        const connection = await AlgorandApiConnection.create(
-          endpoint,
-          this.fetchBlockBatches,
-        );
-        const api = connection.unsafeApi;
-
-        if (!this.networkMeta) {
-          this.networkMeta = connection.networkMeta;
-        }
-
-        if (this.project.network.chainId !== api.getGenesisHash()) {
-          throw this.metadataMismatchError(
-            'ChainId',
-            this.project.network.chainId,
-            api.getGenesisHash(),
-          );
-        }
-
-        await this.connectionPoolService.addToConnections(connection, endpoint);
-      } catch (error) {
-        if (retries < maxRetries) {
-          retries++;
-          logger.warn(
-            `Failed to start up endpoint ${endpoint} (retry ${retries}/${maxRetries}): ${error.message}`,
-          );
-          setTimeout(() => {
-            tryConnect();
-          }, retryInterval);
-        } else {
-          logger.error(
-            `Failed to start up endpoint ${endpoint} after ${maxRetries} retries: ${error.message}`,
-          );
-        }
-      }
-    };
-
-    await tryConnect();
+    super(connectionPoolService, eventEmitter);
   }
 
   async init(): Promise<AlgorandApiService> {
-    let network: ProjectNetworkV1_0_0;
+    let network;
 
     try {
       network = this.project.network;
@@ -91,40 +41,22 @@ export class AlgorandApiService extends ApiService<
       process.exit(1);
     }
 
-    const endpoints = Array.isArray(network.endpoint)
-      ? network.endpoint
-      : [network.endpoint];
-
-    const maxRetries = 3;
-    const retryInterval = 30000; // 30 seconds
-    const connectionPromises: Promise<void>[] = [];
-
-    endpoints.forEach((endpoint, i) => {
-      connectionPromises.push(
-        this.connectWithRetry(endpoint, i, maxRetries, retryInterval),
-      );
-    });
-
-    // Wait for at least one successful connection before proceeding
-    await Promise.race(connectionPromises);
+    await this.createConnections(
+      network,
+      (endpoint) =>
+        AlgorandApiConnection.create(endpoint, this.fetchBlockBatches),
+      //eslint-disable-next-line @typescript-eslint/require-await
+      async (connection: AlgorandApiConnection) => {
+        const api = connection.unsafeApi;
+        return api.getGenesisHash();
+      },
+    );
 
     return this;
   }
 
   get api(): AlgorandApi {
     return this.unsafeApi;
-  }
-
-  private metadataMismatchError(
-    metadata: string,
-    expected: string,
-    actual: string,
-  ): Error {
-    return Error(
-      `Value of ${metadata} does not match across all endpoints. Please check that your endpoints are for the same network.\n
-       Expected: ${expected}
-       Actual: ${actual}`,
-    );
   }
 
   async fetchBlockBatches(
