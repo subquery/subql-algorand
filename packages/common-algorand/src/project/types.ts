@@ -1,8 +1,8 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {IProjectManifest, ProjectNetworkConfig} from '@subql/common';
 import {AlgorandDataSource} from '@subql/types-algorand';
+import {IProjectManifest} from '@subql/types-core';
 
 // All of these used to be redefined in this file, re-exporting for simplicity
 export {
@@ -21,9 +21,3 @@ export {
 
 export type IAlgorandProjectManifest = IProjectManifest<AlgorandDataSource>;
 export type TokenHeader = Record<string, string>;
-
-export interface AlgorandProjectNetworkConfig extends ProjectNetworkConfig {
-  genesisHash?: string;
-  chainId?: string;
-  apiKey?: string | TokenHeader;
-}

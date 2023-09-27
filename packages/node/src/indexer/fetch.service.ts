@@ -13,11 +13,11 @@ import {
   AlgorandRuntimeHandlerFilter,
 } from '@subql/common-algorand';
 import { NodeConfig, BaseFetchService, getModulos } from '@subql/node-core';
-import { DictionaryQueryCondition } from '@subql/types';
+import { AlgorandBlockFilter } from '@subql/types-algorand';
 import {
-  AlgorandBlockFilter,
+  DictionaryQueryCondition,
   DictionaryQueryEntry,
-} from '@subql/types-algorand';
+} from '@subql/types-core';
 import { sortBy, uniqBy } from 'lodash';
 import { AlgorandApi, AlgorandApiService, calcInterval } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';

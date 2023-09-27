@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {BaseMapping, FileReference} from '@subql/common';
+import {BlockFilterImpl, ProcessorImpl} from '@subql/common';
 import {
   CustomDataSourceAsset as AlgorandCustomDataSourceAsset,
   AlgorandBlockFilter,
@@ -16,6 +16,8 @@ import {
   AlgorandTransactionHandler,
   AlgorandTransactionFilter,
 } from '@subql/types-algorand';
+import {BaseMapping, FileReference, Processor} from '@subql/types-core';
+
 import {TransactionType} from 'algosdk';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {
@@ -198,7 +200,7 @@ export class CustomDataSourceBase<K extends string, M extends CustomMapping, O =
   @ValidateNested({each: true})
   assets: Map<string, AlgorandCustomDataSourceAsset>;
 
-  @Type(() => FileReferenceImpl)
+  @Type(() => ProcessorImpl)
   @IsObject()
-  processor: FileReference;
+  processor: Processor<O>;
 }

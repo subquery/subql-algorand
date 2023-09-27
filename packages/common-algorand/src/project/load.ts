@@ -9,10 +9,3 @@ export function parseAlgorandProjectManifest(raw: unknown): AlgorandProjectManif
   projectManifest.validate();
   return projectManifest;
 }
-
-export function loadSubstrateProjectManifest(file: string): AlgorandProjectManifestVersioned {
-  const doc = loadFromJsonOrYaml(getManifestPath(file));
-  const projectManifest = new AlgorandProjectManifestVersioned(doc as VersionedProjectManifest);
-  projectManifest.validate();
-  return projectManifest;
-}

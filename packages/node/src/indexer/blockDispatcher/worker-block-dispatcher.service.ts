@@ -26,7 +26,7 @@ import {
   IProjectUpgradeService,
   HostUnfinalizedBlocks,
 } from '@subql/node-core';
-import { Store } from '@subql/types';
+import { Store } from '@subql/types-core';
 import { AlgorandApiConnection } from '../../algorand';
 import {
   AlgorandProjectDs,

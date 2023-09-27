@@ -16,6 +16,7 @@
     "/dist"
   ],
   "peerDependencies": {
+    "@subql/types-core": "0.0.0-2",
     "algosdk": "^2.2.0"
   },
   "devDependencies": {

@@ -10,15 +10,15 @@ import {
   AlgorandRuntimeDataSource,
 } from '@subql/types-algorand';
 
-export function isBlockHandlerProcessor<E>(
-  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, unknown, unknown>
-): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, unknown, E> {
+export function isBlockHandlerProcessor<F extends Record<string, unknown>, E>(
+  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, F, unknown>
+): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, F, E> {
   return hp.baseHandlerKind === AlgorandHandlerKind.Block;
 }
 
-export function isTransactionHandlerProcessor<E>(
-  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, unknown, unknown>
-): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Transaction, unknown, E> {
+export function isTransactionHandlerProcessor<F extends Record<string, unknown>, E>(
+  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, F, unknown>
+): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Transaction, F, E> {
   return hp.baseHandlerKind === AlgorandHandlerKind.Transaction;
 }
 

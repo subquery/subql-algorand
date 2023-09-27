@@ -13,7 +13,7 @@ const ALGORAND_SUPPORTED_VERSIONS = {
 
 type Versions = keyof typeof ALGORAND_SUPPORTED_VERSIONS;
 
-type ProjectManifestImpls = InstanceType<(typeof ALGORAND_SUPPORTED_VERSIONS)[Versions]>;
+export type ProjectManifestImpls = InstanceType<(typeof ALGORAND_SUPPORTED_VERSIONS)[Versions]>;
 
 export function manifestIsV1_0_0(manifest: IAlgorandProjectManifest): manifest is ProjectManifestV1_0_0Impl {
   return manifest.specVersion === '1.0.0';
@@ -43,7 +43,7 @@ export class AlgorandProjectManifestVersioned implements IAlgorandProjectManifes
   }
 
   toDeployment(): string | undefined {
-    return this._impl.toDeployment();
+    return this._impl.deployment.toYaml();
   }
 
   validate(): void {

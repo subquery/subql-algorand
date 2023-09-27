@@ -1,8 +1,22 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import {
+  BaseTemplateDataSource,
+  IProjectNetworkConfig,
+  CommonSubqueryProject,
+  DictionaryQueryEntry,
+  FileReference,
+  Processor,
+  ProjectManifestV1_0_0,
+} from '@subql/types-core';
 import type {Indexer} from 'algosdk';
 import {AlgorandBlock, AlgorandTransaction} from './interfaces';
+
+export type RuntimeDatasourceTemplate = BaseTemplateDataSource<AlgorandRuntimeDataSource>;
+export type CustomDatasourceTemplate = BaseTemplateDataSource<AlgorandCustomDataSource>;
+
+export type AlgorandProjectManifestV1_0_0 = ProjectManifestV1_0_0<AlgorandRuntimeDataSource | AlgorandCustomDataSource>;
 
 export enum AlgorandDataSourceKind {
   Runtime = 'algorand/Runtime',
@@ -22,21 +36,6 @@ type RuntimeFilterMap = {
   [AlgorandHandlerKind.Block]: {};
   [AlgorandHandlerKind.Transaction]: AlgorandTransactionFilter;
 };
-
-export interface ProjectManifest {
-  specVersion: string;
-  description: string;
-  repository: string;
-
-  schema: string;
-
-  network: {
-    endpoint: string;
-  };
-
-  dataSources: AlgorandDataSource[];
-  bypassBlocks?: number[];
-}
 
 // [startSpecVersion?, endSpecVersion?] closed range
 export type SpecVersionRange = [number, number];
@@ -97,13 +96,7 @@ export interface AlgorandRuntimeDataSource<
 
 export type AlgorandDataSource = AlgorandRuntimeDataSource | AlgorandCustomDataSource;
 
-export interface FileReference {
-  file: string;
-}
-
 export type CustomDataSourceAsset = FileReference;
-
-export type Processor<O = any> = FileReference & {options?: O};
 
 export interface AlgorandCustomDataSource<
   K extends string = string,
@@ -115,8 +108,6 @@ export interface AlgorandCustomDataSource<
   processor: Processor<O>;
 }
 
-//export type SubstrateBuiltinDataSource = IAlgorandDataSource;
-
 export interface HandlerInputTransformer_0_0_0<
   T extends AlgorandHandlerKind,
   E,
@@ -127,7 +118,7 @@ export interface HandlerInputTransformer_0_0_0<
 
 export interface HandlerInputTransformer_1_0_0<
   T extends AlgorandHandlerKind,
-  F,
+  F extends Record<string, unknown>,
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > {
@@ -142,7 +133,7 @@ export interface HandlerInputTransformer_1_0_0<
 
 type SecondLayerHandlerProcessorArray<
   K extends string,
-  T,
+  T extends Record<string, unknown>,
   DS extends AlgorandCustomDataSource<K> = AlgorandCustomDataSource<K>
 > = SecondLayerHandlerProcessor<AlgorandHandlerKind, T, DS>;
 
@@ -160,20 +151,9 @@ export interface AlgorandDataSourceProcessor<
   handlerProcessors: P;
 }
 
-export interface DictionaryQueryCondition {
-  field: string;
-  value: string | boolean | string[];
-  matcher?: string; // defaults to "equalTo", use "contains" for JSON
-}
-
-export interface DictionaryQueryEntry {
-  entity: string;
-  conditions: DictionaryQueryCondition[];
-}
-
 interface SecondLayerHandlerProcessorBase<
   K extends AlgorandHandlerKind,
-  F,
+  F extends Record<string, unknown>,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > {
   baseHandlerKind: K;
@@ -185,7 +165,7 @@ interface SecondLayerHandlerProcessorBase<
 // only allow one custom handler for each baseHandler kind
 export interface SecondLayerHandlerProcessor_0_0_0<
   K extends AlgorandHandlerKind,
-  F,
+  F extends Record<string, unknown>,
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > extends SecondLayerHandlerProcessorBase<K, F, DS> {
@@ -196,7 +176,7 @@ export interface SecondLayerHandlerProcessor_0_0_0<
 
 export interface SecondLayerHandlerProcessor_1_0_0<
   K extends AlgorandHandlerKind,
-  F,
+  F extends Record<string, unknown>,
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > extends SecondLayerHandlerProcessorBase<K, F, DS> {
@@ -207,7 +187,13 @@ export interface SecondLayerHandlerProcessor_1_0_0<
 
 export type SecondLayerHandlerProcessor<
   K extends AlgorandHandlerKind,
-  F,
+  F extends Record<string, unknown>,
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > = SecondLayerHandlerProcessor_0_0_0<K, F, E, DS> | SecondLayerHandlerProcessor_1_0_0<K, F, E, DS>;
+
+export type AlgorandProject<DS extends AlgorandDataSource = AlgorandRuntimeDataSource> = CommonSubqueryProject<
+  IProjectNetworkConfig,
+  AlgorandRuntimeDataSource | DS,
+  BaseTemplateDataSource<AlgorandRuntimeDataSource> | BaseTemplateDataSource<DS>
+>;

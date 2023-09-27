@@ -24,7 +24,7 @@ export interface DsPluginSandboxOption {
 
 export function isSecondLayerHandlerProcessor_0_0_0<
   K extends AlgorandHandlerKind,
-  F,
+  F extends Record<string, unknown>,
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource,
 >(
@@ -38,7 +38,7 @@ export function isSecondLayerHandlerProcessor_0_0_0<
 
 export function isSecondLayerHandlerProcessor_1_0_0<
   K extends AlgorandHandlerKind,
-  F,
+  F extends Record<string, unknown>,
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource,
 >(
@@ -51,7 +51,7 @@ export function isSecondLayerHandlerProcessor_1_0_0<
 
 export function asSecondLayerHandlerProcessor_1_0_0<
   K extends AlgorandHandlerKind,
-  F,
+  F extends Record<string, unknown>,
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource,
 >(

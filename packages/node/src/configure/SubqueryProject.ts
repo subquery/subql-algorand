@@ -3,14 +3,8 @@
 
 import assert from 'assert';
 import { Injectable } from '@nestjs/common';
+import { validateSemver } from '@subql/common';
 import {
-  ParentProject,
-  Reader,
-  RunnerSpecs,
-  validateSemver,
-} from '@subql/common';
-import {
-  AlgorandProjectNetworkConfig,
   parseAlgorandProjectManifest,
   AlgorandDataSource,
   ProjectManifestV1_0_0Impl,
@@ -18,8 +12,6 @@ import {
   isRuntimeDs,
   AlgorandHandlerKind,
   isCustomDs,
-  RuntimeDataSourceTemplate,
-  CustomDataSourceTemplate,
 } from '@subql/common-algorand';
 import {
   insertBlockFiltersCronSchedules,
@@ -27,6 +19,16 @@ import {
   SubqlProjectDs,
   updateDataSourcesV1_0_0,
 } from '@subql/node-core';
+import {
+  CustomDatasourceTemplate,
+  RuntimeDatasourceTemplate,
+} from '@subql/types-algorand';
+import {
+  IProjectNetworkConfig,
+  ParentProject,
+  Reader,
+  RunnerSpecs,
+} from '@subql/types-core';
 import { buildSchemaFromString } from '@subql/utils';
 import Cron from 'cron-converter';
 import { GraphQLSchema } from 'graphql';
@@ -36,8 +38,8 @@ const { version: packageVersion } = require('../../package.json');
 export type AlgorandProjectDs = SubqlProjectDs<AlgorandDataSource>;
 
 export type AlgorandProjectDsTemplate =
-  | SubqlProjectDs<RuntimeDataSourceTemplate>
-  | SubqlProjectDs<CustomDataSourceTemplate>;
+  | SubqlProjectDs<RuntimeDatasourceTemplate>
+  | SubqlProjectDs<CustomDatasourceTemplate>;
 
 export type SubqlProjectBlockFilter = BlockFilter & {
   cronSchedule?: {
@@ -55,7 +57,7 @@ const NOT_SUPPORT = (name: string) => {
 };
 
 // This is the runtime type after we have mapped genesisHash to chainId and endpoint/dict have been provided when dealing with deployments
-type NetworkConfig = AlgorandProjectNetworkConfig & { chainId: string };
+type NetworkConfig = IProjectNetworkConfig & { chainId: string };
 
 @Injectable()
 export class SubqueryProject {
@@ -94,7 +96,7 @@ export class SubqueryProject {
     rawManifest: unknown,
     reader: Reader,
     root: string,
-    networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
+    networkOverrides?: Partial<IProjectNetworkConfig>,
   ): Promise<SubqueryProject> {
     // rawManifest and reader can be reused here.
     // It has been pre-fetched and used for rebase manifest runner options with args
@@ -138,7 +140,7 @@ async function loadProjectFromManifestBase(
   reader: Reader,
   path: string,
   root: string,
-  networkOverrides?: Partial<AlgorandProjectNetworkConfig>,
+  networkOverrides?: Partial<IProjectNetworkConfig>,
 ): Promise<SubqueryProject> {
   if (typeof projectManifest.network.endpoint === 'string') {
     projectManifest.network.endpoint = [projectManifest.network.endpoint];
