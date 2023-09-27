@@ -5,29 +5,24 @@ import { isMainThread } from 'worker_threads';
 import { Module } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
-  StoreService,
-  PoiService,
   ConnectionPoolService,
-  StoreCacheService,
   WorkerDynamicDsService,
   ConnectionPoolStateManager,
   WorkerConnectionPoolStateManager,
 } from '@subql/node-core';
-import { AlgorandApiService, AlgorandApiConnection } from '../algorand';
-import { SubqueryProject } from '../configure/SubqueryProject';
-import { DsProcessorService } from './ds-processor.service';
-import { DynamicDsService } from './dynamic-ds.service';
-import { IndexerManager } from './indexer.manager';
-import { ProjectService } from './project.service';
-import { SandboxService } from './sandbox.service';
-import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
-import { WorkerService } from './worker/worker.service';
+import { AlgorandApiService, AlgorandApiConnection } from '../../algorand';
+import { SubqueryProject } from '../../configure/SubqueryProject';
+import { DsProcessorService } from '../ds-processor.service';
+import { DynamicDsService } from '../dynamic-ds.service';
+import { IndexerManager } from '../indexer.manager';
+import { ProjectService } from '../project.service';
+import { SandboxService } from '../sandbox.service';
+import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
+import { WorkerService } from './worker.service';
 
 @Module({
   providers: [
     IndexerManager,
-    StoreCacheService,
-    StoreService,
     {
       provide: ConnectionPoolStateManager,
       useFactory: () => {
@@ -67,13 +62,12 @@ import { WorkerService } from './worker/worker.service';
         return new WorkerDynamicDsService((global as any).host);
       },
     },
-    PoiService,
     {
       provide: 'IProjectService',
       useClass: ProjectService,
     },
     WorkerService,
   ],
-  exports: [StoreService],
+  exports: [],
 })
-export class IndexerModule {}
+export class WorkerFetchModule {}

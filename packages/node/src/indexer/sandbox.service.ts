@@ -21,6 +21,7 @@ export class SandboxService<Api> {
 
   constructor(
     private readonly apiService: AlgorandApiService,
+    @Inject(isMainThread ? StoreService : 'Null')
     private readonly storeService: StoreService,
     private readonly nodeConfig: NodeConfig,
     @Inject('ISubqueryProject') private readonly project: ISubqueryProject,
