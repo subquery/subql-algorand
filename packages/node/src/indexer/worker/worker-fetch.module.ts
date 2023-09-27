@@ -19,6 +19,7 @@ import { ProjectService } from '../project.service';
 import { SandboxService } from '../sandbox.service';
 import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
 import { WorkerService } from './worker.service';
+import { WorkerUnfinalizedBlocksService } from './worker.unfinalizedBlocks.service';
 
 @Module({
   providers: [
@@ -33,7 +34,6 @@ import { WorkerService } from './worker.service';
       },
     },
     ConnectionPoolService,
-    UnfinalizedBlocksService,
     {
       provide: AlgorandApiService,
       useFactory: async (
@@ -65,6 +65,15 @@ import { WorkerService } from './worker.service';
     {
       provide: 'IProjectService',
       useClass: ProjectService,
+    },
+    {
+      provide: UnfinalizedBlocksService,
+      useFactory: () => {
+        if (isMainThread) {
+          throw new Error('Expected to be worker thread');
+        }
+        return new WorkerUnfinalizedBlocksService((global as any).host);
+      },
     },
     WorkerService,
   ],
