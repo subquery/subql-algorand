@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {BlockFilterImpl, ProcessorImpl} from '@subql/common';
+import {ProcessorImpl} from '@subql/common';
 import {
   CustomDataSourceAsset as AlgorandCustomDataSourceAsset,
   AlgorandBlockFilter,

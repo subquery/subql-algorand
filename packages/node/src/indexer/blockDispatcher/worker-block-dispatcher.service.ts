@@ -47,6 +47,7 @@ async function createIndexerWorker(
   unfinalizedBlocksService: IUnfinalizedBlocksService<BlockContent>,
   connectionPoolState: ConnectionPoolStateManager<AlgorandApiConnection>,
   root: string,
+  startHeight: number,
 ): Promise<IndexerWorker> {
   const indexerWorker = Worker.create<
     IInitIndexerWorker,
@@ -70,7 +71,7 @@ async function createIndexerWorker(
     root,
   );
 
-  await indexerWorker.initWorker();
+  await indexerWorker.initWorker(startHeight);
 
   return indexerWorker;
 }
@@ -114,6 +115,7 @@ export class WorkerBlockDispatcherService
           unfinalizedBlocksService,
           connectionPoolState,
           project.root,
+          projectService.startHeight,
         ),
     );
   }

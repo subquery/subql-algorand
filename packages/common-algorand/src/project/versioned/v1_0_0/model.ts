@@ -6,7 +6,6 @@ import {
   FileType,
   ParentProjectModel,
   ProjectManifestBaseImpl,
-  RunnerNodeImpl,
   RunnerQueryBaseModel,
   validateObject,
   CommonProjectNetworkV1_0_0,

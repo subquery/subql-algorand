@@ -10,7 +10,6 @@ import {
   StoreService,
   NodeConfig,
   IProjectUpgradeService,
-  mainThreadOnly,
 } from '@subql/node-core';
 import { Sequelize } from '@subql/x-sequelize';
 import { AlgorandApiService } from '../algorand';
@@ -67,7 +66,6 @@ export class ProjectService extends BaseProjectService<
     return new Date(block.timestamp);
   }
 
-  @mainThreadOnly()
   protected onProjectChange(project: SubqueryProject): void | Promise<void> {
     // TODO update this when implementing skipBlock feature for Eth
     // this.apiService.updateBlockFetching();

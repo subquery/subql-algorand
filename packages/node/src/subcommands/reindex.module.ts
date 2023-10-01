@@ -7,6 +7,7 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import {
   DbModule,
   ForceCleanService,
+  PoiService,
   ReindexService,
   StoreCacheService,
   StoreService,
@@ -23,6 +24,7 @@ import { DynamicDsService } from '../indexer/dynamic-ds.service';
     ReindexService,
     ForceCleanService,
     DynamicDsService,
+    PoiService,
     DsProcessorService,
     {
       // Used to work with DI for unfinalizedBlocksService but not used with reindex

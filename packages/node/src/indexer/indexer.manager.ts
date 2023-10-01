@@ -38,7 +38,6 @@ import {
   DsProcessorService,
 } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
-import { ProjectService } from './project.service';
 import { SandboxService } from './sandbox.service';
 import { BlockContent } from './types';
 import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
@@ -63,7 +62,6 @@ export class IndexerManager extends BaseIndexerManager<
     sandboxService: SandboxService<SafeAPI>,
     dsProcessorService: DsProcessorService,
     dynamicDsService: DynamicDsService,
-    @Inject('IProjectService') private projectService: ProjectService,
     unfinalizedBlocksService: UnfinalizedBlocksService,
   ) {
     super(
@@ -90,11 +88,6 @@ export class IndexerManager extends BaseIndexerManager<
     return super.internalIndexBlock(block, dataSources, () =>
       this.getApi(block),
     );
-  }
-
-  async start(): Promise<void> {
-    await this.projectService.init();
-    logger.info('indexer manager started');
   }
 
   getBlockHeight(block: BlockContent): number {
