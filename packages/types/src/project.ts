@@ -10,6 +10,10 @@ import {
   Processor,
   ProjectManifestV1_0_0,
   BlockFilter,
+  BaseHandler,
+  BaseMapping,
+  BaseDataSource,
+  BaseCustomDataSource,
 } from '@subql/types-core';
 import type {Indexer, TransactionType} from 'algosdk';
 import {AlgorandBlock, AlgorandTransaction} from './interfaces';
@@ -126,7 +130,8 @@ export type AlgorandTransactionHandler = AlgorandCustomHandler<
  * @template K - The kind of the handler (default: string).
  * @template F - The filter type for the handler (default: Record<string, unknown>).
  */
-export interface AlgorandCustomHandler<K extends string = string, F = Record<string, unknown>> {
+export interface AlgorandCustomHandler<K extends string = string, F = Record<string, unknown>>
+  extends BaseHandler<F, K> {
   /**
    * The kind of handler. For `algorand/Runtime` datasources this is either `Block` or `Transaction` kinds.
    * The value of this will determine the filter options as well as the data provided to your handler function
@@ -136,15 +141,6 @@ export interface AlgorandCustomHandler<K extends string = string, F = Record<str
    */
   kind: K;
   /**
-   * The name of your handler function. This must be defined and exported from your code.
-   * @type {string}
-   * @example
-   * handler: 'handleBlock'
-   */
-  handler: string;
-  /**
-   * The filter for the handler. The handler kind will determine the possible filters (optional).
-   *
    * @type {F}
    * @example
    * filter: {
@@ -177,9 +173,8 @@ export type AlgorandRuntimeHandlerFilter = AlgorandBlockFilter | AlgorandTransac
  * @interface
  * @extends {FileReference}
  */
-export interface AlgorandMapping<T extends AlgorandHandler = AlgorandHandler> extends FileReference {
+export interface AlgorandMapping<T extends AlgorandHandler = AlgorandHandler> extends BaseMapping<T> {
   /**
-   * An array of handlers associated with the mapping.
    * @type {T[]}
    * @example
    * handlers: [{
@@ -200,25 +195,7 @@ export interface AlgorandMapping<T extends AlgorandHandler = AlgorandHandler> ex
  * @interface
  * @template M - The mapping type for the datasource.
  */
-interface IAlgorandDataSource<M extends AlgorandMapping> {
-  /**
-   * The kind of the datasource.
-   * @type {string}
-   */
-  kind: string;
-  /**
-   * The starting block number for the datasource. If not specified, 1 will be used (optional).
-   * @type {number}
-   * @default 1
-   */
-  startBlock?: number;
-  /**
-   * The mapping associated with the datasource.
-   * This contains the handlers.
-   * @type {M}
-   */
-  mapping: M;
-}
+type IAlgorandDataSource<M extends AlgorandMapping> = BaseDataSource<AlgorandHandler, M>;
 
 export interface AlgorandRuntimeDataSource<
   M extends AlgorandMapping<AlgorandRuntimeHandler> = AlgorandMapping<AlgorandRuntimeHandler>
@@ -232,12 +209,13 @@ export type CustomDataSourceAsset = FileReference;
 
 export interface AlgorandCustomDataSource<
   K extends string = string,
-  M extends AlgorandMapping = AlgorandMapping<AlgorandCustomHandler>,
-  O = any
-> extends IAlgorandDataSource<M> {
+  M extends AlgorandMapping = AlgorandMapping<AlgorandCustomHandler>
+> extends BaseCustomDataSource<AlgorandHandler, M> {
+  /**
+   * The kind of the custom datasource. This should follow the pattern `algorand/*`.
+   * @type {K}
+   */
   kind: K;
-  assets: Map<string, CustomDataSourceAsset>;
-  processor: Processor<O>;
 }
 
 export interface HandlerInputTransformer_0_0_0<

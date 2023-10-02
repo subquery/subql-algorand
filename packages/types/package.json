@@ -23,6 +23,6 @@
     "algosdk": "^2.2.0"
   },
   "dependencies": {
-    "@subql/types-core": "^0.0.1"
+    "@subql/types-core": "^0.1.0"
   }
 }

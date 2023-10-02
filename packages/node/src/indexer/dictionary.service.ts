@@ -7,6 +7,7 @@ import {
   NodeConfig,
   DictionaryService as CoreDictionaryService,
 } from '@subql/node-core';
+import { MetaData } from '@subql/utils';
 import { SubqueryProject } from '../configure/SubqueryProject';
 
 @Injectable()
@@ -22,5 +23,10 @@ export class DictionaryService extends CoreDictionaryService {
       nodeConfig,
       eventEmitter,
     );
+  }
+
+  protected validateChainMeta(metaData: MetaData): boolean {
+    // Chain id is used as genesis hash
+    return this.project.network.chainId === metaData.genesisHash;
   }
 }

@@ -131,6 +131,10 @@ export class FetchService extends BaseFetchService<
     );
   }
 
+  protected getGenesisHash(): string {
+    return this.apiService.networkMeta.genesisHash;
+  }
+
   protected async getFinalizedHeight(): Promise<number> {
     const checkHealth = await this.api.api.makeHealthCheck().do();
     return checkHealth.round;

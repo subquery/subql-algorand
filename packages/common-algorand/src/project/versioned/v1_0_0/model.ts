@@ -80,7 +80,7 @@ export class AlgorandRuntimeDataSourceV1_0_0Impl extends RuntimeDataSourceBase {
 
 export class AlgorandCustomDataSourceV1_0_0Impl<
     K extends string = string,
-    M extends BaseMapping<any, any> = BaseMapping<Record<string, unknown>, any>
+    M extends BaseMapping<any> = BaseMapping<any>
   >
   extends CustomDataSourceBase<K, M>
   implements AlgorandCustomDataSource<K, M>

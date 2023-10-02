@@ -132,7 +132,7 @@ export class CustomHandler implements AlgorandCustomHandler {
   filter?: Record<string, unknown>;
 }
 
-export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandlerFilter, AlgorandRuntimeHandler> {
+export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandler> {
   @Transform((params) => {
     const handlers: AlgorandRuntimeHandler[] = params.value;
     return handlers.map((handler) => {
@@ -154,7 +154,7 @@ export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandlerFilter,
   file: string;
 }
 
-export class CustomMapping implements BaseMapping<Record<string, unknown>, AlgorandCustomHandler> {
+export class CustomMapping implements BaseMapping<AlgorandCustomHandler> {
   @IsArray()
   @Type(() => CustomHandler)
   @ValidateNested()
@@ -183,7 +183,7 @@ export class FileReferenceImpl implements FileReference {
 }
 
 export class CustomDataSourceBase<K extends string, M extends CustomMapping, O = any>
-  implements AlgorandCustomDataSource<K, M, O>
+  implements AlgorandCustomDataSource<K, M>
 {
   @IsString()
   kind: K;
