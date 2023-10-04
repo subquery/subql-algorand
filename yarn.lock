@@ -2969,7 +2969,6 @@ __metadata:
     "@subql/common-algorand": "workspace:*"
     "@subql/node-core": ^5.0.3
     "@subql/types-algorand": "workspace:*"
-    "@subql/types-core": 0.0.0-2
     "@types/express": ^4.17.13
     "@types/jest": ^27.4.0
     "@types/lodash": ^4.14.178
@@ -3048,15 +3047,6 @@ __metadata:
     algosdk: ^2.2.0
   languageName: unknown
   linkType: soft
-
-"@subql/types-core@npm:0.0.0-2":
-  version: 0.0.0-2
-  resolution: "@subql/types-core@npm:0.0.0-2"
-  dependencies:
-    package-json-type: ^1.0.3
-  checksum: 3cd6a90391a8d206d0140bc84fff3b019a54488b711ce4f3d8c59f5b326dba9fc8b76d233add90b6a8dc953b09a7d3057f5132ec04a4b46e18c1aac49e8c685f
-  languageName: node
-  linkType: hard
 
 "@subql/types-core@npm:0.1.1, @subql/types-core@npm:^0.1.1":
   version: 0.1.1
