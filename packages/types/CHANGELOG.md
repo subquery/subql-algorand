@@ -6,11 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2023-10-04
+### Changed
+- Use `@subql/types-core`
+
 ## [2.2.0] - 2023-07-31
 ### Added
 - Add `block` to `AlgorandTransaction` (#67)
 - Add `getTransactionsByGroup` to `AlgorandBlock` (#67)
 - Add `applicationArgs` to `AlgorandTransactionFilter` (#67)
+
 ### Changed
 - Update license to GPL-3.0 (#70)
 
@@ -44,7 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.1] - 2022-08-04
 
 ## [1.2.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/types/2.2.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/types/3.0.0...HEAD
+[3.0.0]: https://github.com/subquery/subql-algorand/compare/types/2.2.0...types/3.0.0
 [2.2.0]: https://github.com/subquery/subql-algorand/compare/types/2.1.0...types/2.2.0
 [2.1.0]: https://github.com/subquery/subql-algorand/compare/types/2.0.0...types/2.1.0
 [2.0.0]: https://github.com/subquery/subql-algorand/compare/types/1.6.0...types/2.0.0
