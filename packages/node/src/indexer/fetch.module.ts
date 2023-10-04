@@ -6,16 +6,14 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   PoiBenchmarkService,
   IndexingBenchmarkService,
-  MmrService,
   StoreService,
   PoiService,
   NodeConfig,
   SmartBatchService,
   ConnectionPoolService,
   StoreCacheService,
-  PgMmrCacheService,
-  MmrQueryService,
   ConnectionPoolStateManager,
+  IProjectUpgradeService,
 } from '@subql/node-core';
 import { AlgorandApiConnection, AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -70,6 +68,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         nodeConfig: NodeConfig,
         eventEmitter: EventEmitter2,
         projectService: ProjectService,
+        projectUpgradeService: IProjectUpgradeService,
         apiService: AlgorandApiService,
         indexerManager: IndexerManager,
         smartBatchService: SmartBatchService,
@@ -86,6 +85,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               nodeConfig,
               eventEmitter,
               projectService,
+              projectUpgradeService,
               smartBatchService,
               storeService,
               storeCacheService,
@@ -101,6 +101,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               indexerManager,
               eventEmitter,
               projectService,
+              projectUpgradeService,
               smartBatchService,
               storeService,
               storeCacheService,
@@ -112,6 +113,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         NodeConfig,
         EventEmitter2,
         'IProjectService',
+        'IProjectUpgradeService',
         AlgorandApiService,
         IndexerManager,
         SmartBatchService,
@@ -133,14 +135,11 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
     DsProcessorService,
     DynamicDsService,
     PoiService,
-    MmrService,
-    MmrQueryService,
-    PgMmrCacheService,
     {
       useClass: ProjectService,
       provide: 'IProjectService',
     },
   ],
-  exports: [StoreService, MmrService, StoreCacheService, MmrQueryService],
+  exports: [StoreService, StoreCacheService],
 })
 export class FetchModule {}

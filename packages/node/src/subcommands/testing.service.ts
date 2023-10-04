@@ -10,7 +10,10 @@ import {
   TestRunner,
 } from '@subql/node-core';
 import { AlgorandApi, AlgorandApiService, SafeAPIService } from '../algorand';
-import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import {
+  AlgorandProjectDs,
+  SubqueryProject,
+} from '../configure/SubqueryProject';
 import { IndexerManager } from '../indexer/indexer.manager';
 import { ProjectService } from '../indexer/project.service';
 import { BlockContent } from '../indexer/types';
@@ -21,7 +24,7 @@ export class TestingService extends BaseTestingService<
   AlgorandApi,
   SafeAPIService,
   BlockContent,
-  SubqlProjectDs
+  AlgorandProjectDs
 > {
   constructor(
     nodeConfig: NodeConfig,
@@ -31,7 +34,15 @@ export class TestingService extends BaseTestingService<
   }
 
   async getTestRunner(): Promise<
-    TestRunner<AlgorandApi, SafeAPIService, BlockContent, SubqlProjectDs>
+    [
+      close: () => Promise<void>,
+      runner: TestRunner<
+        AlgorandApi,
+        SafeAPIService,
+        BlockContent,
+        AlgorandProjectDs
+      >,
+    ]
   > {
     const testContext = await NestFactory.createApplicationContext(
       TestingModule,
@@ -42,14 +53,14 @@ export class TestingService extends BaseTestingService<
 
     await testContext.init();
 
-    const projectService: ProjectService = testContext.get(ProjectService);
+    const projectService: ProjectService = testContext.get('IProjectService');
     const apiService = testContext.get(AlgorandApiService);
 
     // Initialise async services, we do this here rather than in factories, so we can capture one off events
     await apiService.init();
     await projectService.init();
 
-    return testContext.get(TestRunner);
+    return [testContext.close.bind(testContext), testContext.get(TestRunner)];
   }
 
   async indexBlock(

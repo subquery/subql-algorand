@@ -1,10 +1,9 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Interval, SchedulerRegistry } from '@nestjs/schedule';
-
+import { SchedulerRegistry } from '@nestjs/schedule';
 import {
   isCustomDs,
   isRuntimeDs,
@@ -12,24 +11,22 @@ import {
   AlgorandHandler,
   AlgorandDataSource,
   AlgorandRuntimeHandlerFilter,
-  isRuntimeDataSourceV1_0_0,
 } from '@subql/common-algorand';
-import { NodeConfig, BaseFetchService } from '@subql/node-core';
-import { DictionaryQueryCondition } from '@subql/types';
+import { NodeConfig, BaseFetchService, getModulos } from '@subql/node-core';
+import { AlgorandBlockFilter } from '@subql/types-algorand';
 import {
-  AlgorandBlockFilter,
+  DictionaryQueryCondition,
   DictionaryQueryEntry,
-} from '@subql/types-algorand';
-import { MetaData } from '@subql/utils';
-import { Indexer } from 'algosdk';
-import { range, sortBy, uniqBy, without } from 'lodash';
+} from '@subql/types-core';
+import { sortBy, uniqBy } from 'lodash';
 import { AlgorandApi, AlgorandApiService, calcInterval } from '../algorand';
-import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import { SubqueryProject } from '../configure/SubqueryProject';
 import { isBaseHandler, isCustomHandler } from '../utils/project';
 import { IAlgorandBlockDispatcher } from './blockDispatcher';
 import { DictionaryService } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
+import { ProjectService } from './project.service';
 
 const BLOCK_TIME_VARIANCE = 5000; //ms
 const DICTIONARY_MAX_QUERY_SIZE = 10000;
@@ -40,30 +37,29 @@ const INTERVAL_PERCENT = 0.9;
 
 @Injectable()
 export class FetchService extends BaseFetchService<
-  AlgorandApiService,
   AlgorandDataSource,
   IAlgorandBlockDispatcher,
   DictionaryService
 > {
   constructor(
-    apiService: AlgorandApiService,
+    private apiService: AlgorandApiService,
     nodeConfig: NodeConfig,
+    @Inject('IProjectService') projectService: ProjectService,
     @Inject('ISubqueryProject') project: SubqueryProject,
     @Inject('IBlockDispatcher')
     blockDispatcher: IAlgorandBlockDispatcher,
     dictionaryService: DictionaryService,
-    dsProcessorService: DsProcessorService,
+    private dsProcessorService: DsProcessorService,
     dynamicDsService: DynamicDsService,
     eventEmitter: EventEmitter2,
     schedulerRegistry: SchedulerRegistry,
   ) {
     super(
-      apiService,
       nodeConfig,
-      project,
+      projectService,
+      project.network,
       blockDispatcher,
       dictionaryService,
-      dsProcessorService,
       dynamicDsService,
       eventEmitter,
       schedulerRegistry,
@@ -74,20 +70,12 @@ export class FetchService extends BaseFetchService<
     return this.apiService.unsafeApi;
   }
 
-  buildDictionaryQueryEntries(startBlock: number): DictionaryQueryEntry[] {
+  buildDictionaryQueryEntries(
+    dataSources: AlgorandDataSource[],
+  ): DictionaryQueryEntry[] {
     const queryEntries: DictionaryQueryEntry[] = [];
-    const dataSources = this.project.dataSources.filter((ds) =>
-      isRuntimeDataSourceV1_0_0(ds),
-    );
 
-    // Only run the ds that is equal or less than startBlock
-    // sort array from lowest ds.startBlock to highest
-    const filteredDs = dataSources
-      .concat(this.templateDynamicDatasouces)
-      .filter((ds) => ds.startBlock <= startBlock)
-      .sort((a, b) => a.startBlock - b.startBlock);
-
-    for (const ds of filteredDs) {
+    for (const ds of dataSources) {
       const plugin = isCustomDs(ds)
         ? this.dsProcessorService.getDsProcessor(ds)
         : undefined;
@@ -143,6 +131,10 @@ export class FetchService extends BaseFetchService<
     );
   }
 
+  protected getGenesisHash(): string {
+    return this.apiService.networkMeta.genesisHash;
+  }
+
   protected async getFinalizedHeight(): Promise<number> {
     const checkHealth = await this.api.api.makeHealthCheck().do();
     return checkHealth.round;
@@ -167,22 +159,11 @@ export class FetchService extends BaseFetchService<
   }
 
   getModulos(): number[] {
-    const modulos: number[] = [];
-    for (const ds of this.project.dataSources) {
-      if (isCustomDs(ds)) {
-        continue;
-      }
-      for (const handler of ds.mapping.handlers) {
-        if (
-          handler.kind === AlgorandHandlerKind.Block &&
-          handler.filter &&
-          handler.filter.modulo
-        ) {
-          modulos.push(handler.filter.modulo);
-        }
-      }
-    }
-    return modulos;
+    return getModulos(
+      this.projectService.getAllDataSources(),
+      isCustomDs,
+      AlgorandHandlerKind.Block,
+    );
   }
 
   private getBaseHandlerKind(

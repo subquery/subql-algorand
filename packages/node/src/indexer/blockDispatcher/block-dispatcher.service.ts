@@ -12,11 +12,12 @@ import {
   PoiService,
   BlockDispatcher,
   ProcessBlockResponse,
+  IProjectUpgradeService,
 } from '@subql/node-core';
 import { AlgorandBlock } from '@subql/types-algorand';
 import { AlgorandApiService } from '../../algorand';
 import {
-  SubqlProjectDs,
+  AlgorandProjectDs,
   SubqueryProject,
 } from '../../configure/SubqueryProject';
 import { DynamicDsService } from '../dynamic-ds.service';
@@ -27,7 +28,7 @@ import { IndexerManager } from '../indexer.manager';
  */
 @Injectable()
 export class BlockDispatcherService
-  extends BlockDispatcher<AlgorandBlock, SubqlProjectDs>
+  extends BlockDispatcher<AlgorandBlock, AlgorandProjectDs>
   implements OnApplicationShutdown
 {
   constructor(
@@ -35,7 +36,10 @@ export class BlockDispatcherService
     nodeConfig: NodeConfig,
     private indexerManager: IndexerManager,
     eventEmitter: EventEmitter2,
-    @Inject('IProjectService') projectService: IProjectService<SubqlProjectDs>,
+    @Inject('IProjectService')
+    projectService: IProjectService<AlgorandProjectDs>,
+    @Inject('IProjectUpgradeService')
+    projectUpgradeService: IProjectUpgradeService,
     smartBatchService: SmartBatchService,
     storeService: StoreService,
     storeCacheService: StoreCacheService,
@@ -47,6 +51,7 @@ export class BlockDispatcherService
       nodeConfig,
       eventEmitter,
       projectService,
+      projectUpgradeService,
       smartBatchService,
       storeService,
       storeCacheService,
@@ -68,7 +73,7 @@ export class BlockDispatcherService
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(
       block,
-      await this.projectService.getAllDataSources(this.getBlockHeight(block)),
+      await this.projectService.getDataSources(this.getBlockHeight(block)),
     );
   }
 }

@@ -24,7 +24,7 @@ function testSubqueryProject(endpoint: string, chainId): SubqueryProject {
   return {
     network: {
       chainId,
-      endpoint,
+      endpoint: [endpoint],
       dictionary: `https://api.subquery.network/sq/subquery/Algorand-Dictionary`,
     },
     dataSources: [],
@@ -32,9 +32,10 @@ function testSubqueryProject(endpoint: string, chainId): SubqueryProject {
     root: './',
     schema: new GraphQLSchema({}),
     templates: [],
-  };
+  } as any;
 }
 
+// eslint-disable-next-line jest/no-export
 export const prepareApiService = async (
   endpoint: string = mainnetEndpoint,
   chainId: string = mainnetChainId,

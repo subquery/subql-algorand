@@ -3,30 +3,6 @@
 
 import type {TransactionType, Indexer} from 'algosdk';
 
-export interface Entity {
-  id: string;
-  _name?: string;
-  save?: () => Promise<void>;
-}
-
-export type FunctionPropertyNames<T> = {
-  [K in keyof T]: T[K] extends Function ? K : never;
-}[keyof T];
-
-export interface Store {
-  get(entity: string, id: string): Promise<Entity | undefined>;
-  getByField(entity: string, field: string, value: any, options?: {offset?: number; limit?: number}): Promise<Entity[]>;
-  getOneByField(entity: string, field: string, value: any): Promise<Entity | undefined>;
-  set(entity: string, id: string, data: Entity): Promise<void>;
-  bulkCreate(entity: string, data: Entity[]): Promise<void>;
-  //if fields in provided, only specify fields will be updated
-  bulkUpdate(entity: string, data: Entity[], fields?: string[]): Promise<void>;
-  remove(entity: string, id: string): Promise<void>;
-  bulkRemove(entity: string, ids: string[]): Promise<void>;
-}
-
-export type DynamicDatasourceCreator = (name: string, args: Record<string, unknown>) => Promise<void>;
-
 export enum EOnCompletion {
   noop = 'noop',
   optin = 'optin',

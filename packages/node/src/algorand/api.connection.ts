@@ -16,7 +16,8 @@ const logger = getLogger('AlgorandApiConnection');
 type FetchFunc = (api: AlgorandApi, batch: number[]) => Promise<BlockContent[]>;
 
 export class AlgorandApiConnection
-  implements IApiConnectionSpecific<AlgorandApi, SafeAPIService, BlockContent>
+  implements
+    IApiConnectionSpecific<AlgorandApi, SafeAPIService, BlockContent[]>
 {
   readonly networkMeta: NetworkMetadataPayload;
 

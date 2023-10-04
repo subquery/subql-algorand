@@ -2,16 +2,24 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import {
-  BaseMapping,
-  NodeSpec,
+  BaseDeploymentV1_0_0,
+  FileType,
+  ParentProjectModel,
   ProjectManifestBaseImpl,
-  QuerySpec,
   RunnerQueryBaseModel,
-  RunnerSpecs,
+  validateObject,
+  CommonProjectNetworkV1_0_0,
   SemverVersionValidator,
 } from '@subql/common';
-import {AlgorandCustomDataSource} from '@subql/types-algorand';
-import {plainToClass, Transform, Type} from 'class-transformer';
+import {
+  AlgorandCustomDataSource,
+  AlgorandProjectManifestV1_0_0,
+  AlgorandRuntimeDataSource,
+  CustomDatasourceTemplate,
+  RuntimeDatasourceTemplate,
+} from '@subql/types-algorand';
+import {BaseMapping, NodeSpec, ParentProject, QuerySpec, RunnerSpecs} from '@subql/types-core';
+import {plainToInstance, Transform, Type} from 'class-transformer';
 import {
   Equals,
   IsArray,
@@ -27,14 +35,6 @@ import yaml from 'js-yaml';
 import {CustomDataSourceBase, RuntimeDataSourceBase} from '../../models';
 import {TokenHeader} from '../../types';
 import {IsStringOrObject} from '../../validation/is-string-or-object.validation';
-import {
-  CustomDataSourceTemplate,
-  CustomDataSourceV1_0_0,
-  ProjectManifestV1_0_0,
-  RuntimeDataSourceTemplate,
-  RuntimeDataSourceV1_0_0,
-} from './types';
-
 const ALGORAND_NODE_NAME = `@subql/node-algorand`;
 
 export class AlgorandRunnerNodeImpl implements NodeSpec {
@@ -58,11 +58,6 @@ export class AlgorandRunnerSpecsImpl implements RunnerSpecs {
   query: QuerySpec;
 }
 
-export class FileType {
-  @IsString()
-  file: string;
-}
-
 export class ProjectNetworkDeploymentV1_0_0 {
   @IsString()
   chainId: string;
@@ -71,34 +66,13 @@ export class ProjectNetworkDeploymentV1_0_0 {
   bypassBlocks?: (number | string)[];
 }
 
-export class ProjectNetworkV1_0_0 extends ProjectNetworkDeploymentV1_0_0 {
-  @IsString({each: true})
-  @IsOptional()
-  endpoint?: string | string[];
-
-  @IsString()
-  @IsOptional()
-  dictionary?: string;
-
-  @IsString()
-  @IsOptional()
-  genesisHash?: string;
-
+export class ProjectNetworkV1_0_0 extends CommonProjectNetworkV1_0_0<FileType> {
   @IsStringOrObject()
   @IsOptional()
   apiKey?: string | TokenHeader;
 }
 
-function validateObject(object: any, errorMessage = 'failed to validate object.'): void {
-  const errors = validateSync(object, {whitelist: true, forbidNonWhitelisted: true});
-  if (errors?.length) {
-    // TODO: print error details
-    const errorMsgs = errors.map((e) => e.toString()).join('\n');
-    throw new Error(`${errorMessage}\n${errorMsgs}`);
-  }
-}
-
-export class AlgorandRuntimeDataSourceV1_0_0Impl extends RuntimeDataSourceBase implements RuntimeDataSourceV1_0_0 {
+export class AlgorandRuntimeDataSourceV1_0_0Impl extends RuntimeDataSourceBase {
   validate(): void {
     return validateObject(this, 'failed to validate runtime datasource.');
   }
@@ -106,7 +80,7 @@ export class AlgorandRuntimeDataSourceV1_0_0Impl extends RuntimeDataSourceBase i
 
 export class AlgorandCustomDataSourceV1_0_0Impl<
     K extends string = string,
-    M extends BaseMapping<any, any> = BaseMapping<Record<string, unknown>, any>
+    M extends BaseMapping<any> = BaseMapping<any>
   >
   extends CustomDataSourceBase<K, M>
   implements AlgorandCustomDataSource<K, M>
@@ -118,7 +92,7 @@ export class AlgorandCustomDataSourceV1_0_0Impl<
 
 export class RuntimeDataSourceTemplateImpl
   extends AlgorandRuntimeDataSourceV1_0_0Impl
-  implements RuntimeDataSourceTemplate
+  implements RuntimeDatasourceTemplate
 {
   @IsString()
   name: string;
@@ -126,33 +100,26 @@ export class RuntimeDataSourceTemplateImpl
 
 export class CustomDataSourceTemplateImpl
   extends AlgorandCustomDataSourceV1_0_0Impl
-  implements CustomDataSourceTemplate
+  implements CustomDatasourceTemplate
 {
   @IsString()
   name: string;
 }
 
-export class DeploymentV1_0_0 {
+export class DeploymentV1_0_0 extends BaseDeploymentV1_0_0 {
   @Transform((params) => {
     if (params.value.genesisHash && !params.value.chainId) {
       params.value.chainId = params.value.genesisHash;
     }
-    return plainToClass(ProjectNetworkDeploymentV1_0_0, params.value);
+    return plainToInstance(ProjectNetworkDeploymentV1_0_0, params.value);
   })
   @ValidateNested()
   @Type(() => ProjectNetworkDeploymentV1_0_0)
   network: ProjectNetworkDeploymentV1_0_0;
-  @Equals('1.0.0')
-  @IsString()
-  specVersion: string;
   @IsObject()
   @ValidateNested()
   @Type(() => AlgorandRunnerSpecsImpl)
   runner: RunnerSpecs;
-
-  @ValidateNested()
-  @Type(() => FileType)
-  schema: FileType;
 
   @IsArray()
   @ValidateNested()
@@ -163,7 +130,7 @@ export class DeploymentV1_0_0 {
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[];
+  dataSources: (AlgorandCustomDataSource | AlgorandRuntimeDataSource)[];
   @IsOptional()
   @IsArray()
   @ValidateNested()
@@ -174,13 +141,17 @@ export class DeploymentV1_0_0 {
     },
     keepDiscriminatorProperty: true,
   })
-  templates?: (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[];
+  templates?: (RuntimeDatasourceTemplate | CustomDatasourceTemplate)[];
 }
 
 export class ProjectManifestV1_0_0Impl
   extends ProjectManifestBaseImpl<DeploymentV1_0_0>
-  implements ProjectManifestV1_0_0
+  implements AlgorandProjectManifestV1_0_0
 {
+  constructor() {
+    super(DeploymentV1_0_0);
+  }
+
   @Equals('1.0.0')
   specVersion: string;
 
@@ -208,7 +179,7 @@ export class ProjectManifestV1_0_0Impl
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (RuntimeDataSourceV1_0_0 | CustomDataSourceV1_0_0)[];
+  dataSources: (AlgorandRuntimeDataSource | AlgorandCustomDataSource)[];
 
   @IsOptional()
   @IsArray()
@@ -220,28 +191,23 @@ export class ProjectManifestV1_0_0Impl
     },
     keepDiscriminatorProperty: true,
   })
-  templates?: (RuntimeDataSourceTemplate | CustomDataSourceTemplate)[];
+  templates?: (RuntimeDatasourceTemplate | CustomDatasourceTemplate)[];
 
   @IsObject()
   @ValidateNested()
   @Type(() => AlgorandRunnerSpecsImpl)
   runner: RunnerSpecs;
 
-  private _deployment: DeploymentV1_0_0;
+  @IsOptional()
+  @IsObject()
+  @Type(() => ParentProjectModel)
+  parent?: ParentProject;
 
   toDeployment(): string {
     return yaml.dump(this._deployment, {
       sortKeys: true,
       condenseFlow: true,
     });
-  }
-
-  get deployment(): DeploymentV1_0_0 {
-    if (!this._deployment) {
-      this._deployment = plainToClass(DeploymentV1_0_0, this);
-      validateSync(this._deployment, {whitelist: true});
-    }
-    return this._deployment;
   }
 
   validate(): void {

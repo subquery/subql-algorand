@@ -21,10 +21,8 @@ import {
 import {
   AlgorandBlock,
   AlgorandCustomDataSource,
-  AlgorandCustomHandler,
   AlgorandDataSource,
   AlgorandTransaction,
-  RuntimeHandlerInputMap,
   SafeAPI,
 } from '@subql/types-algorand';
 import {
@@ -34,14 +32,12 @@ import {
   filterBlock,
   filterTransaction,
 } from '../algorand';
-import { SubqlProjectDs } from '../configure/SubqueryProject';
-import { yargsOptions } from '../yargs';
+import { AlgorandProjectDs } from '../configure/SubqueryProject';
 import {
   asSecondLayerHandlerProcessor_1_0_0,
   DsProcessorService,
 } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
-import { ProjectService } from './project.service';
 import { SandboxService } from './sandbox.service';
 import { BlockContent } from './types';
 import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
@@ -66,7 +62,6 @@ export class IndexerManager extends BaseIndexerManager<
     sandboxService: SandboxService<SafeAPI>,
     dsProcessorService: DsProcessorService,
     dynamicDsService: DynamicDsService,
-    @Inject('IProjectService') private projectService: ProjectService,
     unfinalizedBlocksService: UnfinalizedBlocksService,
   ) {
     super(
@@ -95,11 +90,6 @@ export class IndexerManager extends BaseIndexerManager<
     );
   }
 
-  async start(): Promise<void> {
-    await this.projectService.init();
-    logger.info('indexer manager started');
-  }
-
   getBlockHeight(block: BlockContent): number {
     return block.round;
   }
@@ -116,8 +106,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   protected async indexBlockData(
     block: BlockContent,
-    dataSources: SubqlProjectDs[],
-    getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
+    dataSources: AlgorandProjectDs[],
+    getVM: (d: AlgorandProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
     await this.indexBlockContent(block, dataSources, getVM);
     for (const tx of block.transactions) {
@@ -127,8 +117,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   private async indexBlockContent(
     block: AlgorandBlock,
-    dataSources: SubqlProjectDs[],
-    getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
+    dataSources: AlgorandProjectDs[],
+    getVM: (d: AlgorandProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
     for (const ds of dataSources) {
       await this.indexData(AlgorandHandlerKind.Block, block, ds, getVM);
@@ -137,8 +127,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   private async indexBlockTransactionContent(
     txn: AlgorandTransaction,
-    dataSources: SubqlProjectDs[],
-    getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
+    dataSources: AlgorandProjectDs[],
+    getVM: (d: AlgorandProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
     for (const ds of dataSources) {
       await this.indexData(AlgorandHandlerKind.Transaction, txn, ds, getVM);

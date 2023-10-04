@@ -4,7 +4,6 @@
 import { NestFactory } from '@nestjs/core';
 import { findAvailablePort } from '@subql/common';
 import { getLogger, NestLogger } from '@subql/node-core';
-import { AlgorandApiService } from './algorand';
 import { AppModule } from './app.module';
 import { FetchService } from './indexer/fetch.service';
 import { yargsOptions } from './yargs';
@@ -42,7 +41,7 @@ export async function bootstrap(): Promise<void> {
 
   try {
     const app = await NestFactory.create(AppModule, {
-      logger: debug ? new NestLogger() : false,
+      logger: new NestLogger(debug),
     });
     await app.init();
 

@@ -7,6 +7,7 @@ import {
   Header,
   NodeConfig,
   StoreCacheService,
+  mainThreadOnly,
 } from '@subql/node-core';
 import { AlgorandApiService } from '../algorand';
 import { BlockContent } from './types';
@@ -29,20 +30,24 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
     super(nodeConfig, storeCache);
   }
 
+  @mainThreadOnly()
   protected blockToHeader(block: BlockContent): Header {
     return algorandBlockToHeader(block);
   }
 
+  @mainThreadOnly()
   protected async getFinalizedHead(): Promise<Header> {
     const checkHealth = await this.apiService.api.api.makeHealthCheck().do();
     const latestHeight = checkHealth.round;
     return this.getHeaderForHeight(latestHeight);
   }
 
+  @mainThreadOnly()
   protected async getHeaderForHash(hash: string): Promise<Header> {
     return this.getHeaderForHeight(parseInt(hash, 10));
   }
 
+  @mainThreadOnly()
   protected async getHeaderForHeight(height: number): Promise<Header> {
     return algorandBlockToHeader(
       await this.apiService.api.getBlockByHeight(height),

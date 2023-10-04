@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {BaseMapping, FileReference} from '@subql/common';
+import {ProcessorImpl} from '@subql/common';
 import {
   CustomDataSourceAsset as AlgorandCustomDataSourceAsset,
   AlgorandBlockFilter,
@@ -16,6 +16,8 @@ import {
   AlgorandTransactionHandler,
   AlgorandTransactionFilter,
 } from '@subql/types-algorand';
+import {BaseMapping, FileReference, Processor} from '@subql/types-core';
+
 import {TransactionType} from 'algosdk';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {
@@ -130,7 +132,7 @@ export class CustomHandler implements AlgorandCustomHandler {
   filter?: Record<string, unknown>;
 }
 
-export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandlerFilter, AlgorandRuntimeHandler> {
+export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandler> {
   @Transform((params) => {
     const handlers: AlgorandRuntimeHandler[] = params.value;
     return handlers.map((handler) => {
@@ -152,7 +154,7 @@ export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandlerFilter,
   file: string;
 }
 
-export class CustomMapping implements BaseMapping<Record<string, unknown>, AlgorandCustomHandler> {
+export class CustomMapping implements BaseMapping<AlgorandCustomHandler> {
   @IsArray()
   @Type(() => CustomHandler)
   @ValidateNested()
@@ -181,7 +183,7 @@ export class FileReferenceImpl implements FileReference {
 }
 
 export class CustomDataSourceBase<K extends string, M extends CustomMapping, O = any>
-  implements AlgorandCustomDataSource<K, M, O>
+  implements AlgorandCustomDataSource<K, M>
 {
   @IsString()
   kind: K;
@@ -198,7 +200,7 @@ export class CustomDataSourceBase<K extends string, M extends CustomMapping, O =
   @ValidateNested({each: true})
   assets: Map<string, AlgorandCustomDataSourceAsset>;
 
-  @Type(() => FileReferenceImpl)
+  @Type(() => ProcessorImpl)
   @IsObject()
-  processor: FileReference;
+  processor: Processor<O>;
 }

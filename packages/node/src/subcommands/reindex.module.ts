@@ -7,8 +7,8 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import {
   DbModule,
   ForceCleanService,
-  MmrService,
-  PgMmrCacheService,
+  PoiService,
+  ReindexService,
   StoreCacheService,
   StoreService,
 } from '@subql/node-core';
@@ -16,17 +16,15 @@ import { AlgorandApiService } from '../algorand';
 import { ConfigureModule } from '../configure/configure.module';
 import { DsProcessorService } from '../indexer/ds-processor.service';
 import { DynamicDsService } from '../indexer/dynamic-ds.service';
-import { ReindexService } from './reindex.service';
 
 @Module({
   providers: [
     StoreCacheService,
     StoreService,
     ReindexService,
-    MmrService,
-    PgMmrCacheService,
     ForceCleanService,
     DynamicDsService,
+    PoiService,
     DsProcessorService,
     {
       // Used to work with DI for unfinalizedBlocksService but not used with reindex

@@ -3,7 +3,6 @@
 
 import { isMainThread } from 'worker_threads';
 import { Inject, Injectable } from '@nestjs/common';
-import { BaseDataSource } from '@subql/common';
 import {
   hostStoreToStore,
   IndexerSandbox,
@@ -11,7 +10,7 @@ import {
   NodeConfig,
   StoreService,
 } from '@subql/node-core';
-import { Store } from '@subql/types';
+import { Store, BaseDataSource } from '@subql/types-core';
 import { AlgorandApiService } from '../algorand';
 
 /* It would be nice to move this to node core but need to find a way to inject other things into the sandbox */
@@ -21,6 +20,7 @@ export class SandboxService<Api> {
 
   constructor(
     private readonly apiService: AlgorandApiService,
+    @Inject(isMainThread ? StoreService : 'Null')
     private readonly storeService: StoreService,
     private readonly nodeConfig: NodeConfig,
     @Inject('ISubqueryProject') private readonly project: ISubqueryProject,
