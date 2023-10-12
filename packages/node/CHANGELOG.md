@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-
+## [3.0.1] - 2023-10-12
 ### Changed
 - debug has changed from a boolean to a string to allow scoping debug log level (#2077)
 
@@ -15,7 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed Poi migration performance issue.
   - Fixed AutoQueue timeout issue.
   - Fixed Poi sync could block DB IO and drop connection issue.
-
 
 ## [3.0.0] - 2023-10-04
 ### Changed
@@ -149,7 +148,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.0.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.0.1...HEAD
+[3.0.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.0.0...node-algorand/3.0.1
 [3.0.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.10.0...node-algorand/3.0.0
 [2.10.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.8.0...node-algorand/2.10.0
 [2.8.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/2.5.2...node-algorand/2.8.0
