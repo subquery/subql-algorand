@@ -10,6 +10,7 @@ import {
   SmartBatchService,
   StoreService,
   PoiService,
+  PoiSyncService,
   StoreCacheService,
   IProjectService,
   IDynamicDsService,
@@ -92,6 +93,7 @@ export class WorkerBlockDispatcherService
     storeService: StoreService,
     storeCacheService: StoreCacheService,
     poiService: PoiService,
+    poiSyncService: PoiSyncService,
     @Inject('ISubqueryProject') project: SubqueryProject,
     dynamicDsService: DynamicDsService,
     unfinalizedBlocksService: UnfinalizedBlocksService,
@@ -106,6 +108,7 @@ export class WorkerBlockDispatcherService
       storeService,
       storeCacheService,
       poiService,
+      poiSyncService,
       project,
       dynamicDsService,
       () =>
