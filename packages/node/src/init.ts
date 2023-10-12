@@ -16,7 +16,6 @@ const logger = getLogger('subql-node');
 
 export async function bootstrap(): Promise<void> {
   logger.info(`Current ${pjson.name} version is ${pjson.version}`);
-  const debug = argv.debug;
 
   const validate = (x: any) => {
     const p = parseInt(x);
@@ -41,7 +40,7 @@ export async function bootstrap(): Promise<void> {
 
   try {
     const app = await NestFactory.create(AppModule, {
-      logger: new NestLogger(debug),
+      logger: new NestLogger(!!argv.debug),
     });
     await app.init();
 
