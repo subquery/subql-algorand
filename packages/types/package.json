@@ -1,6 +1,6 @@
 {
   "name": "@subql/types-algorand",
-  "version": "3.0.0",
+  "version": "3.0.1-0",
   "description": "",
   "homepage": "https://github.com/subquery/subql",
   "repository": "github:subquery/subql-algorand",
@@ -25,5 +25,6 @@
   },
   "dependencies": {
     "@subql/types-core": "^0.1.1"
-  }
+  },
+  "stableVersion": "3.0.0"
 }
