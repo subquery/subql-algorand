@@ -69,7 +69,10 @@ export class AlgorandApiConnection
       formatted_error = AlgorandApiConnection.handleTimeoutError(e);
     } else if (e.message.startsWith(`disconnected from `)) {
       formatted_error = AlgorandApiConnection.handleDisconnectionError(e);
-    } else if (e.message.startsWith(`Rate Limited at endpoint`)) {
+    } else if (
+      e.message.startsWith(`Rate Limited at endpoint`) ||
+      (e as any).statusCode === 429
+    ) {
       formatted_error = AlgorandApiConnection.handleRateLimitError(e);
     } else if (e.message.includes(`Exceeded max limit of`)) {
       formatted_error = AlgorandApiConnection.handleLargeResponseError(e);
