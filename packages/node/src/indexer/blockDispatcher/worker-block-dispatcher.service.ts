@@ -26,8 +26,11 @@ import {
   dynamicDsHostFunctions,
   IProjectUpgradeService,
   HostUnfinalizedBlocks,
+  cacheHostFunctions,
+  HostCache,
+  InMemoryCacheService,
 } from '@subql/node-core';
-import { Store } from '@subql/types-core';
+import { Store, Cache } from '@subql/types-core';
 import { AlgorandApiConnection } from '../../algorand';
 import {
   AlgorandProjectDs,
@@ -44,6 +47,7 @@ type IndexerWorker = IIndexerWorker & {
 
 async function createIndexerWorker(
   store: Store,
+  cache: Cache,
   dynamicDsService: IDynamicDsService<AlgorandProjectDs>,
   unfinalizedBlocksService: IUnfinalizedBlocksService<BlockContent>,
   connectionPoolState: ConnectionPoolStateManager<AlgorandApiConnection>,
@@ -55,6 +59,7 @@ async function createIndexerWorker(
     // HostDynamicDS<AlgorandProjectDs> & HostStore & HostUnfinalizedBlocks
     HostDynamicDS<AlgorandProjectDs> &
       HostStore &
+      HostCache &
       HostUnfinalizedBlocks &
       HostConnectionPoolState<AlgorandApiConnection>
   >(
@@ -62,6 +67,7 @@ async function createIndexerWorker(
     [...baseWorkerFunctions, 'initWorker'],
     {
       ...storeHostFunctions(store),
+      ...cacheHostFunctions(cache),
       ...dynamicDsHostFunctions(dynamicDsService),
       unfinalizedBlocksProcess:
         unfinalizedBlocksService.processUnfinalizedBlockHeader.bind(
@@ -90,6 +96,7 @@ export class WorkerBlockDispatcherService
     @Inject('IProjectUpgradeService')
     projectUpgadeService: IProjectUpgradeService,
     smartBatchService: SmartBatchService,
+    cacheService: InMemoryCacheService,
     storeService: StoreService,
     storeCacheService: StoreCacheService,
     poiService: PoiService,
@@ -114,6 +121,7 @@ export class WorkerBlockDispatcherService
       () =>
         createIndexerWorker(
           storeService.getStore(),
+          cacheService.getCache(),
           dynamicDsService,
           unfinalizedBlocksService,
           connectionPoolState,
