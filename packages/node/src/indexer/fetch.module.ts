@@ -15,6 +15,7 @@ import {
   StoreCacheService,
   ConnectionPoolStateManager,
   IProjectUpgradeService,
+  InMemoryCacheService,
 } from '@subql/node-core';
 import { AlgorandApiConnection, AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -33,6 +34,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
 
 @Module({
   providers: [
+    InMemoryCacheService,
     StoreService,
     StoreCacheService,
     ConnectionPoolService,
@@ -73,6 +75,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         apiService: AlgorandApiService,
         indexerManager: IndexerManager,
         smartBatchService: SmartBatchService,
+        cacheService: InMemoryCacheService,
         storeService: StoreService,
         storeCacheService: StoreCacheService,
         poiService: PoiService,
@@ -89,6 +92,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               projectService,
               projectUpgradeService,
               smartBatchService,
+              cacheService,
               storeService,
               storeCacheService,
               poiService,
@@ -121,6 +125,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         AlgorandApiService,
         IndexerManager,
         SmartBatchService,
+        InMemoryCacheService,
         StoreService,
         StoreCacheService,
         PoiService,

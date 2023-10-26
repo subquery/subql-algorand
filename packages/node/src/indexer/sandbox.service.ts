@@ -6,6 +6,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   hostStoreToStore,
   IndexerSandbox,
+  InMemoryCacheService,
   ISubqueryProject,
   NodeConfig,
   StoreService,
@@ -22,6 +23,7 @@ export class SandboxService<Api> {
     private readonly apiService: AlgorandApiService,
     @Inject(isMainThread ? StoreService : 'Null')
     private readonly storeService: StoreService,
+    private readonly cacheService: InMemoryCacheService,
     private readonly nodeConfig: NodeConfig,
     @Inject('ISubqueryProject') private readonly project: ISubqueryProject,
   ) {}
@@ -31,11 +33,13 @@ export class SandboxService<Api> {
       ? this.storeService.getStore()
       : hostStoreToStore((global as any).host); // Provided in worker.ts
 
+    const cache = this.cacheService.getCache();
     const entry = this.getDataSourceEntry(ds);
     let processor = this.processorCache[entry];
     if (!processor) {
       processor = new IndexerSandbox(
         {
+          cache,
           store,
           root: this.project.root,
           entry,
