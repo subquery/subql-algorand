@@ -8,10 +8,12 @@ import {
   ConnectionPoolService,
   ConnectionPoolStateManager,
   DbModule,
+  InMemoryCacheService,
   PoiService,
+  PoiSyncService,
+  StoreCacheService,
   StoreService,
   TestRunner,
-  StoreCacheService,
 } from '@subql/node-core';
 import { AlgorandApiService } from '../algorand';
 import { ConfigureModule } from '../configure/configure.module';
@@ -23,10 +25,12 @@ import { SandboxService } from '../indexer/sandbox.service';
 import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
 @Module({
   providers: [
+    InMemoryCacheService,
     StoreService,
     StoreCacheService,
     EventEmitter2,
     PoiService,
+    PoiSyncService,
     SandboxService,
     DsProcessorService,
     DynamicDsService,

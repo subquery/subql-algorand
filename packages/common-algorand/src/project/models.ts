@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {ProcessorImpl} from '@subql/common';
+import {BaseDataSource, ProcessorImpl} from '@subql/common';
 import {
   CustomDataSourceAsset as AlgorandCustomDataSourceAsset,
   AlgorandBlockFilter,
@@ -11,7 +11,6 @@ import {
   AlgorandHandlerKind,
   AlgorandRuntimeDataSource,
   AlgorandRuntimeHandler,
-  AlgorandRuntimeHandlerFilter,
   AlgorandCustomDataSource,
   AlgorandTransactionHandler,
   AlgorandTransactionFilter,
@@ -164,17 +163,13 @@ export class CustomMapping implements BaseMapping<AlgorandCustomHandler> {
   file: string;
 }
 
-export class RuntimeDataSourceBase implements AlgorandRuntimeDataSource {
+export class RuntimeDataSourceBase extends BaseDataSource implements AlgorandRuntimeDataSource {
   @IsEnum(AlgorandDataSourceKind, {groups: [AlgorandDataSourceKind.Runtime]})
   kind: AlgorandDataSourceKind.Runtime;
 
   @Type(() => RuntimeMapping)
   @ValidateNested()
   mapping: RuntimeMapping;
-
-  @IsOptional()
-  @IsInt()
-  startBlock?: number;
 }
 
 export class FileReferenceImpl implements FileReference {
@@ -183,6 +178,7 @@ export class FileReferenceImpl implements FileReference {
 }
 
 export class CustomDataSourceBase<K extends string, M extends CustomMapping, O = any>
+  extends BaseDataSource
   implements AlgorandCustomDataSource<K, M>
 {
   @IsString()
@@ -191,10 +187,6 @@ export class CustomDataSourceBase<K extends string, M extends CustomMapping, O =
   @Type(() => CustomMapping)
   @ValidateNested()
   mapping: M;
-
-  @IsOptional()
-  @IsInt()
-  startBlock?: number;
 
   @Type(() => FileReferenceImpl)
   @ValidateNested({each: true})

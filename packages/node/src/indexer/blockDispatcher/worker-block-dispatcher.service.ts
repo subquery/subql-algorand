@@ -6,31 +6,18 @@ import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   NodeConfig,
-  Worker,
   SmartBatchService,
   StoreService,
   PoiService,
   PoiSyncService,
   StoreCacheService,
   IProjectService,
-  IDynamicDsService,
-  HostStore,
-  HostDynamicDS,
   WorkerBlockDispatcher,
-  IUnfinalizedBlocksService,
-  HostConnectionPoolState,
   ConnectionPoolStateManager,
-  connectionPoolStateHostFunctions,
-  baseWorkerFunctions,
-  storeHostFunctions,
-  dynamicDsHostFunctions,
   IProjectUpgradeService,
-  HostUnfinalizedBlocks,
-  cacheHostFunctions,
-  HostCache,
   InMemoryCacheService,
+  createIndexerWorker,
 } from '@subql/node-core';
-import { Store, Cache } from '@subql/types-core';
 import { AlgorandApiConnection } from '../../algorand';
 import {
   AlgorandProjectDs,
@@ -39,49 +26,11 @@ import {
 import { DynamicDsService } from '../dynamic-ds.service';
 import { BlockContent } from '../types';
 import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
-import { IIndexerWorker, IInitIndexerWorker } from '../worker/worker';
+import { IIndexerWorker } from '../worker/worker';
 
 type IndexerWorker = IIndexerWorker & {
   terminate: () => Promise<number>;
 };
-
-async function createIndexerWorker(
-  store: Store,
-  cache: Cache,
-  dynamicDsService: IDynamicDsService<AlgorandProjectDs>,
-  unfinalizedBlocksService: IUnfinalizedBlocksService<BlockContent>,
-  connectionPoolState: ConnectionPoolStateManager<AlgorandApiConnection>,
-  root: string,
-  startHeight: number,
-): Promise<IndexerWorker> {
-  const indexerWorker = Worker.create<
-    IInitIndexerWorker,
-    // HostDynamicDS<AlgorandProjectDs> & HostStore & HostUnfinalizedBlocks
-    HostDynamicDS<AlgorandProjectDs> &
-      HostStore &
-      HostCache &
-      HostUnfinalizedBlocks &
-      HostConnectionPoolState<AlgorandApiConnection>
-  >(
-    path.resolve(__dirname, '../../../dist/indexer/worker/worker.js'),
-    [...baseWorkerFunctions, 'initWorker'],
-    {
-      ...storeHostFunctions(store),
-      ...cacheHostFunctions(cache),
-      ...dynamicDsHostFunctions(dynamicDsService),
-      unfinalizedBlocksProcess:
-        unfinalizedBlocksService.processUnfinalizedBlockHeader.bind(
-          unfinalizedBlocksService,
-        ),
-      ...connectionPoolStateHostFunctions(connectionPoolState),
-    },
-    root,
-  );
-
-  await indexerWorker.initWorker(startHeight);
-
-  return indexerWorker;
-}
 
 @Injectable()
 export class WorkerBlockDispatcherService
@@ -119,7 +68,14 @@ export class WorkerBlockDispatcherService
       project,
       dynamicDsService,
       () =>
-        createIndexerWorker(
+        createIndexerWorker<
+          IIndexerWorker,
+          AlgorandApiConnection,
+          BlockContent,
+          AlgorandProjectDs
+        >(
+          path.resolve(__dirname, '../../../dist/indexer/worker/worker.js'),
+          [],
           storeService.getStore(),
           cacheService.getCache(),
           dynamicDsService,
