@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2023-11-06
+### Added
+- With `dictionary-query-size` now dictionary can config the query block range
+
+### Fixed
+- Sync with node-core 6.3.0 with various fixes
+
 ## [3.2.0] - 2023-11-01
 ### Changed
 - Update `@subql/node-core` with fixes and support for endBlock feature (#83)
@@ -163,7 +170,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.2.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.3.0...HEAD
+[3.3.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.2.0...node-algorand/3.3.0
 [3.2.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.1.1...node-algorand/3.2.0
 [3.1.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.1.0...node-algorand/3.1.1
 [3.1.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.0.1...node-algorand/3.1.0
