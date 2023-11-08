@@ -21,7 +21,7 @@
       "@subql/common-algorand": ["packages/common-algorand/src"],
       "@subql/common-algorand/*": ["packages/common-algorand/src/*"],
       "@subql/types-algorand": ["packages/types/src"],
-      "@subql/types-algorand/*": ["packages/types/src/*"],
+      "@subql/types-algorand/*": ["packages/types/src/*"]
     },
     "skipLibCheck": true
   },
