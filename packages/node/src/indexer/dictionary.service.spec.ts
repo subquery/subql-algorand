@@ -8,8 +8,8 @@ import { DictionaryService } from './dictionary.service';
 describe('dictionary service', () => {
   let dictionaryService: DictionaryService;
 
-  beforeEach(() => {
-    dictionaryService = new DictionaryService(
+  beforeEach(async () => {
+    dictionaryService = await DictionaryService.create(
       {
         network: {
           chainId: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
