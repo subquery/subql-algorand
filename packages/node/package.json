@@ -27,7 +27,7 @@
     "@nestjs/schedule": "^3.0.1",
     "@subql/common": "^3.3.0",
     "@subql/common-algorand": "workspace:*",
-    "@subql/node-core": "^6.4.1",
+    "@subql/node-core": "^6.4.2",
     "@subql/types-algorand": "workspace:*",
     "algosdk": "^2.2.0",
     "axios": "^1.3.4",
