@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.2] - 2023-11-27
+### Changed
+- Update `@subql/node-core` with minor fixes
+
 ## [3.4.1] - 2023-11-16
 ### Fixed
 - Sync with `node-core` 6.4.2, Fix incorrect enqueuedBlocks, dictionaries timing out by updating `@subql/apollo-links` (#93)
@@ -180,7 +184,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.1...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.2...HEAD
+[3.4.2]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.1...node-algorand/3.4.2
 [3.4.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.0...node-algorand/3.4.1
 [3.4.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.3.0...node-algorand/3.4.0
 [3.3.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.2.0...node-algorand/3.3.0
