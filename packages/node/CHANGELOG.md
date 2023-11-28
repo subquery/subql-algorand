@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.3] - 2023-11-28
+### Fixed
+- Fix ipfs deployment templates path failed to resolved, issue was introduced node-core 7.0.0
+- Update with node-core to fix network dictionary timeout but not fallback to config dictionary issue
+
 ## [3.4.2] - 2023-11-27
 ### Changed
 - Update `@subql/node-core` with minor fixes
@@ -16,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.4.0] - 2023-11-13
 ### Changed
-- Updates to match changes in `@subql/node-core` (#91)
+- Updates to match changes in 
   - Dictionary service to use dictionary registry
   - Use yargs from node core
 
@@ -184,7 +189,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.2...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.3...HEAD
+[3.4.3]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.2...node-algorand/3.4.3
 [3.4.2]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.1...node-algorand/3.4.2
 [3.4.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.0...node-algorand/3.4.1
 [3.4.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.3.0...node-algorand/3.4.0
