@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.2.0] - 2024-01-25
 ### Changed
 - bump with @subql/common 3.3.1
 
@@ -68,7 +70,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `assetId` on transaction filter being validated as a string. (#9)
 
 ## [1.0.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.1.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.2.0...HEAD
+[3.2.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.1.0...common-algorand/3.2.0
 [3.1.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.0.2...common-algorand/3.1.0
 [3.0.2]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.0.1...common-algorand/3.0.2
 [3.0.1]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.0.0...common-algorand/3.0.1
