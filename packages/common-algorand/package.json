@@ -14,7 +14,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@subql/common": "^3.3.0",
+    "@subql/common": "^3.3.1",
     "@subql/types-algorand": "workspace:*",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
