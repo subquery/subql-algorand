@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2024-01-25
+### Changed
+- Update @subql/node-core with
+  - a performance fix when using modulo filters with other datasources
+  - support for CSV exports
+  - support for schema migrations
+
 ## [3.4.4] - 2023-11-30
 ### Fixed
 - Sync with `node-core` 7.0.2
@@ -25,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.4.0] - 2023-11-13
 ### Changed
-- Updates to match changes in `@subql/node-core` (#91)
+- Updates to match changes in 
   - Dictionary service to use dictionary registry
   - Use yargs from node core
 
@@ -193,7 +200,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.4...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.5.0...HEAD
+[3.5.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.4...node-algorand/3.5.0
 [3.4.4]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.3...node-algorand/3.4.4
 [3.4.3]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.2...node-algorand/3.4.3
 [3.4.2]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.1...node-algorand/3.4.2
