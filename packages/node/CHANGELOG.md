@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.1] - 2024-02-07
+### Fixed
+- Critical bug introduced in 3.5.0 which broke historical indexing
+
 ## [3.5.0] - 2024-01-25
 ### Changed
 - Update @subql/node-core with
@@ -200,7 +204,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.5.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.5.1...HEAD
+[3.5.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.5.0...node-algorand/3.5.1
 [3.5.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.4...node-algorand/3.5.0
 [3.4.4]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.3...node-algorand/3.4.4
 [3.4.3]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.4.2...node-algorand/3.4.3
