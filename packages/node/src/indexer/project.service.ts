@@ -11,6 +11,7 @@ import {
   StoreService,
   NodeConfig,
   IProjectUpgradeService,
+  profiler,
 } from '@subql/node-core';
 import { Sequelize } from '@subql/x-sequelize';
 import { AlgorandApiService } from '../algorand';
@@ -62,6 +63,11 @@ export class ProjectService extends BaseProjectService<
       eventEmitter,
       unfinalizedBlocksService,
     );
+  }
+
+  @profiler()
+  async init(startHeight?: number): Promise<void> {
+    return super.init(startHeight);
   }
 
   protected async getBlockTimestamp(height: number): Promise<Date> {
