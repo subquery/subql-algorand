@@ -37,7 +37,7 @@ jobs:
   Build-Publish:
     name: Build-Publish
     needs: pre-ci
-    if: "!startsWith(needs.pre-ci.outputs.commit-message, '[SKIP CI]') && startsWith(needs.pre-ci.outputs.commit-message, '[release]') && github.repository == 'subquery/subql'"
+    if: "!startsWith(needs.pre-ci.outputs.commit-message, '[SKIP CI]') && startsWith(needs.pre-ci.outputs.commit-message, '[release]') && github.repository == 'subquery/subql-algorand'"
     runs-on: ubuntu-latest
     steps:
       #Check out
