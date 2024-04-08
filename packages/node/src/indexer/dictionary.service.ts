@@ -19,12 +19,7 @@ export class DictionaryService extends CoreDictionaryService {
     eventEmitter: EventEmitter2,
     dictionaryUrl?: string,
   ) {
-    super(
-      dictionaryUrl ?? project.network.dictionary,
-      project.network.chainId,
-      nodeConfig,
-      eventEmitter,
-    );
+    super(dictionaryUrl, project.network.chainId, nodeConfig, eventEmitter);
   }
 
   protected validateChainMeta(metaData: MetaData): boolean {
@@ -37,7 +32,7 @@ export class DictionaryService extends CoreDictionaryService {
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,
   ): Promise<DictionaryService> {
-    const url =
+    let url =
       project.network.dictionary ??
       (await CoreDictionaryService.resolveDictionary(
         NETWORK_FAMILY.algorand,
@@ -45,6 +40,9 @@ export class DictionaryService extends CoreDictionaryService {
         nodeConfig.dictionaryRegistry,
       ));
 
+    if (Array.isArray(url)) {
+      url = url[0];
+    }
     return new DictionaryService(project, nodeConfig, eventEmitter, url);
   }
 }

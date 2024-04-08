@@ -1,6 +1,6 @@
 {
   "name": "@subql/node-algorand",
-  "version": "3.9.1",
+  "version": "3.10.0",
   "description": "",
   "author": "Ian He",
   "license": "GPL-3.0",
@@ -25,7 +25,7 @@
     "@nestjs/event-emitter": "^2.0.0",
     "@nestjs/platform-express": "^9.4.0",
     "@nestjs/schedule": "^3.0.1",
-    "@subql/common": "^3.4.1",
+    "@subql/common": "^3.5.0",
     "@subql/common-algorand": "workspace:*",
     "@subql/node-core": "^7.4.2",
     "@subql/types-algorand": "workspace:*",
