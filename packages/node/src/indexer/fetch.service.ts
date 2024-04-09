@@ -15,8 +15,6 @@ import { AlgorandApi, AlgorandApiService, calcInterval } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { IAlgorandBlockDispatcher } from './blockDispatcher';
 import { AlgorandDictionaryService } from './dictionary';
-import { DsProcessorService } from './ds-processor.service';
-import { DynamicDsService } from './dynamic-ds.service';
 import { ProjectService } from './project.service';
 
 const BLOCK_TIME_VARIANCE = 5000; //ms
@@ -37,8 +35,6 @@ export class FetchService extends BaseFetchService<
     @Inject('IBlockDispatcher')
     blockDispatcher: IAlgorandBlockDispatcher,
     dictionaryService: AlgorandDictionaryService,
-    private dsProcessorService: DsProcessorService,
-    dynamicDsService: DynamicDsService,
     eventEmitter: EventEmitter2,
     schedulerRegistry: SchedulerRegistry,
   ) {

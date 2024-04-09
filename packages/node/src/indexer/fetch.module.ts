@@ -136,23 +136,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
     ConnectionPoolService,
     IndexingBenchmarkService,
     PoiBenchmarkService,
-    {
-      provide: AlgorandDictionaryService,
-      useFactory: (
-        project: SubqueryProject,
-        nodeConfig: NodeConfig,
-        eventEmitter: EventEmitter2,
-        dsProcessorService: DsProcessorService,
-      ) => {
-        return new AlgorandDictionaryService(
-          project,
-          nodeConfig,
-          eventEmitter,
-          dsProcessorService,
-        );
-      },
-      inject: ['ISubqueryProject', NodeConfig, EventEmitter2],
-    },
+    AlgorandDictionaryService,
     SandboxService,
     DsProcessorService,
     DynamicDsService,

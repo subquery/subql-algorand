@@ -72,9 +72,7 @@ export class BlockDispatcherService
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(
       block,
-      await this.projectService.getDataSources(
-        this.getBlockHeight(block.block),
-      ),
+      await this.projectService.getDataSources(block.getHeader().blockHeight),
     );
   }
 }

@@ -9,7 +9,6 @@ import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
 import { SubqueryProject } from '../../configure/SubqueryProject';
 import { DsProcessorService } from '../ds-processor.service';
 import { AlgorandDictionaryV1 } from './v1';
-import { AlgorandDictionaryV2 } from './v2';
 
 const logger = getLogger('AlograndDictionary');
 
@@ -20,7 +19,6 @@ export class AlgorandDictionaryService extends DictionaryService<
 > {
   async initDictionaries(): Promise<void> {
     const dictionariesV1: AlgorandDictionaryV1[] = [];
-    const dictionariesV2: AlgorandDictionaryV2[] = [];
 
     if (!this.project) {
       throw new Error(`Project in Dictionary service not initialized `);
@@ -43,32 +41,20 @@ export class AlgorandDictionaryService extends DictionaryService<
 
     for (const endpoint of dictionaryEndpoints) {
       try {
-        const dictionaryV2 = await AlgorandDictionaryV2.create(
-          endpoint,
-          this.nodeConfig,
+        const dictionaryV1 = await AlgorandDictionaryV1.create(
           this.project,
-          this.project.network.chainId,
+          this.nodeConfig,
+          this.dsProcessorService.getDsProcessor.bind(this),
+          endpoint,
         );
-        dictionariesV2.push(dictionaryV2);
+        dictionariesV1.push(dictionaryV1);
       } catch (e) {
-        try {
-          const dictionaryV1 = await AlgorandDictionaryV1.create(
-            this.project,
-            this.nodeConfig,
-            this.dsProcessorService.getDsProcessor.bind(this),
-            endpoint,
-          );
-          dictionariesV1.push(dictionaryV1);
-        } catch (e) {
-          logger.warn(
-            `Dictionary endpoint "${endpoint}" is not a valid dictionary`,
-          );
-        }
+        logger.warn(
+          `Dictionary endpoint "${endpoint}" is not a valid dictionary`,
+        );
       }
     }
-
-    // v2 should be prioritised
-    this.init([...dictionariesV2, ...dictionariesV1]);
+    this.init(dictionariesV1);
   }
 
   constructor(
