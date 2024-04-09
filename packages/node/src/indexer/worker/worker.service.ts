@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Inject, Injectable } from '@nestjs/common';
@@ -7,9 +7,15 @@ import {
   IProjectService,
   BaseWorkerService,
   IProjectUpgradeService,
+  ApiService,
+  IBlock,
 } from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
-import { AlgorandApiService } from '../../algorand';
+import {
+  AlgorandApi,
+  AlgorandApiService,
+  SafeAPIService,
+} from '../../algorand';
 import { AlgorandProjectDs } from '../../configure/SubqueryProject';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
@@ -48,7 +54,9 @@ export class WorkerService extends BaseWorkerService<
     super(projectService, projectUpgradeService, nodeConfig);
   }
 
-  protected async fetchChainBlock(heights: number): Promise<AlgorandBlock> {
+  protected async fetchChainBlock(
+    heights: number,
+  ): Promise<IBlock<AlgorandBlock>> {
     const [block] = await this.apiService.fetchBlocks([heights]);
     return block;
   }
@@ -58,7 +66,7 @@ export class WorkerService extends BaseWorkerService<
     };
   }
   protected async processFetchedBlock(
-    block: AlgorandBlock,
+    block: IBlock<AlgorandBlock>,
     dataSources: AlgorandDataSource[],
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(block, dataSources);

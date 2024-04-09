@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Inject, Injectable } from '@nestjs/common';
@@ -8,6 +8,7 @@ import {
   TestingService as BaseTestingService,
   NestLogger,
   TestRunner,
+  IBlock,
 } from '@subql/node-core';
 import { AlgorandApi, AlgorandApiService, SafeAPIService } from '../algorand';
 import {
@@ -64,7 +65,7 @@ export class TestingService extends BaseTestingService<
   }
 
   async indexBlock(
-    block: BlockContent,
+    block: IBlock<BlockContent>,
     handler: string,
     indexerManager: IndexerManager,
   ): Promise<void> {

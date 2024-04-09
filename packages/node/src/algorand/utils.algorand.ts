@@ -1,6 +1,7 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import { Header, IBlock } from '@subql/node-core';
 import {
   AlgorandBlock,
   AlgorandBlockFilter,
@@ -9,6 +10,24 @@ import {
 } from '@subql/types-algorand';
 import { Indexer, TransactionType } from 'algosdk';
 import { camelCase, get } from 'lodash';
+import { BlockContent } from '../indexer/types';
+
+export function algorandBlockToHeader(block: BlockContent): Header {
+  return {
+    blockHeight: block.round,
+    blockHash: block.round.toString(),
+    parentHash: block.previousBlockHash,
+  };
+}
+
+export function formatBlockUtil<B extends AlgorandBlock = AlgorandBlock>(
+  block: B,
+): IBlock<B> {
+  return {
+    block,
+    getHeader: () => algorandBlockToHeader(block),
+  };
+}
 
 export function camelCaseObjectKey(object: object) {
   if (Array.isArray(object)) {

@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { isMainThread } from 'worker_threads';
@@ -7,9 +7,10 @@ import {
   IUnfinalizedBlocksService,
   Header,
   HostUnfinalizedBlocks,
+  IBlock,
 } from '@subql/node-core';
+import { algorandBlockToHeader } from '../../algorand';
 import { BlockContent } from '../types';
-import { algorandBlockToHeader } from '../unfinalizedBlocks.service';
 
 @Injectable()
 export class WorkerUnfinalizedBlocksService
@@ -21,8 +22,12 @@ export class WorkerUnfinalizedBlocksService
     }
   }
 
-  async processUnfinalizedBlocks(block: BlockContent): Promise<number | null> {
-    return this.processUnfinalizedBlockHeader(algorandBlockToHeader(block));
+  async processUnfinalizedBlocks(
+    block: IBlock<BlockContent>,
+  ): Promise<number | null> {
+    return this.processUnfinalizedBlockHeader(
+      algorandBlockToHeader(block.block),
+    );
   }
 
   async processUnfinalizedBlockHeader(header: Header): Promise<number | null> {

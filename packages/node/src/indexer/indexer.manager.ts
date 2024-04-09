@@ -1,7 +1,7 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   isRuntimeDs,
   AlgorandHandlerKind,
@@ -12,11 +12,11 @@ import {
 } from '@subql/common-algorand';
 import {
   NodeConfig,
-  getLogger,
   profiler,
   IndexerSandbox,
   ProcessBlockResponse,
   BaseIndexerManager,
+  IBlock,
 } from '@subql/node-core';
 import {
   AlgorandBlock,
@@ -41,8 +41,6 @@ import { DynamicDsService } from './dynamic-ds.service';
 import { SandboxService } from './sandbox.service';
 import { BlockContent } from './types';
 import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
-
-const logger = getLogger('indexer');
 
 @Injectable()
 export class IndexerManager extends BaseIndexerManager<
@@ -82,11 +80,11 @@ export class IndexerManager extends BaseIndexerManager<
 
   @profiler()
   async indexBlock(
-    block: BlockContent,
+    block: IBlock<BlockContent>,
     dataSources: AlgorandDataSource[],
   ): Promise<ProcessBlockResponse> {
     return super.internalIndexBlock(block, dataSources, () =>
-      this.getApi(block),
+      this.getApi(block.block),
     );
   }
 
@@ -139,7 +137,7 @@ export class IndexerManager extends BaseIndexerManager<
     kind: AlgorandHandlerKind,
     data: T,
   ): Promise<T> {
-    // Substrate doesn't need to do anything here
+    // Algorand doesn't need to do anything here
     return Promise.resolve(data);
   }
 

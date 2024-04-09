@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { INestApplication } from '@nestjs/common';
@@ -67,7 +67,9 @@ describe('ApiService', () => {
 
     const block = (await apiService.api.fetchBlocks([50000]))[0];
 
-    expect(block.hash).toEqual('Gss169f22yVUBJzbNT9qXtQukjh0tgecvapaQY5NIRg=');
+    expect(block.block.hash).toEqual(
+      'Gss169f22yVUBJzbNT9qXtQukjh0tgecvapaQY5NIRg=',
+    );
   });
 
   it('waits on pending block to fetch hash', async () => {
@@ -83,6 +85,6 @@ describe('ApiService', () => {
     expect(fetchLatestBlock).not.toThrow();
 
     const block = await fetchLatestBlock();
-    expect(block.hash).toBeDefined();
+    expect(block.block.hash).toBeDefined();
   });
 });

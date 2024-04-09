@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import {
@@ -7,17 +7,21 @@ import {
   IApiConnectionSpecific,
   NetworkMetadataPayload,
   getLogger,
+  IBlock,
 } from '@subql/node-core';
 import { BlockContent } from '../indexer/types';
 import { AlgorandApi, SafeAPIService } from './api.algorand';
 
 const logger = getLogger('AlgorandApiConnection');
 
-type FetchFunc = (api: AlgorandApi, batch: number[]) => Promise<BlockContent[]>;
+type FetchFunc = (
+  api: AlgorandApi,
+  batch: number[],
+) => Promise<IBlock<BlockContent>[]>;
 
 export class AlgorandApiConnection
   implements
-    IApiConnectionSpecific<AlgorandApi, SafeAPIService, BlockContent[]>
+    IApiConnectionSpecific<AlgorandApi, SafeAPIService, IBlock<BlockContent>[]>
 {
   readonly networkMeta: NetworkMetadataPayload;
 
@@ -56,7 +60,7 @@ export class AlgorandApiConnection
     logger.debug('apiDisconnect is not implemented');
   }
 
-  async fetchBlocks(heights: number[]): Promise<BlockContent[]> {
+  async fetchBlocks(heights: number[]): Promise<IBlock<BlockContent>[]> {
     const blocks = await this.fetchBlocksBatches(this.unsafeApi, heights);
     return blocks;
   }

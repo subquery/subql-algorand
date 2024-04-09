@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
@@ -13,6 +13,7 @@ import {
   BlockDispatcher,
   ProcessBlockResponse,
   IProjectUpgradeService,
+  IBlock,
 } from '@subql/node-core';
 import { AlgorandBlock } from '@subql/types-algorand';
 import { AlgorandApiService } from '../../algorand';
@@ -58,9 +59,7 @@ export class BlockDispatcherService
       poiSyncService,
       project,
       dynamicDsService,
-      async (blockNums: number[]): Promise<AlgorandBlock[]> => {
-        return this.apiService.fetchBlocks(blockNums);
-      },
+      apiService.fetchBlocks.bind(apiService),
     );
   }
 
@@ -69,11 +68,11 @@ export class BlockDispatcherService
   }
 
   protected async indexBlock(
-    block: AlgorandBlock,
+    block: IBlock<AlgorandBlock>,
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(
       block,
-      await this.projectService.getDataSources(this.getBlockHeight(block)),
+      await this.projectService.getDataSources(block.getHeader().blockHeight),
     );
   }
 }

@@ -1,8 +1,8 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { TokenHeader } from '@subql/common-algorand';
-import { delay, getLogger } from '@subql/node-core';
+import { delay, getLogger, IBlock } from '@subql/node-core';
 import {
   AlgorandBlock,
   AlgorandTransaction,
@@ -11,7 +11,7 @@ import {
 import algosdk, { Indexer } from 'algosdk';
 import axios from 'axios';
 import { omit } from 'lodash';
-import { camelCaseObjectKey } from './utils.algorand';
+import { camelCaseObjectKey, formatBlockUtil } from './utils.algorand';
 
 const logger = getLogger('api.algorand');
 
@@ -170,7 +170,7 @@ export class AlgorandApi {
   getSafeApi(height: number): SafeAPIService {
     return new SafeAPIService(this, height, this.endpoint);
   }
-  async fetchBlocks(blockNums: number[]): Promise<AlgorandBlock[]> {
+  async fetchBlocks(blockNums: number[]): Promise<IBlock<AlgorandBlock>[]> {
     let blocks: AlgorandBlock[] = [];
 
     for (let i = 0; i < blockNums.length; i++) {
@@ -185,14 +185,14 @@ export class AlgorandApi {
 
     blocks = [...blocks, ...fetchedBlocks];
 
-    blocks = await Promise.all(
+    const formattedBlocks = await Promise.all(
       blocks.map(async (block) => {
         block.hash = await this.getBlockHash(block.round, blocks);
-        return block;
+        return formatBlockUtil(block);
       }),
     );
 
-    return blocks;
+    return formattedBlocks;
   }
 
   private blockInCache(number: number): AlgorandBlock {

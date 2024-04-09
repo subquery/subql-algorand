@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Inject, Injectable } from '@nestjs/common';
@@ -27,15 +27,15 @@ export class DynamicDsService extends BaseDynamicDsService<AlgorandProjectDs> {
   protected async getDatasource(
     params: DatasourceParams,
   ): Promise<AlgorandProjectDs> {
-    const { name, ...template } = cloneDeep(
-      this.project.templates.find((t) => t.name === params.templateName),
+    const t = this.project.templates.find(
+      (t) => t.name === params.templateName,
     );
-
-    if (!template) {
+    if (!t) {
       throw new Error(
         `Unable to find matching template in project for name: "${params.templateName}"`,
       );
     }
+    const { name, ...template } = cloneDeep(t);
 
     const dsObj = {
       ...template,

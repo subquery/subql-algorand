@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import path from 'path';
@@ -17,6 +17,7 @@ import {
   InMemoryCacheService,
   createIndexerWorker,
 } from '@subql/node-core';
+import { AlgorandBlock } from '@subql/types-algorand';
 import { AlgorandApiConnection } from '../../algorand';
 import {
   AlgorandProjectDs,
@@ -33,7 +34,7 @@ type IndexerWorker = IIndexerWorker & {
 
 @Injectable()
 export class WorkerBlockDispatcherService
-  extends WorkerBlockDispatcher<AlgorandProjectDs, IndexerWorker>
+  extends WorkerBlockDispatcher<AlgorandProjectDs, IndexerWorker, AlgorandBlock>
   implements OnApplicationShutdown
 {
   constructor(
@@ -90,17 +91,5 @@ export class WorkerBlockDispatcherService
   ): Promise<void> {
     // const start = new Date();
     await worker.fetchBlock(height, null);
-    // const end = new Date();
-
-    // const waitTime = end.getTime() - start.getTime();
-    // if (waitTime > 1000) {
-    //   logger.info(
-    //     `Waiting to fetch block ${height}: ${chalk.red(`${waitTime}ms`)}`,
-    //   );
-    // } else if (waitTime > 200) {
-    //   logger.info(
-    //     `Waiting to fetch block ${height}: ${chalk.yellow(`${waitTime}ms`)}`,
-    //   );
-    // }
   }
 }
