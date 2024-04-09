@@ -7,9 +7,11 @@ import {
   IProjectService,
   BaseWorkerService,
   IProjectUpgradeService,
+  ApiService,
+  IBlock,
 } from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
-import { AlgorandApiService } from '../../algorand';
+import { AlgorandApi, SafeAPIService } from '../../algorand';
 import { AlgorandProjectDs } from '../../configure/SubqueryProject';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
@@ -37,7 +39,11 @@ export class WorkerService extends BaseWorkerService<
   {}
 > {
   constructor(
-    private apiService: AlgorandApiService,
+    private apiService: ApiService<
+      AlgorandApi,
+      SafeAPIService,
+      IBlock<BlockContent>[]
+    >,
     private indexerManager: IndexerManager,
     @Inject('IProjectService')
     projectService: IProjectService<AlgorandProjectDs>,
@@ -48,7 +54,9 @@ export class WorkerService extends BaseWorkerService<
     super(projectService, projectUpgradeService, nodeConfig);
   }
 
-  protected async fetchChainBlock(heights: number): Promise<AlgorandBlock> {
+  protected async fetchChainBlock(
+    heights: number,
+  ): Promise<IBlock<AlgorandBlock>> {
     const [block] = await this.apiService.fetchBlocks([heights]);
     return block;
   }
@@ -58,7 +66,7 @@ export class WorkerService extends BaseWorkerService<
     };
   }
   protected async processFetchedBlock(
-    block: AlgorandBlock,
+    block: IBlock<AlgorandBlock>,
     dataSources: AlgorandDataSource[],
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(block, dataSources);

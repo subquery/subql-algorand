@@ -3,7 +3,12 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ApiService, ConnectionPoolService, getLogger } from '@subql/node-core';
+import {
+  ApiService,
+  ConnectionPoolService,
+  getLogger,
+  IBlock,
+} from '@subql/node-core';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { BlockContent } from '../indexer/types';
 import { AlgorandApi, SafeAPIService } from './api.algorand';
@@ -15,7 +20,7 @@ const logger = getLogger('api');
 export class AlgorandApiService extends ApiService<
   AlgorandApi,
   SafeAPIService,
-  BlockContent[]
+  IBlock<BlockContent>[]
 > {
   constructor(
     @Inject('ISubqueryProject') private project: SubqueryProject,
@@ -41,8 +46,7 @@ export class AlgorandApiService extends ApiService<
         AlgorandApiConnection.create(endpoint, this.fetchBlockBatches),
       //eslint-disable-next-line @typescript-eslint/require-await
       async (connection: AlgorandApiConnection) => {
-        const api = connection.unsafeApi;
-        return api.getGenesisHash();
+        return connection.unsafeApi.getGenesisHash();
       },
     );
 
@@ -56,7 +60,7 @@ export class AlgorandApiService extends ApiService<
   async fetchBlockBatches(
     api: AlgorandApi,
     blocks: number[],
-  ): Promise<BlockContent[]> {
+  ): Promise<IBlock<BlockContent>[]> {
     return api.fetchBlocks(blocks);
   }
 }

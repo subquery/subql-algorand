@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { IBlockDispatcher } from '@subql/node-core';
+import { AlgorandBlock } from '@subql/types-algorand';
 
-export interface IAlgorandBlockDispatcher extends IBlockDispatcher {
+export interface IAlgorandBlockDispatcher
+  extends IBlockDispatcher<AlgorandBlock> {
   init(onDynamicDsCreated: (height: number) => Promise<void>): Promise<void>;
 }

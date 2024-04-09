@@ -7,7 +7,6 @@ import {
   CommonSubqueryProject,
   DictionaryQueryEntry,
   FileReference,
-  Processor,
   ProjectManifestV1_0_0,
   BlockFilter,
   BaseHandler,
@@ -223,7 +222,7 @@ export interface HandlerInputTransformer_0_0_0<
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > {
-  (input: RuntimeHandlerInputMap[T], ds: DS, api: Indexer, assets?: Record<string, string>): Promise<E>; //  | SubstrateBuiltinDataSource
+  (input: RuntimeHandlerInputMap[T], ds: DS, api: Indexer, assets?: Record<string, string>): Promise<E>; //  | AlgorandBuiltinDataSource
 }
 
 export interface HandlerInputTransformer_1_0_0<
@@ -238,7 +237,7 @@ export interface HandlerInputTransformer_1_0_0<
     filter?: F;
     api: Indexer;
     assets?: Record<string, string>;
-  }): Promise<E[]>; //  | SubstrateBuiltinDataSource
+  }): Promise<E[]>; //  | AlgorandBuiltinDataSource
 }
 
 type SecondLayerHandlerProcessorArray<

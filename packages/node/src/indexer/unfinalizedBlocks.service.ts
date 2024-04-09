@@ -9,16 +9,8 @@ import {
   StoreCacheService,
   mainThreadOnly,
 } from '@subql/node-core';
-import { AlgorandApiService } from '../algorand';
+import { AlgorandApiService, algorandBlockToHeader } from '../algorand';
 import { BlockContent } from './types';
-
-export function algorandBlockToHeader(block: BlockContent): Header {
-  return {
-    blockHeight: block.round,
-    blockHash: block.round.toString(),
-    parentHash: block.previousBlockHash,
-  };
-}
 
 @Injectable()
 export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<BlockContent> {
@@ -28,11 +20,6 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
     storeCache: StoreCacheService,
   ) {
     super(nodeConfig, storeCache);
-  }
-
-  @mainThreadOnly()
-  protected blockToHeader(block: BlockContent): Header {
-    return algorandBlockToHeader(block);
   }
 
   @mainThreadOnly()
@@ -50,7 +37,7 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
   @mainThreadOnly()
   protected async getHeaderForHeight(height: number): Promise<Header> {
     return algorandBlockToHeader(
-      await this.apiService.api.getBlockByHeight(height),
+      await this.apiService.api.getHeaderOnly(height),
     );
   }
 }
