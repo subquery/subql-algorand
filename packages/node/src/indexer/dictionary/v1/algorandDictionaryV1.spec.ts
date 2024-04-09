@@ -56,9 +56,11 @@ describe('dictionary v1', () => {
   });
 
   it('successfully validates metatada', () => {
-    // @ts-ignore
+    // start height from metadata
+    expect(dictionary.startHeight).toBe(1);
+    // further validation
     expect(
-      dictionary.dictionaryValidation(
+      (dictionary as any).dictionaryValidation(
         {
           lastProcessedHeight: 10000,
           targetHeight: 10000,
