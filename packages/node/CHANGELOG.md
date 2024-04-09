@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Update `@subql/node-core` to 8.0.1, sync changes with main
+
 ## [3.9.1] - 2024-03-14
 ### Changed
 - Update `@subql/node-core` to 4.7.2 with graphql comments escaping fix
