@@ -62,9 +62,8 @@ export class AlgorandDictionaryService extends DictionaryService<
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,
     protected dsProcessorService: DsProcessorService,
-    chainId?: string,
   ) {
-    super(chainId ?? project.network.chainId, nodeConfig, eventEmitter);
+    super(project.network.chainId, nodeConfig, eventEmitter);
   }
 
   private getV1Dictionary(): AlgorandDictionaryV1 | undefined {

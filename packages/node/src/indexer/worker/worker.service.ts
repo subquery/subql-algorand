@@ -11,7 +11,11 @@ import {
   IBlock,
 } from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
-import { AlgorandApi, SafeAPIService } from '../../algorand';
+import {
+  AlgorandApi,
+  AlgorandApiService,
+  SafeAPIService,
+} from '../../algorand';
 import { AlgorandProjectDs } from '../../configure/SubqueryProject';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
@@ -39,11 +43,7 @@ export class WorkerService extends BaseWorkerService<
   {}
 > {
   constructor(
-    private apiService: ApiService<
-      AlgorandApi,
-      SafeAPIService,
-      IBlock<BlockContent>[]
-    >,
+    private apiService: AlgorandApiService,
     private indexerManager: IndexerManager,
     @Inject('IProjectService')
     projectService: IProjectService<AlgorandProjectDs>,
