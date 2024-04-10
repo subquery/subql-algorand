@@ -6,8 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.10.0] - 2024-04-10
 ### Changed
 - Updated with node-core.Now dictionary support multiple dictionary endpoints, indexer will fetch and switch dictionaries base on available blocks
+
 ### Fixed
 - Updated with node-core ,also fixed:
   - Fix modulo block didn't apply correctly with multiple dataSources
@@ -227,7 +229,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.9.1...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.10.0...HEAD
+[3.10.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.9.1...node-algorand/3.10.0
 [3.9.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.9.0...node-algorand/3.9.1
 [3.9.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.8.1...node-algorand/3.9.0
 [3.8.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.8.0...node-algorand/3.8.1
