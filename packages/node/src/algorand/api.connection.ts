@@ -25,7 +25,7 @@ export class AlgorandApiConnection
 {
   readonly networkMeta: NetworkMetadataPayload;
 
-  constructor(
+  private constructor(
     public unsafeApi: AlgorandApi,
     private fetchBlocksBatches: FetchFunc,
   ) {

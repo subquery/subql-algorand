@@ -5,7 +5,6 @@ import {
   BaseTemplateDataSource,
   IProjectNetworkConfig,
   CommonSubqueryProject,
-  DictionaryQueryEntry,
   FileReference,
   ProjectManifestV1_0_0,
   BlockFilter,
@@ -13,6 +12,9 @@ import {
   BaseMapping,
   BaseDataSource,
   BaseCustomDataSource,
+  SecondLayerHandlerProcessor_0_0_0,
+  SecondLayerHandlerProcessor_1_0_0,
+  DsProcessor,
 } from '@subql/types-core';
 import type {Indexer, TransactionType} from 'algosdk';
 import {AlgorandBlock, AlgorandTransaction} from './interfaces';
@@ -51,11 +53,6 @@ export enum AlgorandHandlerKind {
 export type RuntimeHandlerInputMap = {
   [AlgorandHandlerKind.Block]: AlgorandBlock;
   [AlgorandHandlerKind.Transaction]: AlgorandTransaction;
-};
-
-type RuntimeFilterMap = {
-  [AlgorandHandlerKind.Block]: AlgorandBlockFilter;
-  [AlgorandHandlerKind.Transaction]: AlgorandTransactionFilter;
 };
 
 export type AlgorandBlockFilter = BlockFilter;
@@ -217,89 +214,32 @@ export interface AlgorandCustomDataSource<
   kind: K;
 }
 
-export interface HandlerInputTransformer_0_0_0<
-  T extends AlgorandHandlerKind,
-  E,
-  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
-> {
-  (input: RuntimeHandlerInputMap[T], ds: DS, api: Indexer, assets?: Record<string, string>): Promise<E>; //  | AlgorandBuiltinDataSource
-}
-
-export interface HandlerInputTransformer_1_0_0<
-  T extends AlgorandHandlerKind,
+export type SecondLayerHandlerProcessor<
+  K extends AlgorandHandlerKind,
   F extends Record<string, unknown>,
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
-> {
-  (params: {
-    input: RuntimeHandlerInputMap[T];
-    ds: DS;
-    filter?: F;
-    api: Indexer;
-    assets?: Record<string, string>;
-  }): Promise<E[]>; //  | AlgorandBuiltinDataSource
-}
+> =
+  | SecondLayerHandlerProcessor_0_0_0<RuntimeHandlerInputMap, K, F, E, DS, Indexer>
+  | SecondLayerHandlerProcessor_1_0_0<RuntimeHandlerInputMap, K, F, E, DS, Indexer>;
 
 type SecondLayerHandlerProcessorArray<
   K extends string,
-  T extends Record<string, unknown>,
+  F extends Record<string, unknown>,
+  T,
   DS extends AlgorandCustomDataSource<K> = AlgorandCustomDataSource<K>
-> = SecondLayerHandlerProcessor<AlgorandHandlerKind, T, DS>;
+> =
+  | SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, F, T, DS>
+  | SecondLayerHandlerProcessor<AlgorandHandlerKind.Transaction, F, T, DS>;
 
-export interface AlgorandDataSourceProcessor<
+export type AlgorandDataSourceProcessor<
   K extends string,
   DS extends AlgorandCustomDataSource<K> = AlgorandCustomDataSource<K>,
   P extends Record<string, SecondLayerHandlerProcessorArray<K, any, DS>> = Record<
     string,
     SecondLayerHandlerProcessorArray<K, any, DS>
   >
-> {
-  kind: K;
-  validate(ds: DS, assets: Record<string, string>): void;
-  dsFilterProcessor(ds: DS, api: Indexer): boolean;
-  handlerProcessors: P;
-}
-
-interface SecondLayerHandlerProcessorBase<
-  K extends AlgorandHandlerKind,
-  F extends Record<string, unknown>,
-  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
-> {
-  baseHandlerKind: K;
-  baseFilter: RuntimeFilterMap[K] | RuntimeFilterMap[K][];
-  filterValidator: (filter?: F) => void;
-  dictionaryQuery?: (filter: F, ds: DS) => DictionaryQueryEntry | undefined;
-}
-
-// only allow one custom handler for each baseHandler kind
-export interface SecondLayerHandlerProcessor_0_0_0<
-  K extends AlgorandHandlerKind,
-  F extends Record<string, unknown>,
-  E,
-  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
-> extends SecondLayerHandlerProcessorBase<K, F, DS> {
-  specVersion: undefined;
-  transformer: HandlerInputTransformer_0_0_0<K, E, DS>;
-  filterProcessor: (filter: F | undefined, input: RuntimeHandlerInputMap[K], ds: DS) => boolean;
-}
-
-export interface SecondLayerHandlerProcessor_1_0_0<
-  K extends AlgorandHandlerKind,
-  F extends Record<string, unknown>,
-  E,
-  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
-> extends SecondLayerHandlerProcessorBase<K, F, DS> {
-  specVersion: '1.0.0';
-  transformer: HandlerInputTransformer_1_0_0<K, F, E, DS>;
-  filterProcessor: (params: {filter: F | undefined; input: RuntimeHandlerInputMap[K]; ds: DS}) => boolean;
-}
-
-export type SecondLayerHandlerProcessor<
-  K extends AlgorandHandlerKind,
-  F extends Record<string, unknown>,
-  E,
-  DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
-> = SecondLayerHandlerProcessor_0_0_0<K, F, E, DS> | SecondLayerHandlerProcessor_1_0_0<K, F, E, DS>;
+> = DsProcessor<DS, P, Indexer>;
 
 export type AlgorandProject<DS extends AlgorandDataSource = AlgorandRuntimeDataSource> = CommonSubqueryProject<
   IProjectNetworkConfig,

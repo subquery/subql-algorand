@@ -17,6 +17,7 @@ import {
   ProcessBlockResponse,
   BaseIndexerManager,
   IBlock,
+  SandboxService,
 } from '@subql/node-core';
 import {
   AlgorandBlock,
@@ -33,19 +34,15 @@ import {
   filterTransaction,
 } from '../algorand';
 import { AlgorandProjectDs } from '../configure/SubqueryProject';
-import {
-  asSecondLayerHandlerProcessor_1_0_0,
-  DsProcessorService,
-} from './ds-processor.service';
+import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
-import { SandboxService } from './sandbox.service';
 import { BlockContent } from './types';
 import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
 
 @Injectable()
 export class IndexerManager extends BaseIndexerManager<
-  SafeAPIService,
   AlgorandApi,
+  SafeAPIService,
   BlockContent,
   AlgorandApiService,
   AlgorandDataSource,
@@ -57,7 +54,7 @@ export class IndexerManager extends BaseIndexerManager<
   constructor(
     apiService: AlgorandApiService,
     nodeConfig: NodeConfig,
-    sandboxService: SandboxService<SafeAPI>,
+    sandboxService: SandboxService<SafeAPI, AlgorandApi>,
     dsProcessorService: DsProcessorService,
     dynamicDsService: DynamicDsService,
     unfinalizedBlocksService: UnfinalizedBlocksService,
@@ -76,7 +73,6 @@ export class IndexerManager extends BaseIndexerManager<
 
   protected isRuntimeDs = isRuntimeDs;
   protected isCustomDs = isCustomDs;
-  protected updateCustomProcessor = asSecondLayerHandlerProcessor_1_0_0;
 
   @profiler()
   async indexBlock(
@@ -88,18 +84,8 @@ export class IndexerManager extends BaseIndexerManager<
     );
   }
 
-  getBlockHeight(block: BlockContent): number {
-    return block.round;
-  }
-
-  getBlockHash(block: BlockContent): string {
-    return block.hash;
-  }
-
   async getApi(block: BlockContent): Promise<SafeAPIService> {
-    return Promise.resolve(
-      this.apiService.api.getSafeApi(this.getBlockHeight(block)),
-    );
+    return Promise.resolve(this.apiService.api.getSafeApi(block.round));
   }
 
   protected async indexBlockData(

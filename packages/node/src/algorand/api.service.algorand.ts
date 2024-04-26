@@ -40,14 +40,8 @@ export class AlgorandApiService extends ApiService<
       process.exit(1);
     }
 
-    await this.createConnections(
-      network,
-      (endpoint) =>
-        AlgorandApiConnection.create(endpoint, this.fetchBlockBatches),
-      //eslint-disable-next-line @typescript-eslint/require-await
-      async (connection: AlgorandApiConnection) => {
-        return connection.unsafeApi.getGenesisHash();
-      },
+    await this.createConnections(network, (endpoint) =>
+      AlgorandApiConnection.create(endpoint, this.fetchBlockBatches),
     );
 
     return this;
