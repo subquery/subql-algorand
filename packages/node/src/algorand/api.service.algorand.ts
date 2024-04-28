@@ -8,7 +8,9 @@ import {
   ConnectionPoolService,
   getLogger,
   IBlock,
+  MetadataMismatchError,
 } from '@subql/node-core';
+import { ProjectNetworkConfig } from '@subql/types-core';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { BlockContent } from '../indexer/types';
 import { AlgorandApi, SafeAPIService } from './api.algorand';
@@ -56,5 +58,18 @@ export class AlgorandApiService extends ApiService<
     blocks: number[],
   ): Promise<IBlock<BlockContent>[]> {
     return api.fetchBlocks(blocks);
+  }
+
+  protected assertChainId(
+    network: ProjectNetworkConfig & { chainId: string },
+    connection: AlgorandApiConnection,
+  ): void {
+    if (network.chainId !== connection.networkMeta.genesisHash) {
+      throw new MetadataMismatchError(
+        'ChainId',
+        network.chainId,
+        connection.networkMeta.genesisHash,
+      );
+    }
   }
 }
