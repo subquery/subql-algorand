@@ -8,7 +8,6 @@ import {
   DynamicDsService as BaseDynamicDsService,
 } from '@subql/node-core';
 import { TransactionType } from 'algosdk';
-import { cloneDeep } from 'lodash';
 import {
   AlgorandProjectDs,
   SubqueryProject,
@@ -16,32 +15,24 @@ import {
 import { DsProcessorService } from './ds-processor.service';
 
 @Injectable()
-export class DynamicDsService extends BaseDynamicDsService<AlgorandProjectDs> {
+export class DynamicDsService extends BaseDynamicDsService<
+  AlgorandProjectDs,
+  SubqueryProject
+> {
   constructor(
     private readonly dsProcessorService: DsProcessorService,
-    @Inject('ISubqueryProject') private readonly project: SubqueryProject,
+    @Inject('ISubqueryProject') project: SubqueryProject,
   ) {
-    super();
+    super(project);
   }
 
   protected async getDatasource(
     params: DatasourceParams,
   ): Promise<AlgorandProjectDs> {
-    const t = this.project.templates.find(
-      (t) => t.name === params.templateName,
+    const dsObj = this.getTemplate<AlgorandProjectDs>(
+      params.templateName,
+      params.startBlock,
     );
-    if (!t) {
-      throw new Error(
-        `Unable to find matching template in project for name: "${params.templateName}"`,
-      );
-    }
-    const { name, ...template } = cloneDeep(t);
-
-    const dsObj = {
-      ...template,
-      startBlock: params.startBlock,
-    } as AlgorandProjectDs;
-
     try {
       if (isCustomDs(dsObj)) {
         dsObj.processor.options = {

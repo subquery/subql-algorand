@@ -164,9 +164,11 @@ export class AlgorandApi {
   getGenesisHash(): string {
     return this.genesisHash;
   }
+
   getChainId(): string {
     return this.chain;
   }
+
   getSafeApi(height: number): SafeAPIService {
     return new SafeAPIService(this, height, this.endpoint);
   }
