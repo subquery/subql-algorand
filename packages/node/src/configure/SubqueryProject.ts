@@ -13,6 +13,7 @@ import {
   isCustomDs,
 } from '@subql/common-algorand';
 import {
+  CronFilter,
   insertBlockFiltersCronSchedules,
   loadProjectTemplates,
   updateDataSourcesV1_0_0,
@@ -29,7 +30,6 @@ import {
   RunnerSpecs,
 } from '@subql/types-core';
 import { buildSchemaFromString } from '@subql/utils';
-import Cron from 'cron-converter';
 import { GraphQLSchema } from 'graphql';
 
 const { version: packageVersion } = require('../../package.json');
@@ -38,12 +38,7 @@ export type AlgorandProjectDsTemplate =
   | RuntimeDatasourceTemplate
   | CustomDatasourceTemplate;
 
-export type SubqlProjectBlockFilter = BlockFilter & {
-  cronSchedule?: {
-    schedule: Cron.Seeker;
-    next: number;
-  };
-};
+export type SubqlProjectBlockFilter = BlockFilter & CronFilter;
 
 const NOT_SUPPORT = (name: string) => {
   throw new Error(`Manifest specVersion ${name}() is not supported`);

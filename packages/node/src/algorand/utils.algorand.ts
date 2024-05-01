@@ -1,7 +1,7 @@
 // Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Header, IBlock } from '@subql/node-core';
+import { filterBlockTimestamp, Header, IBlock } from '@subql/node-core';
 import {
   AlgorandBlock,
   AlgorandBlockFilter,
@@ -10,6 +10,7 @@ import {
 } from '@subql/types-algorand';
 import { Indexer, TransactionType } from 'algosdk';
 import { camelCase, get } from 'lodash';
+import { SubqlProjectBlockFilter } from '../configure/SubqueryProject';
 import { BlockContent } from '../indexer/types';
 
 export function algorandBlockToHeader(block: BlockContent): Header {
@@ -86,6 +87,11 @@ export function filterBlock(
 ): boolean {
   if (!filter) return true;
   if (!filterBlockModulo(block, filter)) return false;
+  if (
+    !filterBlockTimestamp(block.timestamp, filter as SubqlProjectBlockFilter)
+  ) {
+    return false;
+  }
   // no filters for block.
   return true;
 }
