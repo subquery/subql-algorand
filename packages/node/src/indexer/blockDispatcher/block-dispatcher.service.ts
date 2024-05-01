@@ -14,12 +14,9 @@ import {
   IProjectUpgradeService,
   IBlock,
 } from '@subql/node-core';
-import { AlgorandBlock } from '@subql/types-algorand';
+import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
 import { AlgorandApiService } from '../../algorand';
-import {
-  AlgorandProjectDs,
-  SubqueryProject,
-} from '../../configure/SubqueryProject';
+import { SubqueryProject } from '../../configure/SubqueryProject';
 import { IndexerManager } from '../indexer.manager';
 
 /**
@@ -27,16 +24,16 @@ import { IndexerManager } from '../indexer.manager';
  */
 @Injectable()
 export class BlockDispatcherService
-  extends BlockDispatcher<AlgorandBlock, AlgorandProjectDs>
+  extends BlockDispatcher<AlgorandBlock, AlgorandDataSource>
   implements OnApplicationShutdown
 {
   constructor(
-    private apiService: AlgorandApiService,
+    apiService: AlgorandApiService,
     nodeConfig: NodeConfig,
     private indexerManager: IndexerManager,
     eventEmitter: EventEmitter2,
     @Inject('IProjectService')
-    projectService: IProjectService<AlgorandProjectDs>,
+    projectService: IProjectService<AlgorandDataSource>,
     @Inject('IProjectUpgradeService')
     projectUpgradeService: IProjectUpgradeService,
     storeService: StoreService,

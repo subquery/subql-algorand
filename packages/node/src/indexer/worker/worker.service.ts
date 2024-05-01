@@ -7,16 +7,10 @@ import {
   IProjectService,
   BaseWorkerService,
   IProjectUpgradeService,
-  ApiService,
   IBlock,
 } from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
-import {
-  AlgorandApi,
-  AlgorandApiService,
-  SafeAPIService,
-} from '../../algorand';
-import { AlgorandProjectDs } from '../../configure/SubqueryProject';
+import { AlgorandApiService } from '../../algorand';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
 
@@ -46,7 +40,7 @@ export class WorkerService extends BaseWorkerService<
     private apiService: AlgorandApiService,
     private indexerManager: IndexerManager,
     @Inject('IProjectService')
-    projectService: IProjectService<AlgorandProjectDs>,
+    projectService: IProjectService<AlgorandDataSource>,
     @Inject('IProjectUpgradeService')
     projectUpgradeService: IProjectUpgradeService,
     nodeConfig: NodeConfig,

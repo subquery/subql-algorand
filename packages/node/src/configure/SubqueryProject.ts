@@ -6,7 +6,6 @@ import { Injectable } from '@nestjs/common';
 import { validateSemver } from '@subql/common';
 import {
   parseAlgorandProjectManifest,
-  AlgorandDataSource,
   ProjectManifestV1_0_0Impl,
   BlockFilter,
   isRuntimeDs,
@@ -16,10 +15,10 @@ import {
 import {
   insertBlockFiltersCronSchedules,
   loadProjectTemplates,
-  SubqlProjectDs,
   updateDataSourcesV1_0_0,
 } from '@subql/node-core';
 import {
+  AlgorandDataSource,
   CustomDatasourceTemplate,
   RuntimeDatasourceTemplate,
 } from '@subql/types-algorand';
@@ -35,11 +34,9 @@ import { GraphQLSchema } from 'graphql';
 
 const { version: packageVersion } = require('../../package.json');
 
-export type AlgorandProjectDs = SubqlProjectDs<AlgorandDataSource>;
-
 export type AlgorandProjectDsTemplate =
-  | SubqlProjectDs<RuntimeDatasourceTemplate>
-  | SubqlProjectDs<CustomDatasourceTemplate>;
+  | RuntimeDatasourceTemplate
+  | CustomDatasourceTemplate;
 
 export type SubqlProjectBlockFilter = BlockFilter & {
   cronSchedule?: {
@@ -57,13 +54,13 @@ type NetworkConfig = IProjectNetworkConfig & { chainId: string };
 
 @Injectable()
 export class SubqueryProject {
-  #dataSources: AlgorandProjectDs[];
+  #dataSources: AlgorandDataSource[];
 
   constructor(
     readonly id: string,
     readonly root: string,
     readonly network: NetworkConfig,
-    dataSources: AlgorandProjectDs[],
+    dataSources: AlgorandDataSource[],
     readonly schema: GraphQLSchema,
     readonly templates: AlgorandProjectDsTemplate[],
     readonly runner?: RunnerSpecs,
@@ -72,7 +69,7 @@ export class SubqueryProject {
     this.#dataSources = dataSources;
   }
 
-  get dataSources(): AlgorandProjectDs[] {
+  get dataSources(): AlgorandDataSource[] {
     return this.#dataSources;
   }
 

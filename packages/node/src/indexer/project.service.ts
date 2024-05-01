@@ -13,12 +13,10 @@ import {
   IProjectUpgradeService,
   profiler,
 } from '@subql/node-core';
+import { AlgorandDataSource } from '@subql/types-algorand';
 import { Sequelize } from '@subql/x-sequelize';
 import { AlgorandApiService } from '../algorand';
-import {
-  SubqueryProject,
-  AlgorandProjectDs,
-} from '../configure/SubqueryProject';
+import { SubqueryProject } from '../configure/SubqueryProject';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
@@ -29,7 +27,7 @@ const { version: packageVersion } = require('../../package.json');
 @Injectable()
 export class ProjectService extends BaseProjectService<
   AlgorandApiService,
-  AlgorandProjectDs
+  AlgorandDataSource
 > {
   protected packageVersion = packageVersion;
 

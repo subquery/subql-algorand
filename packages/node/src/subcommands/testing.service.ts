@@ -10,11 +10,9 @@ import {
   TestRunner,
   IBlock,
 } from '@subql/node-core';
+import { AlgorandDataSource } from '@subql/types-algorand';
 import { AlgorandApi, AlgorandApiService, SafeAPIService } from '../algorand';
-import {
-  AlgorandProjectDs,
-  SubqueryProject,
-} from '../configure/SubqueryProject';
+import { SubqueryProject } from '../configure/SubqueryProject';
 import { IndexerManager } from '../indexer/indexer.manager';
 import { ProjectService } from '../indexer/project.service';
 import { BlockContent } from '../indexer/types';
@@ -25,7 +23,7 @@ export class TestingService extends BaseTestingService<
   AlgorandApi,
   SafeAPIService,
   BlockContent,
-  AlgorandProjectDs
+  AlgorandDataSource
 > {
   constructor(
     nodeConfig: NodeConfig,
@@ -41,7 +39,7 @@ export class TestingService extends BaseTestingService<
         AlgorandApi,
         SafeAPIService,
         BlockContent,
-        AlgorandProjectDs
+        AlgorandDataSource
       >,
     ]
   > {

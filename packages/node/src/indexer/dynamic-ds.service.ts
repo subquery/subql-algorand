@@ -7,16 +7,14 @@ import {
   DatasourceParams,
   DynamicDsService as BaseDynamicDsService,
 } from '@subql/node-core';
+import { AlgorandDataSource } from '@subql/types-algorand';
 import { TransactionType } from 'algosdk';
-import {
-  AlgorandProjectDs,
-  SubqueryProject,
-} from '../configure/SubqueryProject';
+import { SubqueryProject } from '../configure/SubqueryProject';
 import { DsProcessorService } from './ds-processor.service';
 
 @Injectable()
 export class DynamicDsService extends BaseDynamicDsService<
-  AlgorandProjectDs,
+  AlgorandDataSource,
   SubqueryProject
 > {
   constructor(
@@ -28,8 +26,8 @@ export class DynamicDsService extends BaseDynamicDsService<
 
   protected async getDatasource(
     params: DatasourceParams,
-  ): Promise<AlgorandProjectDs> {
-    const dsObj = this.getTemplate<AlgorandProjectDs>(
+  ): Promise<AlgorandDataSource> {
+    const dsObj = this.getTemplate<AlgorandDataSource>(
       params.templateName,
       params.startBlock,
     );

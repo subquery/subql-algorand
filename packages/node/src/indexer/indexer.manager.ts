@@ -33,7 +33,6 @@ import {
   filterBlock,
   filterTransaction,
 } from '../algorand';
-import { AlgorandProjectDs } from '../configure/SubqueryProject';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { BlockContent } from './types';
@@ -90,8 +89,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   protected async indexBlockData(
     block: BlockContent,
-    dataSources: AlgorandProjectDs[],
-    getVM: (d: AlgorandProjectDs) => Promise<IndexerSandbox>,
+    dataSources: AlgorandDataSource[],
+    getVM: (d: AlgorandDataSource) => Promise<IndexerSandbox>,
   ): Promise<void> {
     await this.indexBlockContent(block, dataSources, getVM);
     for (const tx of block.transactions) {
@@ -101,8 +100,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   private async indexBlockContent(
     block: AlgorandBlock,
-    dataSources: AlgorandProjectDs[],
-    getVM: (d: AlgorandProjectDs) => Promise<IndexerSandbox>,
+    dataSources: AlgorandDataSource[],
+    getVM: (d: AlgorandDataSource) => Promise<IndexerSandbox>,
   ): Promise<void> {
     for (const ds of dataSources) {
       await this.indexData(AlgorandHandlerKind.Block, block, ds, getVM);
@@ -111,8 +110,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   private async indexBlockTransactionContent(
     txn: AlgorandTransaction,
-    dataSources: AlgorandProjectDs[],
-    getVM: (d: AlgorandProjectDs) => Promise<IndexerSandbox>,
+    dataSources: AlgorandDataSource[],
+    getVM: (d: AlgorandDataSource) => Promise<IndexerSandbox>,
   ): Promise<void> {
     for (const ds of dataSources) {
       await this.indexData(AlgorandHandlerKind.Transaction, txn, ds, getVM);
