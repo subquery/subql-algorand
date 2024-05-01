@@ -16,12 +16,9 @@ import {
   InMemoryCacheService,
   createIndexerWorker,
 } from '@subql/node-core';
-import { AlgorandBlock } from '@subql/types-algorand';
+import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
 import { AlgorandApiConnection } from '../../algorand';
-import {
-  AlgorandProjectDs,
-  SubqueryProject,
-} from '../../configure/SubqueryProject';
+import { SubqueryProject } from '../../configure/SubqueryProject';
 import { DynamicDsService } from '../dynamic-ds.service';
 import { BlockContent } from '../types';
 import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
@@ -33,14 +30,18 @@ type IndexerWorker = IIndexerWorker & {
 
 @Injectable()
 export class WorkerBlockDispatcherService
-  extends WorkerBlockDispatcher<AlgorandProjectDs, IndexerWorker, AlgorandBlock>
+  extends WorkerBlockDispatcher<
+    AlgorandDataSource,
+    IndexerWorker,
+    AlgorandBlock
+  >
   implements OnApplicationShutdown
 {
   constructor(
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,
     @Inject('IProjectService')
-    projectService: IProjectService<AlgorandProjectDs>,
+    projectService: IProjectService<AlgorandDataSource>,
     @Inject('IProjectUpgradeService')
     projectUpgadeService: IProjectUpgradeService,
     cacheService: InMemoryCacheService,
@@ -66,7 +67,7 @@ export class WorkerBlockDispatcherService
           IIndexerWorker,
           AlgorandApiConnection,
           BlockContent,
-          AlgorandProjectDs
+          AlgorandDataSource
         >(
           path.resolve(__dirname, '../../../dist/indexer/worker/worker.js'),
           [],
