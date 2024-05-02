@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Unused deps and deprecated type (#116)
 
+### Fixed
+- Timestamp filter not working (#117)
+
 ## [3.10.0] - 2024-04-10
 ### Changed
 - Updated with node-core.Now dictionary support multiple dictionary endpoints, indexer will fetch and switch dictionaries base on available blocks
