@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.5.0] - 2024-05-20
 ### Removed
 - Transient dependencies specified already in `@subql/common` (#123)
 
@@ -88,7 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `assetId` on transaction filter being validated as a string. (#9)
 
 ## [1.0.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.4.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.5.0...HEAD
+[3.5.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.4.0...common-algorand/3.5.0
 [3.4.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.3.0...common-algorand/3.4.0
 [3.3.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.2.2...common-algorand/3.3.0
 [3.2.2]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.2.1...common-algorand/3.2.2
