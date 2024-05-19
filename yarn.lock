@@ -2789,6 +2789,7 @@ __metadata:
     "@types/pino": ^6.3.12
     "@types/semver": ^7
   peerDependencies:
+    algosdk: "*"
     class-transformer: "*"
     class-validator: "*"
     js-yaml: "*"
