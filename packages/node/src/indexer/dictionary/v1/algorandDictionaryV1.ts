@@ -98,7 +98,10 @@ function buildDictionaryV1QueryEntries<
         case AlgorandHandlerKind.Transaction:
           filterList.forEach((f) => {
             const conditions: DictionaryQueryCondition[] = Object.entries(f)
-              .filter(([field]) => field !== 'applicationArgs') // Dictionary doesn't support applciation args
+              .filter(
+                ([field, value]) =>
+                  field !== 'applicationArgs' && value !== undefined,
+              )
               .map(([field, value]) => ({
                 field,
                 value,

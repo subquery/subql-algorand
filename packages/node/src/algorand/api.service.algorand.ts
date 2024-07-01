@@ -9,6 +9,7 @@ import {
   getLogger,
   IBlock,
   MetadataMismatchError,
+  exitWithError,
 } from '@subql/node-core';
 import { ProjectNetworkConfig } from '@subql/types-core';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -38,8 +39,10 @@ export class AlgorandApiService extends ApiService<
     try {
       network = this.project.network;
     } catch (e) {
-      logger.error(Object.keys(e));
-      process.exit(1);
+      exitWithError(
+        new Error(`Failed to init api`, { cause: e }),
+        logger,
+      );
     }
 
     await this.createConnections(network, (endpoint) =>
