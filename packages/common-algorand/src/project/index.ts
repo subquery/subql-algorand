@@ -6,3 +6,6 @@ export * from './models';
 export * from './types';
 export * from './utils';
 export * from './versioned';
+
+import {parseAlgorandProjectManifest} from './load';
+export {parseAlgorandProjectManifest as parseProjectManifest};
