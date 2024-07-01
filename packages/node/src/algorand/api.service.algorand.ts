@@ -40,7 +40,7 @@ export class AlgorandApiService extends ApiService<
       network = this.project.network;
     } catch (e) {
       exitWithError(
-        new Error(`Failed to init api`, { cause: Object.keys(e) }),
+        new Error(`Failed to init api`, { cause: e }),
         logger,
       );
     }
