@@ -15,6 +15,7 @@ import {
   IProjectUpgradeService,
   InMemoryCacheService,
   createIndexerWorker,
+  MonitorServiceInterface,
 } from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
 import { AlgorandApiConnection } from '../../algorand';
@@ -52,6 +53,7 @@ export class WorkerBlockDispatcherService
     dynamicDsService: DynamicDsService,
     unfinalizedBlocksService: UnfinalizedBlocksService,
     connectionPoolState: ConnectionPoolStateManager<AlgorandApiConnection>,
+    monitorService?: MonitorServiceInterface,
   ) {
     super(
       nodeConfig,
@@ -78,7 +80,9 @@ export class WorkerBlockDispatcherService
           connectionPoolState,
           project.root,
           projectService.startHeight,
+          monitorService,
         ),
+      monitorService,
     );
   }
 

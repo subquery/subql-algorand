@@ -20,17 +20,7 @@ import {
 } from '@subql/types-algorand';
 import {BaseMapping, NodeSpec, ParentProject, QuerySpec, RunnerSpecs} from '@subql/types-core';
 import {plainToInstance, Transform, Type} from 'class-transformer';
-import {
-  Equals,
-  IsArray,
-  IsNotEmpty,
-  IsObject,
-  IsOptional,
-  IsString,
-  Validate,
-  ValidateNested,
-  validateSync,
-} from 'class-validator';
+import {Equals, IsArray, IsObject, IsOptional, IsString, Validate, ValidateNested, validateSync} from 'class-validator';
 import yaml from 'js-yaml';
 import {CustomDataSourceBase, RuntimeDataSourceBase} from '../../models';
 import {TokenHeader} from '../../types';
@@ -43,7 +33,7 @@ export class AlgorandRunnerNodeImpl implements NodeSpec {
 
   @IsString()
   @Validate(SemverVersionValidator)
-  version: string;
+  version: string = ALGORAND_NODE_NAME;
 }
 
 export class AlgorandRunnerSpecsImpl implements RunnerSpecs {
@@ -153,7 +143,7 @@ export class ProjectManifestV1_0_0Impl
   }
 
   @Equals('1.0.0')
-  specVersion: string;
+  specVersion = '1.0.0';
 
   @IsString()
   name: string;

@@ -11,6 +11,8 @@ import {
   InMemoryCacheService,
   WorkerInMemoryCacheService,
   SandboxService,
+  MonitorService,
+  WorkerMonitorService,
   WorkerUnfinalizedBlocksService,
 } from '@subql/node-core';
 import { AlgorandApiService, AlgorandApiConnection } from '../../algorand';
@@ -62,6 +64,10 @@ import { WorkerService } from './worker.service';
       provide: UnfinalizedBlocksService,
       useFactory: () =>
         new WorkerUnfinalizedBlocksService((global as any).host),
+    },
+    {
+      provide: MonitorService,
+      useFactory: () => new WorkerMonitorService((global as any).host),
     },
     {
       provide: InMemoryCacheService,
