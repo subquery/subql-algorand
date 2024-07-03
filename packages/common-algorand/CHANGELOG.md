@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2024-07-03
 ### Added
 - Add alias `parseProjectManifest`, also follow type of `INetworkCommonModule` (#2462)
 
@@ -93,7 +94,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `assetId` on transaction filter being validated as a string. (#9)
 
 ## [1.0.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.5.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/common-algorand/4.0.0...HEAD
+[4.0.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.5.0...common-algorand/4.0.0
 [3.5.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.4.0...common-algorand/3.5.0
 [3.4.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.3.0...common-algorand/3.4.0
 [3.3.0]: https://github.com/subquery/subql-algorand/compare/common-algorand/3.2.2...common-algorand/3.3.0
