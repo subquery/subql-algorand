@@ -54,6 +54,7 @@ export class AlgorandDictionaryService extends DictionaryService<
         );
       }
     }
+
     this.init(dictionariesV1);
   }
 
@@ -64,12 +65,5 @@ export class AlgorandDictionaryService extends DictionaryService<
     protected dsProcessorService: DsProcessorService,
   ) {
     super(project.network.chainId, nodeConfig, eventEmitter);
-  }
-
-  private getV1Dictionary(): AlgorandDictionaryV1 | undefined {
-    // TODO this needs to be removed once Algorand supports V2 dictionaries
-    return this._dictionaries[
-      this._currentDictionaryIndex
-    ] as AlgorandDictionaryV1;
   }
 }

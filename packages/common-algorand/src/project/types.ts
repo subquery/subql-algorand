@@ -20,4 +20,3 @@ export {
 } from '@subql/types-algorand';
 
 export type IAlgorandProjectManifest = IProjectManifest<AlgorandDataSource>;
-export type TokenHeader = Record<string, string>;

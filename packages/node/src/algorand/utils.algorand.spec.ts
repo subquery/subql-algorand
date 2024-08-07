@@ -24,29 +24,31 @@ describe('Algorand Filters', () => {
     });
 
     it('returns true with no filter', () => {
-      expect(filterTransaction(block.transactions[13])).toBeTruthy();
+      expect(filterTransaction(block.transactions![13])).toBeTruthy();
     });
 
     it('can fillter by sender', () => {
       expect(
-        filterTransaction(block.transactions[13], {
+        filterTransaction(block.transactions![13], {
           sender: '5GMADASEGJ324HR4GI2XZ2BNSN77ND45LLF4F4XDTAYX3YM6TX5YEU4FEA',
         }),
       ).toBeTruthy();
       expect(
-        filterTransaction(block.transactions[13], { sender: 'WRONG_ADDRESSS' }),
+        filterTransaction(block.transactions![13], {
+          sender: 'WRONG_ADDRESSS',
+        }),
       ).toBeFalsy();
     });
 
     it('can fillter by receiver', () => {
       expect(
-        filterTransaction(block.transactions[18], {
+        filterTransaction(block.transactions![18], {
           receiver:
             'V6CK3HRC4JBRBDIBB4JWOBMYNUYIP7SYHRPVHH5ZMJQME337C57IBIZVFI',
         }),
       ).toBeTruthy();
       expect(
-        filterTransaction(block.transactions[18], {
+        filterTransaction(block.transactions![18], {
           receiver: 'WRONG_ADDRESSS',
         }),
       ).toBeFalsy();
@@ -54,30 +56,41 @@ describe('Algorand Filters', () => {
 
     it('can fillter by application id', () => {
       expect(
-        filterTransaction(block.transactions[13], { applicationId: 971368268 }),
+        filterTransaction(block.transactions![13], {
+          applicationId: 971368268,
+        }),
       ).toBeTruthy();
       expect(
-        filterTransaction(block.transactions[13], { applicationId: 0 }),
+        filterTransaction(block.transactions![13], { applicationId: 0 }),
       ).toBeFalsy();
     });
 
     it('can fillter by application args', () => {
       // Filter single argument (function signature)
       expect(
-        filterTransaction(block.transactions[13], {
+        filterTransaction(block.transactions![13], {
           applicationArgs: ['udVC+w=='],
         }),
       ).toBeTruthy();
       // Filter all arguments
       expect(
-        filterTransaction(block.transactions[13], {
+        filterTransaction(block.transactions![13], {
           applicationArgs: ['udVC+w==', 'AQ==', 'AA==', 'AQ==', 'AQ=='],
         }),
       ).toBeTruthy();
       // Filter specific argument
       expect(
-        filterTransaction(block.transactions[13], {
-          applicationArgs: ['udVC+w==', null, null, null, 'AQ=='],
+        filterTransaction(block.transactions![13], {
+          applicationArgs: ['udVC+w==', null, null, null, 'AQ=='] as any,
+        }),
+      ).toBeTruthy();
+    });
+
+    it('should not filter undefined options', () => {
+      expect(
+        filterTransaction(block.transactions![4], {
+          sender: 'ZW3ISEHZUHPO7OZGMKLKIIMKVICOUDRCERI454I3DB2BH52HGLSO67W754',
+          receiver: undefined,
         }),
       ).toBeTruthy();
     });

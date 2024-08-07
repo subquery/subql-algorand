@@ -137,11 +137,11 @@ export function filterTransaction(
   for (const key in filterByKey) {
     if (
       mappingFilterTransaction[txn.txType] &&
+      filterByKey[key] !== undefined &&
       !txComparator(
         filterByKey[key],
         get(txn, mappingFilterTransaction[txn.txType][key]),
       )
-      // filterByKey[key] !== get(txn, mappingFilterTransaction[txn.txType][key])
     ) {
       return false;
     }

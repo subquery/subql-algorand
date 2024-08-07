@@ -6,5 +6,7 @@ import { AlgorandBlock } from '@subql/types-algorand';
 
 export interface IAlgorandBlockDispatcher
   extends IBlockDispatcher<AlgorandBlock> {
-  init(onDynamicDsCreated: (height: number) => Promise<void>): Promise<void>;
+  init(
+    onDynamicDsCreated: (height: number) => Promise<void> | void,
+  ): Promise<void>;
 }

@@ -80,7 +80,7 @@ export class ForceCleanService {
       }
 
       logger.info('force cleaned schema and tables');
-    } catch (err) {
+    } catch (err: any) {
       logger.error(err, 'failed to force clean');
       throw err;
     }
