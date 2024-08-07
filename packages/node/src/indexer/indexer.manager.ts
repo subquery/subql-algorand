@@ -93,7 +93,7 @@ export class IndexerManager extends BaseIndexerManager<
     getVM: (d: AlgorandDataSource) => Promise<IndexerSandbox>,
   ): Promise<void> {
     await this.indexBlockContent(block, dataSources, getVM);
-    for (const tx of block.transactions) {
+    for (const tx of block.transactions ?? []) {
       await this.indexBlockTransactionContent(tx, dataSources, getVM);
     }
   }

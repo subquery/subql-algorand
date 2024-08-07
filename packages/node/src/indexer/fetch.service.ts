@@ -9,13 +9,25 @@ import {
   AlgorandHandlerKind,
   AlgorandDataSource,
 } from '@subql/common-algorand';
-import { NodeConfig, BaseFetchService, getModulos } from '@subql/node-core';
+import {
+  NodeConfig,
+  BaseFetchService,
+  getModulos,
+  Header,
+  StoreCacheService,
+} from '@subql/node-core';
 import { AlgorandBlock } from '@subql/types-algorand';
-import { AlgorandApi, AlgorandApiService, calcInterval } from '../algorand';
+import {
+  AlgorandApi,
+  AlgorandApiService,
+  algorandBlockToHeader,
+  calcInterval,
+} from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { IAlgorandBlockDispatcher } from './blockDispatcher';
 import { AlgorandDictionaryService } from './dictionary';
 import { ProjectService } from './project.service';
+import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
 
 const BLOCK_TIME_VARIANCE = 5000; //ms
 
@@ -35,8 +47,10 @@ export class FetchService extends BaseFetchService<
     @Inject('IBlockDispatcher')
     blockDispatcher: IAlgorandBlockDispatcher,
     dictionaryService: AlgorandDictionaryService,
+    unfinalizedBlocksService: UnfinalizedBlocksService,
     eventEmitter: EventEmitter2,
     schedulerRegistry: SchedulerRegistry,
+    storeCacheService: StoreCacheService,
   ) {
     super(
       nodeConfig,
@@ -46,6 +60,8 @@ export class FetchService extends BaseFetchService<
       dictionaryService,
       eventEmitter,
       schedulerRegistry,
+      unfinalizedBlocksService,
+      storeCacheService,
     );
   }
 
@@ -53,13 +69,16 @@ export class FetchService extends BaseFetchService<
     return this.apiService.unsafeApi;
   }
 
-  protected async getFinalizedHeight(): Promise<number> {
+  protected async getFinalizedHeader(): Promise<Header> {
     const checkHealth = await this.api.api.makeHealthCheck().do();
-    return checkHealth.round;
+
+    const block = await this.api.getHeaderOnly(checkHealth.round);
+    return algorandBlockToHeader(block);
   }
 
   protected async getBestHeight(): Promise<number> {
-    return this.getFinalizedHeight();
+    const checkHealth = await this.api.api.makeHealthCheck().do();
+    return checkHealth.round;
   }
 
   protected async getChainId(): Promise<string> {

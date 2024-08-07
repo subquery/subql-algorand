@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import {
+  SecondLayerHandlerProcessorArray,
   SecondLayerHandlerProcessor,
   AlgorandCustomDataSource,
   AlgorandDataSource,
@@ -11,13 +12,13 @@ import {
 } from '@subql/types-algorand';
 
 export function isBlockHandlerProcessor<F extends Record<string, unknown>, E>(
-  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, F, unknown>
+  hp: SecondLayerHandlerProcessorArray<AlgorandHandlerKind, F, unknown>
 ): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Block, F, E> {
   return hp.baseHandlerKind === AlgorandHandlerKind.Block;
 }
 
 export function isTransactionHandlerProcessor<F extends Record<string, unknown>, E>(
-  hp: SecondLayerHandlerProcessor<AlgorandHandlerKind, F, unknown>
+  hp: SecondLayerHandlerProcessorArray<AlgorandHandlerKind, F, unknown>
 ): hp is SecondLayerHandlerProcessor<AlgorandHandlerKind.Transaction, F, E> {
   return hp.baseHandlerKind === AlgorandHandlerKind.Transaction;
 }

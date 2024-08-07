@@ -122,17 +122,16 @@ describe('Algorand RPC', () => {
   });
 
   // This is failing since switching from algo explorer api. This is due to a node configuration limit
-  it.skip('paginate large blocks', async () => {
+  it('paginate large blocks', async () => {
     [app, apiService] = await prepareApiService(
       testnetEndpoint,
       testnetChainId,
     );
     const failingBlock = 27739202; // testnet
-    const passingBlock = 27739200; // testnet
     const api = apiService.api;
 
     const paginateSpy = jest.spyOn(api, 'paginatedTransactions');
-    const result = await api.getBlockByHeight(failingBlock)();
+    const result = await api.getBlockByHeight(failingBlock);
     expect(paginateSpy).toHaveBeenCalledTimes(3);
     expect(result.transactions.length).toEqual(13916);
   });

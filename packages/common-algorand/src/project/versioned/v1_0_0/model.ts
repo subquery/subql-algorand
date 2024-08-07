@@ -23,13 +23,11 @@ import {plainToInstance, Transform, Type} from 'class-transformer';
 import {Equals, IsArray, IsObject, IsOptional, IsString, Validate, ValidateNested, validateSync} from 'class-validator';
 import yaml from 'js-yaml';
 import {CustomDataSourceBase, RuntimeDataSourceBase} from '../../models';
-import {TokenHeader} from '../../types';
-import {IsStringOrObject} from '../../validation/is-string-or-object.validation';
 const ALGORAND_NODE_NAME = `@subql/node-algorand`;
 
 export class AlgorandRunnerNodeImpl implements NodeSpec {
   @Equals(ALGORAND_NODE_NAME, {message: `Runner algorand node name incorrect, suppose be '${ALGORAND_NODE_NAME}'`})
-  name: string;
+  name!: string;
 
   @IsString()
   @Validate(SemverVersionValidator)
@@ -40,27 +38,23 @@ export class AlgorandRunnerSpecsImpl implements RunnerSpecs {
   @IsObject()
   @ValidateNested()
   @Type(() => AlgorandRunnerNodeImpl)
-  node: NodeSpec;
+  node!: NodeSpec;
 
   @IsObject()
   @ValidateNested()
   @Type(() => RunnerQueryBaseModel)
-  query: QuerySpec;
+  query!: QuerySpec;
 }
 
 export class ProjectNetworkDeploymentV1_0_0 {
   @IsString()
-  chainId: string;
+  chainId!: string;
   @IsOptional()
   @IsArray()
   bypassBlocks?: (number | string)[];
 }
 
-export class ProjectNetworkV1_0_0 extends CommonProjectNetworkV1_0_0<FileType> {
-  @IsStringOrObject()
-  @IsOptional()
-  apiKey?: string | TokenHeader;
-}
+export class ProjectNetworkV1_0_0 extends CommonProjectNetworkV1_0_0<FileType> {}
 
 export class AlgorandRuntimeDataSourceV1_0_0Impl extends RuntimeDataSourceBase {
   validate(): void {
@@ -85,7 +79,7 @@ export class RuntimeDataSourceTemplateImpl
   implements RuntimeDatasourceTemplate
 {
   @IsString()
-  name: string;
+  name!: string;
 }
 
 export class CustomDataSourceTemplateImpl
@@ -93,7 +87,7 @@ export class CustomDataSourceTemplateImpl
   implements CustomDatasourceTemplate
 {
   @IsString()
-  name: string;
+  name!: string;
 }
 
 export class DeploymentV1_0_0 extends BaseDeploymentV1_0_0 {
@@ -105,11 +99,11 @@ export class DeploymentV1_0_0 extends BaseDeploymentV1_0_0 {
   })
   @ValidateNested()
   @Type(() => ProjectNetworkDeploymentV1_0_0)
-  network: ProjectNetworkDeploymentV1_0_0;
+  network!: ProjectNetworkDeploymentV1_0_0;
   @IsObject()
   @ValidateNested()
   @Type(() => AlgorandRunnerSpecsImpl)
-  runner: RunnerSpecs;
+  runner!: RunnerSpecs;
 
   @IsArray()
   @ValidateNested()
@@ -120,7 +114,7 @@ export class DeploymentV1_0_0 extends BaseDeploymentV1_0_0 {
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (AlgorandCustomDataSource | AlgorandRuntimeDataSource)[];
+  dataSources!: (AlgorandCustomDataSource | AlgorandRuntimeDataSource)[];
   @IsOptional()
   @IsArray()
   @ValidateNested()
@@ -146,19 +140,19 @@ export class ProjectManifestV1_0_0Impl
   specVersion = '1.0.0';
 
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
-  version: string;
+  version!: string;
 
   @IsObject()
   @ValidateNested()
   @Type(() => ProjectNetworkV1_0_0)
-  network: ProjectNetworkV1_0_0;
+  network!: ProjectNetworkV1_0_0;
 
   @ValidateNested()
   @Type(() => FileType)
-  schema: FileType;
+  schema!: FileType;
 
   @IsArray()
   @ValidateNested()
@@ -169,7 +163,7 @@ export class ProjectManifestV1_0_0Impl
     },
     keepDiscriminatorProperty: true,
   })
-  dataSources: (AlgorandRuntimeDataSource | AlgorandCustomDataSource)[];
+  dataSources!: (AlgorandRuntimeDataSource | AlgorandCustomDataSource)[];
 
   @IsOptional()
   @IsArray()
@@ -186,7 +180,7 @@ export class ProjectManifestV1_0_0Impl
   @IsObject()
   @ValidateNested()
   @Type(() => AlgorandRunnerSpecsImpl)
-  runner: RunnerSpecs;
+  runner!: RunnerSpecs;
 
   @IsOptional()
   @IsObject()

@@ -18,13 +18,14 @@ import {
 import { sortBy, uniqBy } from 'lodash';
 import { SubqueryProject } from '../../../configure/SubqueryProject';
 import { isBaseHandler, isCustomHandler } from '../../../utils/project';
+import { DsProcessorService } from '../../ds-processor.service';
 
-function getBaseHandlerKind<
-  P extends DsProcessor<AlgorandDataSource> = DsProcessor<AlgorandDataSource>,
->(
+type GetDsProcessor = DsProcessorService['getDsProcessor'];
+
+function getBaseHandlerKind(
   ds: AlgorandDataSource,
   handler: AlgorandHandler,
-  getDsProcessor: (ds: AlgorandDataSource) => P,
+  getDsProcessor: GetDsProcessor,
 ): AlgorandHandlerKind {
   if (isRuntimeDs(ds) && isBaseHandler(handler)) {
     return handler.kind;
@@ -42,13 +43,10 @@ function getBaseHandlerKind<
   }
 }
 
-function getBaseHandlerFilters<
-  T extends AlgorandRuntimeHandlerFilter,
-  P extends DsProcessor<AlgorandDataSource> = DsProcessor<AlgorandDataSource>,
->(
+function getBaseHandlerFilters<T extends AlgorandRuntimeHandlerFilter>(
   ds: AlgorandDataSource,
   handlerKind: string,
-  getDsProcessor: (ds: AlgorandDataSource) => P,
+  getDsProcessor: GetDsProcessor,
 ): T[] {
   if (isCustomDs(ds)) {
     const plugin = getDsProcessor(ds);
@@ -62,11 +60,9 @@ function getBaseHandlerFilters<
 }
 
 // eslint-disable-next-line complexity
-function buildDictionaryV1QueryEntries<
-  P extends DsProcessor<AlgorandDataSource> = DsProcessor<AlgorandDataSource>,
->(
+function buildDictionaryV1QueryEntries(
   dataSources: AlgorandDataSource[],
-  getDsProcessor: (ds: AlgorandDataSource) => P,
+  getDsProcessor: GetDsProcessor,
 ): DictionaryV1QueryEntry[] {
   const queryEntries: DictionaryV1QueryEntry[] = [];
 
@@ -82,7 +78,7 @@ function buildDictionaryV1QueryEntries<
           getDsProcessor,
         );
       } else {
-        filterList = [handler.filter];
+        filterList = handler.filter ? [handler.filter] : [];
       }
       // Filter out any undefined
       filterList = filterList.filter(Boolean);
@@ -131,10 +127,8 @@ export class AlgorandDictionaryV1 extends DictionaryV1<AlgorandDataSource> {
   constructor(
     project: SubqueryProject,
     nodeConfig: NodeConfig,
-    protected getDsProcessor: (
-      ds: AlgorandDataSource,
-    ) => DsProcessor<AlgorandDataSource>,
-    dictionaryUrl?: string,
+    protected getDsProcessor: GetDsProcessor,
+    dictionaryUrl: string,
     chainId?: string,
   ) {
     super(dictionaryUrl, chainId ?? project.network.chainId, nodeConfig);
@@ -143,8 +137,8 @@ export class AlgorandDictionaryV1 extends DictionaryV1<AlgorandDataSource> {
   static async create(
     project: SubqueryProject,
     nodeConfig: NodeConfig,
-    getDsProcessor: (ds: AlgorandDataSource) => DsProcessor<AlgorandDataSource>,
-    dictionaryUrl?: string,
+    getDsProcessor: GetDsProcessor,
+    dictionaryUrl: string,
     chainId?: string,
   ): Promise<AlgorandDictionaryV1> {
     const dictionary = new AlgorandDictionaryV1(

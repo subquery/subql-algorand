@@ -9,6 +9,7 @@ import {
   getLogger,
   IBlock,
 } from '@subql/node-core';
+import { IEndpointConfig } from '@subql/types-core';
 import { BlockContent } from '../indexer/types';
 import { AlgorandApi, SafeAPIService } from './api.algorand';
 
@@ -32,17 +33,16 @@ export class AlgorandApiConnection
     this.networkMeta = {
       chain: unsafeApi.getChainId(),
       genesisHash: unsafeApi.getGenesisHash(),
-      specName: undefined,
+      specName: 'algorand',
     };
   }
 
   static async create(
     endpoint: string,
+    config: IEndpointConfig,
     fetchBlocksBatches: FetchFunc,
   ): Promise<AlgorandApiConnection> {
-    const api = new AlgorandApi(endpoint);
-
-    await api.init();
+    const api = await AlgorandApi.create(endpoint, config);
 
     return new AlgorandApiConnection(api, fetchBlocksBatches);
   }

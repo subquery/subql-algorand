@@ -6,14 +6,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   ConnectionPoolService,
   WorkerDynamicDsService,
-  ConnectionPoolStateManager,
-  WorkerConnectionPoolStateManager,
-  InMemoryCacheService,
-  WorkerInMemoryCacheService,
-  SandboxService,
-  MonitorService,
-  WorkerMonitorService,
   WorkerUnfinalizedBlocksService,
+  WorkerCoreModule,
 } from '@subql/node-core';
 import { AlgorandApiService, AlgorandApiConnection } from '../../algorand';
 import { SubqueryProject } from '../../configure/SubqueryProject';
@@ -25,14 +19,9 @@ import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
 import { WorkerService } from './worker.service';
 
 @Module({
+  imports: [WorkerCoreModule],
   providers: [
     IndexerManager,
-    {
-      provide: ConnectionPoolStateManager,
-      useFactory: () =>
-        new WorkerConnectionPoolStateManager((global as any).host),
-    },
-    ConnectionPoolService,
     {
       provide: AlgorandApiService,
       useFactory: async (
@@ -50,7 +39,6 @@ import { WorkerService } from './worker.service';
       },
       inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
     },
-    SandboxService,
     DsProcessorService,
     {
       provide: DynamicDsService,
@@ -64,14 +52,6 @@ import { WorkerService } from './worker.service';
       provide: UnfinalizedBlocksService,
       useFactory: () =>
         new WorkerUnfinalizedBlocksService((global as any).host),
-    },
-    {
-      provide: MonitorService,
-      useFactory: () => new WorkerMonitorService((global as any).host),
-    },
-    {
-      provide: InMemoryCacheService,
-      useFactory: () => new WorkerInMemoryCacheService((global as any).host),
     },
     WorkerService,
   ],

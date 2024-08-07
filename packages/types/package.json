@@ -17,11 +17,11 @@
     "/dist"
   ],
   "peerDependencies": {
-    "algosdk": "^2.2.0"
+    "algosdk": "^2.8.0"
   },
   "devDependencies": {
     "@types/app-module-path": "^2.2.0",
-    "algosdk": "^2.2.0"
+    "algosdk": "^2.8.0"
   },
   "dependencies": {
     "@subql/types-core": "^1.0.0"

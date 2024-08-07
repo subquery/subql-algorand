@@ -1,50 +1,66 @@
 // Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { TokenHeader } from '@subql/common-algorand';
+import assert from 'assert';
 import { delay, getLogger, IBlock } from '@subql/node-core';
 import {
   AlgorandBlock,
   AlgorandTransaction,
   SafeAPI,
 } from '@subql/types-algorand';
+import { IEndpointConfig } from '@subql/types-core';
 import algosdk, { Indexer } from 'algosdk';
-import axios from 'axios';
 import { omit } from 'lodash';
 import { camelCaseObjectKey, formatBlockUtil } from './utils.algorand';
 
 const logger = getLogger('api.algorand');
 
 export class AlgorandApi {
-  private genesisHash: string;
-  private chain: string;
-  api: Indexer;
-  private blockCache: AlgorandBlock[];
+  private _genesisHash?: string;
+  private _chain?: string;
+  readonly api: Indexer;
+  private blockCache: AlgorandBlock[] = [];
   private paginationLimit = 10000;
 
-  constructor(private endpoint: string, private token?: string | TokenHeader) {
-    this.token = token ?? '';
-    this.blockCache = [];
+  private constructor(endpoint: string, config: IEndpointConfig) {
+    this.api = new algosdk.Indexer(
+      config.headers?.['X-Indexer-API-Token'] ?? '',
+      endpoint,
+      new URL(endpoint).port, // Specify the port, by default it will be an empty string, we don't want undefined because it then defaults to 8080
+      config.headers,
+    );
   }
 
-  async init(): Promise<void> {
+  static async create(
+    endpoint: string,
+    config: IEndpointConfig,
+  ): Promise<AlgorandApi> {
+    const api = new AlgorandApi(endpoint, config);
+
     // get genesisHash in block
-    const urlEndpoint = new URL(this.endpoint);
-    const baseServer = `${urlEndpoint.protocol}//${urlEndpoint.host}${urlEndpoint.pathname}`;
+    const block = await api.api.lookupBlock(1).do();
 
-    this.api = new algosdk.Indexer(this.token, baseServer, urlEndpoint.port);
+    api._genesisHash = block['genesis-hash'] ?? '';
+    api._chain = block['genesis-id'] ?? '';
 
-    const block = await this.api.lookupBlock(1).do();
+    return api;
+  }
 
-    this.genesisHash = block['genesis-hash'] ?? '';
-    this.chain = block['genesis-id'] ?? '';
+  private get genesisHash(): string {
+    assert(this._genesisHash, 'genesisHash not initialized');
+    return this._genesisHash;
+  }
+
+  private get chain(): string {
+    assert(this._chain, 'chain not initialized');
+    return this._chain;
   }
 
   async getBlockByHeight(height: number): Promise<AlgorandBlock> {
     try {
       const blockInfo = await this.api.lookupBlock(height).do();
       return this.constructBlock(camelCaseObjectKey(blockInfo));
-    } catch (error) {
+    } catch (error: any) {
       if (error.message.includes('Max transactions limit exceeded')) {
         logger.warn('Max transactions limit exceeded, paginating transactions');
 
@@ -58,17 +74,8 @@ export class AlgorandApi {
 
   async getHeaderOnly(block: number): Promise<AlgorandBlock> {
     try {
-      const result = (
-        await axios({
-          params: {
-            'header-only': true,
-          },
-          method: 'get',
-          url: `/v2/blocks/${block}`,
-          baseURL: this.endpoint,
-        })
-      ).data;
-      return result;
+      const result = await this.api.lookupBlock(block).headerOnly(true).do();
+      return this.constructBlock(result as AlgorandBlock);
     } catch (e) {
       logger.error('Failed to fetch round header', e);
       throw e;
@@ -80,24 +87,23 @@ export class AlgorandApi {
     nextToken?: string,
   ): Promise<AlgorandTransaction[]> {
     try {
-      const result: { transactions: AlgorandTransaction[] } = (
-        await axios({
-          params: {
-            round: blockHeight,
-            limit: this.paginationLimit,
-            next: nextToken && nextToken,
-          },
-          method: 'get',
-          url: `/v2/transactions`,
-          baseURL: this.endpoint,
-        })
-      ).data;
+      let req = this.api
+        .searchForTransactions()
+        .round(blockHeight)
+        .limit(this.paginationLimit);
+
+      if (nextToken) {
+        req = req.nextToken(nextToken);
+      }
+
+      const result = await req.do();
       /*
       Maximum number of results to return. There could be additional pages even if the limit is not reached.
       https://developer.algorand.org/docs/rest-apis/indexer/#get-v2transactions
 
       Hence, the condition below
        */
+
       if (result.transactions.length > 0) {
         const nextPage = await this.paginatedTransactions(
           blockHeight,
@@ -106,7 +112,7 @@ export class AlgorandApi {
         return result.transactions.concat(nextPage);
       }
       return result.transactions;
-    } catch (e) {
+    } catch (e: any) {
       logger.error(e, 'Failed to paginated transactions');
       throw e;
     }
@@ -133,12 +139,12 @@ export class AlgorandApi {
     const newBlock = {
       ...block,
       getTransactionsByGroup: (groupId: string) =>
-        transactions.filter((tx) => tx.group === groupId),
+        transactions?.filter((tx) => tx.group === groupId) ?? [],
       toJSON() {
         return omit(this, ['getTransactionsByGroup', 'toJSON']);
       },
     };
-    const transactions = newBlock.transactions.map((tx) => ({
+    const transactions = newBlock.transactions?.map((tx) => ({
       ...tx,
       block: newBlock,
       toJSON() {
@@ -170,7 +176,7 @@ export class AlgorandApi {
   }
 
   getSafeApi(height: number): SafeAPIService {
-    return new SafeAPIService(this, height, this.endpoint);
+    return new SafeAPIService(this, height);
   }
   async fetchBlocks(blockNums: number[]): Promise<IBlock<AlgorandBlock>[]> {
     let blocks: AlgorandBlock[] = [];
@@ -197,7 +203,7 @@ export class AlgorandApi {
     return formattedBlocks;
   }
 
-  private blockInCache(number: number): AlgorandBlock {
+  private blockInCache(number: number): AlgorandBlock | undefined {
     for (let i = 0; i < this.blockCache.length; i++) {
       if (this.blockCache[i].round === number) {
         const block = this.blockCache[i];
@@ -236,16 +242,13 @@ export class AlgorandApi {
         currentRound = checkHealth.round;
       }
     }
+    throw new Error(`Unable to get block hash for round ${round}`);
   }
 }
 
 export class SafeAPIService implements SafeAPI {
   readonly indexer: Indexer;
-  private readonly height;
-  private readonly endpoint;
-  constructor(private api: AlgorandApi, height: number, endpoint: string) {
-    this.height = height;
-    this.endpoint = endpoint;
+  constructor(private api: AlgorandApi, private readonly height: number) {
     this.indexer = api.api;
   }
   async getBlock(): Promise<AlgorandBlock> {

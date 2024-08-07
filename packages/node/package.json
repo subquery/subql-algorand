@@ -28,11 +28,9 @@
     "@subql/common-algorand": "workspace:*",
     "@subql/node-core": "^14.0.0",
     "@subql/types-algorand": "workspace:*",
-    "algosdk": "^2.2.0",
-    "axios": "^1.3.4",
+    "algosdk": "^2.8.0",
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^3.0.2",
     "yargs": "^16.2.0"
   },
   "devDependencies": {
@@ -45,7 +43,8 @@
     "@types/tar": "^6.1.1",
     "@types/yargs": "^16.0.4",
     "dotenv": "^15.0.1",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "rimraf": "^6.0.1"
   },
   "peerDependencies": {
     "@subql/utils": "*"

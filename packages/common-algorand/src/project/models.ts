@@ -95,10 +95,10 @@ export class TransactionFilter implements AlgorandTransactionFilter {
 
 export class BlockHandler implements AlgorandBlockHandler {
   @IsEnum(AlgorandHandlerKind, {groups: [AlgorandHandlerKind.Block]})
-  kind: AlgorandHandlerKind.Block;
+  kind!: AlgorandHandlerKind.Block;
 
   @IsString()
-  handler: string;
+  handler!: string;
 
   @IsOptional()
   @ValidateNested()
@@ -113,18 +113,18 @@ export class TransactionHandler implements AlgorandTransactionHandler {
   filter?: AlgorandTransactionFilter;
 
   @IsEnum(AlgorandHandlerKind, {groups: [AlgorandHandlerKind.Block]})
-  kind: AlgorandHandlerKind.Transaction;
+  kind!: AlgorandHandlerKind.Transaction;
 
   @IsString()
-  handler: string;
+  handler!: string;
 }
 
 export class CustomHandler implements AlgorandCustomHandler {
   @IsString()
-  kind: string;
+  kind!: string;
 
   @IsString()
-  handler: string;
+  handler!: string;
 
   @IsObject()
   @IsOptional()
@@ -147,34 +147,34 @@ export class RuntimeMapping implements BaseMapping<AlgorandRuntimeHandler> {
   })
   @IsArray()
   @ValidateNested()
-  handlers: AlgorandRuntimeHandler[];
+  handlers!: AlgorandRuntimeHandler[];
 
   @IsString()
-  file: string;
+  file!: string;
 }
 
 export class CustomMapping implements BaseMapping<AlgorandCustomHandler> {
   @IsArray()
   @Type(() => CustomHandler)
   @ValidateNested()
-  handlers: CustomHandler[];
+  handlers!: CustomHandler[];
 
   @IsString()
-  file: string;
+  file!: string;
 }
 
 export class RuntimeDataSourceBase extends BaseDataSource implements AlgorandRuntimeDataSource {
   @IsEnum(AlgorandDataSourceKind, {groups: [AlgorandDataSourceKind.Runtime]})
-  kind: AlgorandDataSourceKind.Runtime;
+  kind!: AlgorandDataSourceKind.Runtime;
 
   @Type(() => RuntimeMapping)
   @ValidateNested()
-  mapping: RuntimeMapping;
+  mapping!: RuntimeMapping;
 }
 
 export class FileReferenceImpl implements FileReference {
   @IsString()
-  file: string;
+  file!: string;
 }
 
 export class CustomDataSourceBase<K extends string, M extends CustomMapping, O = any>
@@ -182,17 +182,17 @@ export class CustomDataSourceBase<K extends string, M extends CustomMapping, O =
   implements AlgorandCustomDataSource<K, M>
 {
   @IsString()
-  kind: K;
+  kind!: K;
 
   @Type(() => CustomMapping)
   @ValidateNested()
-  mapping: M;
+  mapping!: M;
 
   @Type(() => FileReferenceImpl)
   @ValidateNested({each: true})
-  assets: Map<string, AlgorandCustomDataSourceAsset>;
+  assets!: Map<string, AlgorandCustomDataSourceAsset>;
 
   @Type(() => ProcessorImpl)
   @IsObject()
-  processor: Processor<O>;
+  processor!: Processor<O>;
 }

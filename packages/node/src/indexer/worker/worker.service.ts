@@ -8,6 +8,7 @@ import {
   BaseWorkerService,
   IProjectUpgradeService,
   IBlock,
+  ProcessBlockResponse,
 } from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
 import { AlgorandApiService } from '../../algorand';
@@ -15,12 +16,6 @@ import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
 
 export type FetchBlockResponse = { parentHash: string } | undefined;
-
-export type ProcessBlockResponse = {
-  dynamicDsCreated: boolean;
-  blockHash: string;
-  reindexBlockHeight: number;
-};
 
 export type WorkerStatusResponse = {
   threadId: number;

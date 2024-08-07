@@ -34,20 +34,13 @@ export class AlgorandApiService extends ApiService<
   }
 
   async init(): Promise<AlgorandApiService> {
-    let network;
-
     try {
-      network = this.project.network;
-    } catch (e) {
-      exitWithError(
-        new Error(`Failed to init api`, { cause: e }),
-        logger,
+      await this.createConnections(this.project.network, (endpoint, config) =>
+        AlgorandApiConnection.create(endpoint, config, this.fetchBlockBatches),
       );
+    } catch (e) {
+      exitWithError(new Error(`Failed to init api`, { cause: e }), logger);
     }
-
-    await this.createConnections(network, (endpoint) =>
-      AlgorandApiConnection.create(endpoint, this.fetchBlockBatches),
-    );
 
     return this;
   }

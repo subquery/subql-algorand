@@ -55,6 +55,11 @@ export type RuntimeHandlerInputMap = {
   [AlgorandHandlerKind.Transaction]: AlgorandTransaction;
 };
 
+export type RuntimeFilterMap = {
+  [AlgorandHandlerKind.Block]: AlgorandBlockFilter;
+  [AlgorandHandlerKind.Transaction]: AlgorandTransactionFilter;
+};
+
 export type AlgorandBlockFilter = BlockFilter;
 
 /**
@@ -220,10 +225,10 @@ export type SecondLayerHandlerProcessor<
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > =
-  | SecondLayerHandlerProcessor_0_0_0<RuntimeHandlerInputMap, K, F, E, DS, Indexer>
-  | SecondLayerHandlerProcessor_1_0_0<RuntimeHandlerInputMap, K, F, E, DS, Indexer>;
+  | SecondLayerHandlerProcessor_0_0_0<RuntimeFilterMap, K, F, E, DS, Indexer>
+  | SecondLayerHandlerProcessor_1_0_0<RuntimeFilterMap, K, F, E, DS, Indexer>;
 
-type SecondLayerHandlerProcessorArray<
+export type SecondLayerHandlerProcessorArray<
   K extends string,
   F extends Record<string, unknown>,
   T,
