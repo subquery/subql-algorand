@@ -54,6 +54,7 @@ export class AlgorandDictionaryService extends DictionaryService<
         );
       }
     }
+
     this.init(dictionariesV1);
   }
 

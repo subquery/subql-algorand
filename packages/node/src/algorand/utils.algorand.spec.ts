@@ -85,5 +85,14 @@ describe('Algorand Filters', () => {
         }),
       ).toBeTruthy();
     });
+
+    it('should not filter undefined options', () => {
+      expect(
+        filterTransaction(block.transactions![4], {
+          sender: 'ZW3ISEHZUHPO7OZGMKLKIIMKVICOUDRCERI454I3DB2BH52HGLSO67W754',
+          receiver: undefined,
+        }),
+      ).toBeTruthy();
+    });
   });
 });

@@ -13,7 +13,6 @@ import { AlgorandBlockFilter, AlgorandDataSource } from '@subql/types-algorand';
 import {
   DictionaryQueryCondition,
   DictionaryQueryEntry as DictionaryV1QueryEntry,
-  DsProcessor,
 } from '@subql/types-core';
 import { sortBy, uniqBy } from 'lodash';
 import { SubqueryProject } from '../../../configure/SubqueryProject';
@@ -71,7 +70,6 @@ function buildDictionaryV1QueryEntries(
       const baseHandlerKind = getBaseHandlerKind(ds, handler, getDsProcessor);
       let filterList: AlgorandRuntimeHandlerFilter[];
       if (isCustomDs(ds)) {
-        //const processor = plugin.handlerProcessors[handler.kind];
         filterList = getBaseHandlerFilters<AlgorandRuntimeHandlerFilter>(
           ds,
           handler.kind,
