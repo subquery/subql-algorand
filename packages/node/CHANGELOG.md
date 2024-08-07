@@ -5,11 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.13.0] - 2024-08-07
 ### Changed
 - Update dependencies and apply dependent changes (#130)
 
 ### Added
 - Support for specifying headers for network endpoints (#130)
+
+### Fixed
+- Transaction filters not working correctly (#130)
 
 ## [3.12.0] - 2024-07-03
 ### Changed
@@ -256,7 +261,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.12.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.13.0...HEAD
+[3.13.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.12.0...node-algorand/3.13.0
 [3.12.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.11.3...node-algorand/3.12.0
 [3.11.3]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.11.2...node-algorand/3.11.3
 [3.11.2]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.11.0...node-algorand/3.11.2
