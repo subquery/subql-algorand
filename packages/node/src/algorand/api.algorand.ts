@@ -56,6 +56,13 @@ export class AlgorandApi {
     return this._chain;
   }
 
+  async getLatestBlockHeader(): Promise<AlgorandBlock> {
+    const checkHealth = await this.api.makeHealthCheck().do();
+    const block = await this.getHeaderOnly(checkHealth.round);
+
+    return block;
+  }
+
   async getBlockByHeight(height: number): Promise<AlgorandBlock> {
     try {
       const blockInfo = await this.api.lookupBlock(height).do();
@@ -66,7 +73,7 @@ export class AlgorandApi {
 
         return this.combinePaginateBlock(height);
       } else {
-        logger.error(`failed to fetch Block at round ${height}`);
+        logger.error(error, `failed to fetch Block at round ${height}`);
         throw error;
       }
     }

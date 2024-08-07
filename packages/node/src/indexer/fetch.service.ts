@@ -70,9 +70,7 @@ export class FetchService extends BaseFetchService<
   }
 
   protected async getFinalizedHeader(): Promise<Header> {
-    const checkHealth = await this.api.api.makeHealthCheck().do();
-
-    const block = await this.api.getHeaderOnly(checkHealth.round);
+    const block = await this.api.getLatestBlockHeader();
     return algorandBlockToHeader(block);
   }
 
