@@ -225,8 +225,8 @@ export type SecondLayerHandlerProcessor<
   E,
   DS extends AlgorandCustomDataSource = AlgorandCustomDataSource
 > =
-  | SecondLayerHandlerProcessor_0_0_0<RuntimeFilterMap, K, F, E, DS, Indexer>
-  | SecondLayerHandlerProcessor_1_0_0<RuntimeFilterMap, K, F, E, DS, Indexer>;
+  | SecondLayerHandlerProcessor_0_0_0<K, RuntimeHandlerInputMap, RuntimeFilterMap, F, E, DS, Indexer>
+  | SecondLayerHandlerProcessor_1_0_0<K, RuntimeHandlerInputMap, RuntimeFilterMap, F, E, DS, Indexer>;
 
 export type SecondLayerHandlerProcessorArray<
   K extends string,
