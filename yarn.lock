@@ -2709,7 +2709,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@subql/common-algorand@workspace:packages/common-algorand"
   dependencies:
-    "@subql/common": ^5.0.0
+    "@subql/common": ^5.1.2
     "@subql/types-algorand": "workspace:*"
     "@types/bn.js": 4.11.6
     "@types/js-yaml": ^4.0.4
@@ -2723,7 +2723,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/common@npm:5.1.2":
+"@subql/common@npm:5.1.2, @subql/common@npm:^5.1.2":
   version: 5.1.2
   resolution: "@subql/common@npm:5.1.2"
   dependencies:
@@ -2739,23 +2739,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/common@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "@subql/common@npm:5.0.0"
-  dependencies:
-    "@subql/types-core": 1.0.0
-    axios: ^0.28.0
-    class-transformer: ^0.5.1
-    class-validator: ^0.14.0
-    fs-extra: ^10.1.0
-    js-yaml: ^4.1.0
-    reflect-metadata: ^0.1.13
-    semver: ^7.5.2
-    update-notifier: 5.1.0
-  checksum: ce520fd2a95240ba69425e3a9cadd0a3bdb4e07c4fbd22162e4f864d611d2651fdab1c178dd5128e1aa0ade5bb6f2f9a8c10c33ed0e43380f225b96437627817
-  languageName: node
-  linkType: hard
-
 "@subql/node-algorand@workspace:packages/node":
   version: 0.0.0-use.local
   resolution: "@subql/node-algorand@workspace:packages/node"
@@ -2767,7 +2750,7 @@ __metadata:
     "@nestjs/schedule": ^3.0.1
     "@nestjs/schematics": ^9.2.0
     "@nestjs/testing": ^9.4.0
-    "@subql/common": ^5.0.0
+    "@subql/common": ^5.1.2
     "@subql/common-algorand": "workspace:*"
     "@subql/node-core": ^14.1.4
     "@subql/types-algorand": "workspace:*"
@@ -2836,7 +2819,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@subql/types-algorand@workspace:packages/types"
   dependencies:
-    "@subql/types-core": ^1.0.0
+    "@subql/types-core": ^1.1.1
     "@types/app-module-path": ^2.2.0
     algosdk: ^2.8.0
   peerDependencies:
@@ -2844,16 +2827,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/types-core@npm:1.0.0, @subql/types-core@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@subql/types-core@npm:1.0.0"
-  dependencies:
-    package-json-type: ^1.0.3
-  checksum: 3bed1a6a0b2b8f68d5c13306ee59f68d049d0917eb1588594f96cb125eebc51f321f910157b068a0b5f8a3a36a72fae8c96a22ea77b5adc0410e84330d887405
-  languageName: node
-  linkType: hard
-
-"@subql/types-core@npm:1.1.1":
+"@subql/types-core@npm:1.1.1, @subql/types-core@npm:^1.1.1":
   version: 1.1.1
   resolution: "@subql/types-core@npm:1.1.1"
   checksum: d804ba8f9a9a8bbce36e98ef3dd03e33602495e96ca8e04438c38b6631de102772b5f209de17d78657bcacc9c91f9af02dabd68edb8e6e24a2ca6e681e4636fc
@@ -3374,7 +3348,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/validator@npm:^13.7.1, @types/validator@npm:^13.7.10":
+"@types/validator@npm:^13.7.1":
   version: 13.7.17
   resolution: "@types/validator@npm:13.7.17"
   checksum: a827e480c09b957fe1e773e15a18e79930c546c21044ca99d9fb832268d85536cd3577391b6a3c6ebdb38eee244439056ebeed0886123e248d6b8be318c8374e
@@ -4592,17 +4566,6 @@ __metadata:
   version: 0.5.1
   resolution: "class-transformer@npm:0.5.1"
   checksum: f191c8b4cc4239990f5efdd790cabdd852c243ed66248e39f6616a349c910c6eed2d9fd1fbf7ee6ea89f69b4f1d0b493b27347fe0cd0ae26b47c3745a805b6d3
-  languageName: node
-  linkType: hard
-
-"class-validator@npm:^0.14.0":
-  version: 0.14.0
-  resolution: "class-validator@npm:0.14.0"
-  dependencies:
-    "@types/validator": ^13.7.10
-    libphonenumber-js: ^1.10.14
-    validator: ^13.7.0
-  checksum: f62e4a0ad24cee68f4b2bc70d32b96de90cb598f96bde362b4dbf4234151af8eb6ae225458312a38fc49fa3959844cf61c60e731a8205e9a570454cff8de2710
   languageName: node
   linkType: hard
 
@@ -6074,17 +6037,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:^10.1.0":
-  version: 10.1.0
-  resolution: "fs-extra@npm:10.1.0"
-  dependencies:
-    graceful-fs: ^4.2.0
-    jsonfile: ^6.0.1
-    universalify: ^2.0.0
-  checksum: dc94ab37096f813cc3ca12f0f1b5ad6744dfed9ed21e953d72530d103cea193c2f81584a39e9dee1bea36de5ee66805678c0dddc048e8af1427ac19c00fffc50
-  languageName: node
-  linkType: hard
-
 "fs-minipass@npm:^2.0.0, fs-minipass@npm:^2.1.0":
   version: 2.1.0
   resolution: "fs-minipass@npm:2.1.0"
@@ -6411,7 +6363,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6, graceful-fs@npm:^4.2.9":
+"graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6, graceful-fs@npm:^4.2.9":
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: ac85f94da92d8eb6b7f5a8b20ce65e43d66761c55ce85ac96df6865308390da45a8d3f0296dd3a663de65d30ba497bd46c696cc1e248c72b13d6d567138a4fc7
@@ -7856,19 +7808,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonfile@npm:^6.0.1":
-  version: 6.1.0
-  resolution: "jsonfile@npm:6.1.0"
-  dependencies:
-    graceful-fs: ^4.1.6
-    universalify: ^2.0.0
-  dependenciesMeta:
-    graceful-fs:
-      optional: true
-  checksum: 7af3b8e1ac8fe7f1eccc6263c6ca14e1966fcbc74b618d3c78a0a2075579487547b94f72b7a1114e844a1e15bb00d440e5d1720bfc4612d790a6f285d5ea8354
-  languageName: node
-  linkType: hard
-
 "keyv@npm:^3.0.0":
   version: 3.1.0
   resolution: "keyv@npm:3.1.0"
@@ -7908,13 +7847,6 @@ __metadata:
     prelude-ls: ^1.2.1
     type-check: ~0.4.0
   checksum: 12c5021c859bd0f5248561bf139121f0358285ec545ebf48bb3d346820d5c61a4309535c7f387ed7d84361cf821e124ce346c6b7cef8ee09a67c1473b46d0fc4
-  languageName: node
-  linkType: hard
-
-"libphonenumber-js@npm:^1.10.14":
-  version: 1.10.30
-  resolution: "libphonenumber-js@npm:1.10.30"
-  checksum: 677bdd25b709cc55f10c599df09e67b501554578e4700ae31d9f2153b4e6847710d2454b4551f19df3e443eb836c0f287a12159ee6acd931150407c0eaf010a0
   languageName: node
   linkType: hard
 
@@ -10128,17 +10060,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.5.2":
-  version: 7.5.3
-  resolution: "semver@npm:7.5.3"
-  dependencies:
-    lru-cache: ^6.0.0
-  bin:
-    semver: bin/semver.js
-  checksum: 9d58db16525e9f749ad0a696a1f27deabaa51f66e91d2fa2b0db3de3e9644e8677de3b7d7a03f4c15bc81521e0c3916d7369e0572dbde250d9bedf5194e2a8a7
-  languageName: node
-  linkType: hard
-
 "semver@npm:^7.5.3, semver@npm:^7.5.4":
   version: 7.6.0
   resolution: "semver@npm:7.6.0"
@@ -11326,13 +11247,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"universalify@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "universalify@npm:2.0.0"
-  checksum: 2406a4edf4a8830aa6813278bab1f953a8e40f2f63a37873ffa9a3bc8f9745d06cc8e88f3572cb899b7e509013f7f6fcc3e37e8a6d914167a5381d8440518c44
-  languageName: node
-  linkType: hard
-
 "unpipe@npm:1.0.0, unpipe@npm:~1.0.0":
   version: 1.0.0
   resolution: "unpipe@npm:1.0.0"
@@ -11368,7 +11282,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"update-notifier@npm:5.1.0, update-notifier@npm:^5.1.0":
+"update-notifier@npm:^5.1.0":
   version: 5.1.0
   resolution: "update-notifier@npm:5.1.0"
   dependencies:
