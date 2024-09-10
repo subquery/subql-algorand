@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Bump version with `@subql/types-core`
+- SecondLayerHandlerProcessor_1_0_0 build faild
 
 ## [3.5.0] - 2024-08-07
 ### Changed
