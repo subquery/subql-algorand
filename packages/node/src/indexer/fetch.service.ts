@@ -43,7 +43,6 @@ export class FetchService extends BaseFetchService<
     private apiService: AlgorandApiService,
     nodeConfig: NodeConfig,
     @Inject('IProjectService') projectService: ProjectService,
-    @Inject('ISubqueryProject') project: SubqueryProject,
     @Inject('IBlockDispatcher')
     blockDispatcher: IAlgorandBlockDispatcher,
     dictionaryService: AlgorandDictionaryService,
@@ -55,7 +54,6 @@ export class FetchService extends BaseFetchService<
     super(
       nodeConfig,
       projectService,
-      project.network,
       blockDispatcher,
       dictionaryService,
       eventEmitter,
