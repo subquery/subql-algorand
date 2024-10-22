@@ -23,7 +23,6 @@ import {
   algorandBlockToHeader,
   calcInterval,
 } from '../algorand';
-import { SubqueryProject } from '../configure/SubqueryProject';
 import { IAlgorandBlockDispatcher } from './blockDispatcher';
 import { AlgorandDictionaryService } from './dictionary';
 import { ProjectService } from './project.service';
