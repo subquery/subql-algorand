@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.4] - 2024-10-23
+### Changed
+- Bump `@subql/common` dependency (#139)
+
 ## [3.14.3] - 2024-10-22
 ### Changed
 - Bump `@subql/common` and `@subql/node-core` dependency (#135)
@@ -269,7 +273,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.14.3...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.14.4...HEAD
+[3.14.4]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.14.3...node-algorand/3.14.4
 [3.14.3]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.14.1...node-algorand/3.14.3
 [3.14.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.13.0...node-algorand/3.14.1
 [3.13.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.12.0...node-algorand/3.13.0
