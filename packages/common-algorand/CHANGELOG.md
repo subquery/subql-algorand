@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.2.4] - 2024-10-23
 ### Changed
-- Bump `@subql/common` dependency (#)
+- Bump `@subql/common` dependency (#139)
 
 ## [4.2.3] - 2024-10-22
 ### Changed
