@@ -1,12 +1,12 @@
 // Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   BaseUnfinalizedBlocksService,
   Header,
   NodeConfig,
-  StoreCacheService,
+  IStoreModelProvider,
   mainThreadOnly,
 } from '@subql/node-core';
 import { AlgorandApiService, algorandBlockToHeader } from '../algorand';
@@ -17,9 +17,9 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
   constructor(
     private readonly apiService: AlgorandApiService,
     nodeConfig: NodeConfig,
-    storeCache: StoreCacheService,
+    @Inject('IStoreModelProvider') storeModelProvider: IStoreModelProvider,
   ) {
-    super(nodeConfig, storeCache);
+    super(nodeConfig, storeModelProvider);
   }
 
   @mainThreadOnly()
@@ -35,7 +35,7 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
   }
 
   @mainThreadOnly()
-  protected async getHeaderForHeight(height: number): Promise<Header> {
+  async getHeaderForHeight(height: number): Promise<Header> {
     return algorandBlockToHeader(
       await this.apiService.api.getHeaderOnly(height),
     );

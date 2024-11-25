@@ -14,7 +14,7 @@ import {
   BaseFetchService,
   getModulos,
   Header,
-  StoreCacheService,
+  IStoreModelProvider,
 } from '@subql/node-core';
 import { AlgorandBlock } from '@subql/types-algorand';
 import {
@@ -48,7 +48,7 @@ export class FetchService extends BaseFetchService<
     unfinalizedBlocksService: UnfinalizedBlocksService,
     eventEmitter: EventEmitter2,
     schedulerRegistry: SchedulerRegistry,
-    storeCacheService: StoreCacheService,
+    @Inject('IStoreModelProvider') storeModelProvider: IStoreModelProvider,
   ) {
     super(
       nodeConfig,
@@ -58,7 +58,7 @@ export class FetchService extends BaseFetchService<
       eventEmitter,
       schedulerRegistry,
       unfinalizedBlocksService,
-      storeCacheService,
+      storeModelProvider,
     );
   }
 

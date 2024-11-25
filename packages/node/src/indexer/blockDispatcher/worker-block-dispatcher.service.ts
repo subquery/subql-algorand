@@ -8,7 +8,6 @@ import {
   NodeConfig,
   StoreService,
   PoiSyncService,
-  StoreCacheService,
   IProjectService,
   WorkerBlockDispatcher,
   ConnectionPoolStateManager,
@@ -16,6 +15,7 @@ import {
   InMemoryCacheService,
   createIndexerWorker,
   MonitorServiceInterface,
+  IStoreModelProvider,
 } from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
 import { AlgorandApiConnection } from '../../algorand';
@@ -47,7 +47,7 @@ export class WorkerBlockDispatcherService
     projectUpgadeService: IProjectUpgradeService,
     cacheService: InMemoryCacheService,
     storeService: StoreService,
-    storeCacheService: StoreCacheService,
+    @Inject('IStoreModelProvider') storeModelProvider: IStoreModelProvider,
     poiSyncService: PoiSyncService,
     @Inject('ISubqueryProject') project: SubqueryProject,
     dynamicDsService: DynamicDsService,
@@ -61,7 +61,7 @@ export class WorkerBlockDispatcherService
       projectService,
       projectUpgadeService,
       storeService,
-      storeCacheService,
+      storeModelProvider,
       poiSyncService,
       project,
       () =>

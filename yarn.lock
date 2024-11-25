@@ -2709,7 +2709,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@subql/common-algorand@workspace:packages/common-algorand"
   dependencies:
-    "@subql/common": ^5.1.4
+    "@subql/common": ^5.2.0
     "@subql/types-algorand": "workspace:*"
     "@types/bn.js": 4.11.6
     "@types/js-yaml": ^4.0.4
@@ -2723,25 +2723,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/common@npm:5.1.3":
-  version: 5.1.3
-  resolution: "@subql/common@npm:5.1.3"
-  dependencies:
-    "@subql/types-core": 1.1.1
-    axios: ^0.28.0
-    class-transformer: ^0.5.1
-    class-validator: ^0.14.1
-    js-yaml: ^4.1.0
-    reflect-metadata: ^0.1.14
-    semver: ^7.6.3
-    update-notifier: ^5.1.0
-  checksum: 8946cca78246460c5a9474548b3e83e276fe29e80b4c654213f43ef5c4a4b2f7f4f06c8e124d6b91855084e4afeef0059df33aa8cd7d372c4586b51cc437dbd3
-  languageName: node
-  linkType: hard
-
-"@subql/common@npm:^5.1.4":
-  version: 5.1.4
-  resolution: "@subql/common@npm:5.1.4"
+"@subql/common@npm:5.2.0, @subql/common@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "@subql/common@npm:5.2.0"
   dependencies:
     "@subql/types-core": 2.0.0
     axios: ^0.28.0
@@ -2751,7 +2735,7 @@ __metadata:
     reflect-metadata: ^0.1.14
     semver: ^7.6.3
     update-notifier: ^5.1.0
-  checksum: e0e4d5eb6ff521234b784cdd82810566aa00c58303345915435d105432c5d98b618fa8523597d9e98edcffbaa3c383dd67458862ae38b1b7b7971fcac0dde092
+  checksum: 8a29bc72c22b6a30a92529c0a710a5219245076ba9a50a9f2dd0f79b9a7f8307cebf1abf1e99cb065833e8170d730bba95c73bb82d518d81a7f58b16928b645b
   languageName: node
   linkType: hard
 
@@ -2766,9 +2750,9 @@ __metadata:
     "@nestjs/schedule": ^3.0.1
     "@nestjs/schematics": ^9.2.0
     "@nestjs/testing": ^9.4.0
-    "@subql/common": ^5.1.4
+    "@subql/common": ^5.2.0
     "@subql/common-algorand": "workspace:*"
-    "@subql/node-core": ^14.1.6
+    "@subql/node-core": ^15.0.0
     "@subql/types-algorand": "workspace:*"
     "@types/express": ^4.17.13
     "@types/jest": ^27.4.0
@@ -2790,18 +2774,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/node-core@npm:^14.1.6":
-  version: 14.1.6
-  resolution: "@subql/node-core@npm:14.1.6"
+"@subql/node-core@npm:^15.0.0":
+  version: 15.0.0
+  resolution: "@subql/node-core@npm:15.0.0"
   dependencies:
     "@apollo/client": ^3.11.2
     "@nestjs/common": ^9.4.0
     "@nestjs/event-emitter": ^2.0.0
     "@nestjs/schedule": ^3.0.1
-    "@subql/common": 5.1.3
-    "@subql/testing": 2.2.1
-    "@subql/types": 3.11.2
-    "@subql/utils": 2.14.0
+    "@subql/common": 5.2.0
+    "@subql/testing": 2.2.2
+    "@subql/types": 3.11.3
+    "@subql/utils": 2.15.0
     "@willsoto/nestjs-prometheus": ^5.4.0
     async-mutex: ^0.5.0
     cron-converter: ^2.0.1
@@ -2818,16 +2802,16 @@ __metadata:
     toposort-class: ^1.0.1
     vm2: ^3.9.19
     yargs: ^16.2.0
-  checksum: c0096e2567ed3a2aeb09e26a4044e1647948dad583eea07c4f261078ed1001593bd0276ab7a430f711b9ba92a929d333bb206ab624b68ddb55bf7847eba94a74
+  checksum: e32e06c56b284db84b4d0ac794f3ab3edadc48d16a943ac669a552d26d92f688f0271fdfe51ce6c29b589abaec89a11a4524f80a97b6363ce5d989d87c5718f1
   languageName: node
   linkType: hard
 
-"@subql/testing@npm:2.2.1":
-  version: 2.2.1
-  resolution: "@subql/testing@npm:2.2.1"
+"@subql/testing@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@subql/testing@npm:2.2.2"
   dependencies:
-    "@subql/types-core": ^0.9.1
-  checksum: 0e2529ec5e3c0b1360f51c3ad7d536b7d63efa9fdafa956c388c7547a23eeca0b9d1445b27010d9fa249b2541882c8009c8f2a4a49a00ef78d94e55c9675f392
+    "@subql/types-core": ^2.0.0
+  checksum: 0f720d9c3f791bd1ffa30d7040cbac8ef5efd41fb18ab3002a87067d92954ca8839b2634abc8cdbdcde67dd284d2ed0fb98fae7f81487ca51f9ee7d225a8fa39
   languageName: node
   linkType: hard
 
@@ -2843,13 +2827,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/types-core@npm:1.1.1":
-  version: 1.1.1
-  resolution: "@subql/types-core@npm:1.1.1"
-  checksum: d804ba8f9a9a8bbce36e98ef3dd03e33602495e96ca8e04438c38b6631de102772b5f209de17d78657bcacc9c91f9af02dabd68edb8e6e24a2ca6e681e4636fc
-  languageName: node
-  linkType: hard
-
 "@subql/types-core@npm:2.0.0, @subql/types-core@npm:^2.0.0":
   version: 2.0.0
   resolution: "@subql/types-core@npm:2.0.0"
@@ -2857,29 +2834,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/types-core@npm:^0.9.1":
-  version: 0.9.1
-  resolution: "@subql/types-core@npm:0.9.1"
+"@subql/types@npm:3.11.3":
+  version: 3.11.3
+  resolution: "@subql/types@npm:3.11.3"
   dependencies:
-    package-json-type: ^1.0.3
-  checksum: cb6ae7220f02e76f8a05bdb5572b2864c8686523c756aadbcd0f3aeab5099acd93eac1cba04a81e2cb02e5e07bd9569ec46565ba78bf1f6213cb2dc2476951f7
-  languageName: node
-  linkType: hard
-
-"@subql/types@npm:3.11.2":
-  version: 3.11.2
-  resolution: "@subql/types@npm:3.11.2"
-  dependencies:
-    "@subql/types-core": 1.1.1
+    "@subql/types-core": 2.0.0
   peerDependencies:
     "@polkadot/api": ^12
-  checksum: ef8e9f6bd73e9071ec267cb90259472d9ecb595d02bf52e44e4f93e90016ed0a897f09f6c8496455368b7ecb42a9a5aac7fc715ac5df5697936e8c1c1956e13f
+  checksum: fa81e757bac193e71c333cd6327d23368810cebd97acc6757494c99de00ae600c6dfd89872b853f1c0551169615797463e4345459e1923bd5c04337cd2bd28d7
   languageName: node
   linkType: hard
 
-"@subql/utils@npm:2.14.0":
-  version: 2.14.0
-  resolution: "@subql/utils@npm:2.14.0"
+"@subql/utils@npm:2.15.0":
+  version: 2.15.0
+  resolution: "@subql/utils@npm:2.15.0"
   dependencies:
     "@polkadot/util": ^13.0.2
     "@polkadot/util-crypto": ^13.0.2
@@ -2892,7 +2860,7 @@ __metadata:
     lodash: ^4.17.21
     pino: ^6.13.3
     rotating-file-stream: ^3.2.3
-  checksum: 0a56114494cb5e8c5dcf62e1d24fb7b2ba7b445472e61661ab9eec61df7a09449dd7251d78d6cd11a6da9939c5d54d2d57e16639b5d0986756513ab8810cf3e5
+  checksum: a83078fcea6c98a011ce18198f475a38693ea8b255db0e082f349344b18838361e756bb32afbb4e08a6adcd89f0af4f715c75f4835f90dd06f98c85a32c3e0a6
   languageName: node
   linkType: hard
 
@@ -8952,13 +8920,6 @@ __metadata:
   version: 1.0.0
   resolution: "package-json-from-dist@npm:1.0.0"
   checksum: ac706ec856a5a03f5261e4e48fa974f24feb044d51f84f8332e2af0af04fbdbdd5bbbfb9cbbe354190409bc8307c83a9e38c6672c3c8855f709afb0006a009ea
-  languageName: node
-  linkType: hard
-
-"package-json-type@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "package-json-type@npm:1.0.3"
-  checksum: ea93a2ee1cbc480feee94974158605463b8ce8f899e8a09dc008ac83c060fd10d8f38bfdd5f28222196dba1f57de4e65b46b057dc889a704967714da393c2ad9
   languageName: node
   linkType: hard
 
