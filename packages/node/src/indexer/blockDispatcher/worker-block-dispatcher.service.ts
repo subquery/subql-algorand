@@ -24,6 +24,7 @@ import { DynamicDsService } from '../dynamic-ds.service';
 import { BlockContent } from '../types';
 import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
 import { IIndexerWorker } from '../worker/worker';
+import { FetchBlockResponse } from '../worker/worker.service';
 
 type IndexerWorker = IIndexerWorker & {
   terminate: () => Promise<number>;
@@ -89,7 +90,7 @@ export class WorkerBlockDispatcherService
   protected async fetchBlock(
     worker: IndexerWorker,
     height: number,
-  ): Promise<void> {
-    await worker.fetchBlock(height, 0 /* Unused with algorand */);
+  ): Promise<FetchBlockResponse> {
+    return worker.fetchBlock(height, 0 /* Unused with algorand */);
   }
 }

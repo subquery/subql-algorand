@@ -9,13 +9,14 @@ import {
   IProjectUpgradeService,
   IBlock,
   ProcessBlockResponse,
+  Header,
 } from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
-import { AlgorandApiService } from '../../algorand';
+import { AlgorandApiService, algorandBlockToHeader } from '../../algorand';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
 
-export type FetchBlockResponse = { parentHash: string } | undefined;
+export type FetchBlockResponse = Header;
 
 export type WorkerStatusResponse = {
   threadId: number;
@@ -49,8 +50,9 @@ export class WorkerService extends BaseWorkerService<
     const [block] = await this.apiService.fetchBlocks([heights]);
     return block;
   }
-  protected toBlockResponse(block: AlgorandBlock): { parentHash: string } {
+  protected toBlockResponse(block: AlgorandBlock): Header {
     return {
+      ...algorandBlockToHeader(block),
       parentHash: block.previousBlockHash,
     };
   }
