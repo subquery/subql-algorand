@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### 
+### Added
 - Support for historical indexing by timestamp as well as block height
 - Add an `--enable-cache` flag, allowing you to choose between DB or cache for IO operations.
 
