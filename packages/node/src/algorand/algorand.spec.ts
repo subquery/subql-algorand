@@ -57,7 +57,7 @@ export const prepareApiService = async (
   const app = module.createNestApplication();
   await app.init();
   const apiService = app.get(AlgorandApiService);
-  await apiService.init();
+
   return [app, apiService];
 };
 

@@ -33,16 +33,31 @@ export class AlgorandApiService extends ApiService<
     super(connectionPoolService, eventEmitter);
   }
 
-  async init(): Promise<AlgorandApiService> {
+  static async init(
+    project: SubqueryProject,
+    connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
+    eventEmitter: EventEmitter2,
+  ): Promise<AlgorandApiService> {
+    const apiService = new AlgorandApiService(
+      project,
+      connectionPoolService,
+      eventEmitter,
+    );
     try {
-      await this.createConnections(this.project.network, (endpoint, config) =>
-        AlgorandApiConnection.create(endpoint, config, this.fetchBlockBatches),
+      await apiService.createConnections(
+        apiService.project.network,
+        (endpoint, config) =>
+          AlgorandApiConnection.create(
+            endpoint,
+            config,
+            apiService.fetchBlockBatches,
+          ),
       );
     } catch (e) {
       exitWithError(new Error(`Failed to init api`, { cause: e }), logger);
     }
 
-    return this;
+    return apiService;
   }
 
   get api(): AlgorandApi {
