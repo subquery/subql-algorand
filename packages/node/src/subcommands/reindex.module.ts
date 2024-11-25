@@ -7,12 +7,10 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import {
   DbModule,
   ForceCleanService,
-  IStoreModelProvider,
   NodeConfig,
-  PlainStoreModelService,
   PoiService,
   ReindexService,
-  StoreCacheService,
+  storeModelFactory,
   StoreService,
 } from '@subql/node-core';
 import { Sequelize } from '@subql/x-sequelize';
@@ -25,21 +23,7 @@ import { DynamicDsService } from '../indexer/dynamic-ds.service';
   providers: [
     {
       provide: 'IStoreModelProvider',
-      useFactory: (
-        nodeConfig: NodeConfig,
-        eventEmitter: EventEmitter2,
-        schedulerRegistry: SchedulerRegistry,
-        sequelize: Sequelize,
-      ): IStoreModelProvider => {
-        return nodeConfig.enableCache
-          ? new StoreCacheService(
-              sequelize,
-              nodeConfig,
-              eventEmitter,
-              schedulerRegistry,
-            )
-          : new PlainStoreModelService(sequelize, nodeConfig);
-      },
+      useFactory: storeModelFactory,
       inject: [NodeConfig, EventEmitter2, SchedulerRegistry, Sequelize],
     },
     StoreService,
