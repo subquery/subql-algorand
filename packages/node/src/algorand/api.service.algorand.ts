@@ -25,7 +25,7 @@ export class AlgorandApiService extends ApiService<
   SafeAPIService,
   IBlock<BlockContent>[]
 > {
-  constructor(
+  private constructor(
     @Inject('ISubqueryProject') private project: SubqueryProject,
     connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
     eventEmitter: EventEmitter2,

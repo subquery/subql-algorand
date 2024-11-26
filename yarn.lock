@@ -2752,7 +2752,7 @@ __metadata:
     "@nestjs/testing": ^9.4.0
     "@subql/common": ^5.2.1
     "@subql/common-algorand": "workspace:*"
-    "@subql/node-core": ^15.0.1
+    "@subql/node-core": ^15.0.3
     "@subql/types-algorand": "workspace:*"
     "@types/express": ^4.17.13
     "@types/jest": ^27.4.0
@@ -2774,9 +2774,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/node-core@npm:^15.0.1":
-  version: 15.0.1
-  resolution: "@subql/node-core@npm:15.0.1"
+"@subql/node-core@npm:^15.0.3":
+  version: 15.0.3
+  resolution: "@subql/node-core@npm:15.0.3"
   dependencies:
     "@apollo/client": ^3.11.2
     "@nestjs/common": ^9.4.0
@@ -2802,7 +2802,7 @@ __metadata:
     toposort-class: ^1.0.1
     vm2: ^3.9.19
     yargs: ^16.2.0
-  checksum: d4219527f36c3ce972829f1f1a4ba1fc87448c96a354ec28f6feffc37240d876e8fd8c215c2225622798efbeccb1d499d3224969776a6c9291bc3f93b97a4c9e
+  checksum: 22749eb41145348720df46acb9ed18c186292b357c4989e9f97870ece848431db6cc492016dfdc698b38679f077add496a63e7928570253ec785583495f29853
   languageName: node
   linkType: hard
 
