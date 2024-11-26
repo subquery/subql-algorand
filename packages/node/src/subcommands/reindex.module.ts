@@ -2,16 +2,18 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { Module } from '@nestjs/common';
-import { EventEmitterModule } from '@nestjs/event-emitter';
+import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import {
   DbModule,
   ForceCleanService,
+  NodeConfig,
   PoiService,
   ReindexService,
-  StoreCacheService,
+  storeModelFactory,
   StoreService,
 } from '@subql/node-core';
+import { Sequelize } from '@subql/x-sequelize';
 import { AlgorandApiService } from '../algorand';
 import { ConfigureModule } from '../configure/configure.module';
 import { DsProcessorService } from '../indexer/ds-processor.service';
@@ -19,7 +21,11 @@ import { DynamicDsService } from '../indexer/dynamic-ds.service';
 
 @Module({
   providers: [
-    StoreCacheService,
+    {
+      provide: 'IStoreModelProvider',
+      useFactory: storeModelFactory,
+      inject: [NodeConfig, EventEmitter2, SchedulerRegistry, Sequelize],
+    },
     StoreService,
     ReindexService,
     ForceCleanService,

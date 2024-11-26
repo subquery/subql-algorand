@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { INestApplication } from '@nestjs/common';
-import { EventEmitterModule } from '@nestjs/event-emitter';
+import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
 import {
   ConnectionPoolService,
@@ -50,7 +50,11 @@ describe('ApiService', () => {
         ConnectionPoolStateManager,
         ConnectionPoolService,
         NodeConfig,
-        AlgorandApiService,
+        {
+          provide: AlgorandApiService,
+          useFactory: AlgorandApiService.init,
+          inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
+        },
       ],
       imports: [EventEmitterModule.forRoot()],
     }).compile();
@@ -58,7 +62,7 @@ describe('ApiService', () => {
     app = module.createNestApplication();
     await app.init();
     const apiService = app.get(AlgorandApiService);
-    await apiService.init();
+
     return apiService;
   };
 

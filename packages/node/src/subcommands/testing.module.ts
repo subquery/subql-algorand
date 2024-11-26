@@ -11,11 +11,13 @@ import {
   InMemoryCacheService,
   PoiService,
   PoiSyncService,
-  StoreCacheService,
   StoreService,
   TestRunner,
   SandboxService,
+  NodeConfig,
+  storeModelFactory,
 } from '@subql/node-core';
+import { Sequelize } from '@subql/x-sequelize';
 import { AlgorandApiService } from '../algorand';
 import { ConfigureModule } from '../configure/configure.module';
 import { DsProcessorService } from '../indexer/ds-processor.service';
@@ -27,7 +29,11 @@ import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
   providers: [
     InMemoryCacheService,
     StoreService,
-    StoreCacheService,
+    {
+      provide: 'IStoreModelProvider',
+      useFactory: storeModelFactory,
+      inject: [NodeConfig, EventEmitter2, SchedulerRegistry, Sequelize],
+    },
     EventEmitter2,
     PoiService,
     PoiSyncService,
@@ -41,7 +47,11 @@ import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
       provide: 'IProjectService',
       useClass: ProjectService,
     },
-    AlgorandApiService,
+    {
+      provide: AlgorandApiService,
+      useFactory: AlgorandApiService.init,
+      inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
+    },
     SchedulerRegistry,
     TestRunner,
     {

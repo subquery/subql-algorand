@@ -8,12 +8,12 @@ import {
   PoiSyncService,
   NodeConfig,
   ConnectionPoolService,
-  StoreCacheService,
   ConnectionPoolStateManager,
   IProjectUpgradeService,
   InMemoryCacheService,
   MonitorService,
   CoreModule,
+  IStoreModelProvider,
 } from '@subql/node-core';
 import { AlgorandApiConnection, AlgorandApiService } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -35,19 +35,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
     UnfinalizedBlocksService,
     {
       provide: AlgorandApiService,
-      useFactory: async (
-        project: SubqueryProject,
-        connectionPoolService: ConnectionPoolService<AlgorandApiConnection>,
-        eventEmitter: EventEmitter2,
-      ) => {
-        const apiService = new AlgorandApiService(
-          project,
-          connectionPoolService,
-          eventEmitter,
-        );
-        await apiService.init();
-        return apiService;
-      },
+      useFactory: AlgorandApiService.init,
       inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
     },
     IndexerManager,
@@ -62,7 +50,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         indexerManager: IndexerManager,
         cacheService: InMemoryCacheService,
         storeService: StoreService,
-        storeCacheService: StoreCacheService,
+        storeModelProvider: IStoreModelProvider,
         poiSyncService: PoiSyncService,
         project: SubqueryProject,
         dynamicDsService: DynamicDsService,
@@ -78,7 +66,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               projectUpgradeService,
               cacheService,
               storeService,
-              storeCacheService,
+              storeModelProvider,
               poiSyncService,
               project,
               dynamicDsService,
@@ -94,7 +82,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               projectService,
               projectUpgradeService,
               storeService,
-              storeCacheService,
+              storeModelProvider,
               poiSyncService,
               project,
             ),
@@ -107,7 +95,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         IndexerManager,
         InMemoryCacheService,
         StoreService,
-        StoreCacheService,
+        'IStoreModelProvider',
         PoiSyncService,
         'ISubqueryProject',
         DynamicDsService,

@@ -8,7 +8,6 @@ import {
   NodeConfig,
   StoreService,
   PoiSyncService,
-  StoreCacheService,
   IProjectService,
   WorkerBlockDispatcher,
   ConnectionPoolStateManager,
@@ -16,6 +15,7 @@ import {
   InMemoryCacheService,
   createIndexerWorker,
   MonitorServiceInterface,
+  IStoreModelProvider,
 } from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
 import { AlgorandApiConnection } from '../../algorand';
@@ -24,6 +24,7 @@ import { DynamicDsService } from '../dynamic-ds.service';
 import { BlockContent } from '../types';
 import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
 import { IIndexerWorker } from '../worker/worker';
+import { FetchBlockResponse } from '../worker/worker.service';
 
 type IndexerWorker = IIndexerWorker & {
   terminate: () => Promise<number>;
@@ -47,7 +48,7 @@ export class WorkerBlockDispatcherService
     projectUpgadeService: IProjectUpgradeService,
     cacheService: InMemoryCacheService,
     storeService: StoreService,
-    storeCacheService: StoreCacheService,
+    @Inject('IStoreModelProvider') storeModelProvider: IStoreModelProvider,
     poiSyncService: PoiSyncService,
     @Inject('ISubqueryProject') project: SubqueryProject,
     dynamicDsService: DynamicDsService,
@@ -61,7 +62,7 @@ export class WorkerBlockDispatcherService
       projectService,
       projectUpgadeService,
       storeService,
-      storeCacheService,
+      storeModelProvider,
       poiSyncService,
       project,
       () =>
@@ -89,7 +90,7 @@ export class WorkerBlockDispatcherService
   protected async fetchBlock(
     worker: IndexerWorker,
     height: number,
-  ): Promise<void> {
-    await worker.fetchBlock(height, 0 /* Unused with algorand */);
+  ): Promise<FetchBlockResponse> {
+    return worker.fetchBlock(height, 0 /* Unused with algorand */);
   }
 }
