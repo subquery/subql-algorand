@@ -47,7 +47,11 @@ import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
       provide: 'IProjectService',
       useClass: ProjectService,
     },
-    AlgorandApiService,
+    {
+      provide: AlgorandApiService,
+      useFactory: AlgorandApiService.init,
+      inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
+    },
     SchedulerRegistry,
     TestRunner,
     {
