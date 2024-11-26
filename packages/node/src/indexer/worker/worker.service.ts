@@ -51,10 +51,7 @@ export class WorkerService extends BaseWorkerService<
     return block;
   }
   protected toBlockResponse(block: AlgorandBlock): Header {
-    return {
-      ...algorandBlockToHeader(block),
-      parentHash: block.previousBlockHash,
-    };
+    return algorandBlockToHeader(block);
   }
   protected async processFetchedBlock(
     block: IBlock<AlgorandBlock>,
