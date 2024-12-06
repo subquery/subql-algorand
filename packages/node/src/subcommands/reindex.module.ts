@@ -5,6 +5,8 @@ import { Module } from '@nestjs/common';
 import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import {
+  ConnectionPoolService,
+  ConnectionPoolStateManager,
   DbModule,
   ForceCleanService,
   NodeConfig,
@@ -32,10 +34,12 @@ import { DynamicDsService } from '../indexer/dynamic-ds.service';
     DynamicDsService,
     PoiService,
     DsProcessorService,
+    ConnectionPoolStateManager,
+    ConnectionPoolService,
     {
-      // Used to work with DI for unfinalizedBlocksService but not used with reindex
       provide: AlgorandApiService,
-      useFactory: () => undefined,
+      useFactory: AlgorandApiService.init,
+      inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
     },
     SchedulerRegistry,
   ],
