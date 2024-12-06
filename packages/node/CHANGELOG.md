@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.15.1] - 2024-12-06
 ### Fixed
 - Missing API dependency when using reindex
 
@@ -284,7 +285,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.15.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.15.1...HEAD
+[3.15.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.15.0...node-algorand/3.15.1
 [3.15.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.14.4...node-algorand/3.15.0
 [3.14.4]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.14.3...node-algorand/3.14.4
 [3.14.3]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.14.1...node-algorand/3.14.3
