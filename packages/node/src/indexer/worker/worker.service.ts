@@ -14,7 +14,7 @@ import {
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
 import { AlgorandApiService, algorandBlockToHeader } from '../../algorand';
 import { IndexerManager } from '../indexer.manager';
-import { BlockContent } from '../types';
+import { BlockContent, getBlockSize } from '../types';
 
 export type FetchBlockResponse = Header;
 
@@ -58,5 +58,9 @@ export class WorkerService extends BaseWorkerService<
     dataSources: AlgorandDataSource[],
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(block, dataSources);
+  }
+
+  protected getBlockSize(block: IBlock<AlgorandBlock>): number {
+    return getBlockSize(block.block);
   }
 }
