@@ -19,7 +19,7 @@
     "subql-node-algorand": "./bin/run"
   },
   "dependencies": {
-    "@nestjs/common": "^9.4.0",
+    "@nestjs/common": "^10.4.16",
     "@nestjs/core": "^9.4.0",
     "@nestjs/event-emitter": "^2.0.0",
     "@nestjs/platform-express": "^9.4.0",
