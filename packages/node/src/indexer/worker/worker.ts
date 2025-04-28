@@ -1,4 +1,4 @@
-// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2025 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 // initlogger and yargs must be imported before all other imports
@@ -24,8 +24,8 @@ import {
   createWorkerHost,
   IBaseIndexerWorker,
   initWorkerServices,
+  ProjectService,
 } from '@subql/node-core';
-import { ProjectService } from '../project.service';
 import { WorkerModule } from './worker.module';
 import { WorkerService } from './worker.service';
 

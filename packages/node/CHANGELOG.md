@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2025-04-28
+### Changed
+- Implement blockchain service (#151)
+
+### Added
+- Support for rewinds and unfinalized blocks with multichain projects
+
 ## [3.17.0] - 2025-01-28
 ### Changed
 - Update `@subql/node-core` with minor bug fixes and improvements
@@ -293,7 +300,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.17.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.0...HEAD
+[4.0.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.17.0...node-algorand/4.0.0
 [3.17.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.16.0...node-algorand/3.17.0
 [3.16.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.15.1...node-algorand/3.16.0
 [3.15.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.15.0...node-algorand/3.15.1

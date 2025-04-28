@@ -1,4 +1,4 @@
-// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2025 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Inject, Injectable } from '@nestjs/common';
@@ -33,7 +33,7 @@ export class WorkerService extends BaseWorkerService<
   {}
 > {
   constructor(
-    private apiService: AlgorandApiService,
+    @Inject('APIService') private apiService: AlgorandApiService,
     private indexerManager: IndexerManager,
     @Inject('IProjectService')
     projectService: IProjectService<AlgorandDataSource>,

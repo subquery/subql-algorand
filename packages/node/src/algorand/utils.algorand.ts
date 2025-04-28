@@ -1,4 +1,4 @@
-// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2025 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { filterBlockTimestamp, Header, IBlock } from '@subql/node-core';
@@ -18,6 +18,7 @@ export function algorandBlockToHeader(block: BlockContent): Header {
     blockHeight: block.round,
     blockHash: block.hash,
     parentHash: block.previousBlockHash,
+    timestamp: new Date(block.timestamp),
   };
 }
 

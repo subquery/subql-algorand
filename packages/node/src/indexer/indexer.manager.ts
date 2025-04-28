@@ -1,7 +1,7 @@
-// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2025 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   isRuntimeDs,
   AlgorandHandlerKind,
@@ -18,6 +18,9 @@ import {
   BaseIndexerManager,
   IBlock,
   SandboxService,
+  DsProcessorService,
+  DynamicDsService,
+  UnfinalizedBlocksService,
 } from '@subql/node-core';
 import {
   AlgorandBlock,
@@ -33,10 +36,8 @@ import {
   filterBlock,
   filterTransaction,
 } from '../algorand';
-import { DsProcessorService } from './ds-processor.service';
-import { DynamicDsService } from './dynamic-ds.service';
+import { BlockchainService } from '../blockchain.service';
 import { BlockContent } from './types';
-import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
 
 @Injectable()
 export class IndexerManager extends BaseIndexerManager<
@@ -51,12 +52,14 @@ export class IndexerManager extends BaseIndexerManager<
   AlgorandRuntimeHandlerInputMap
 > {
   constructor(
-    apiService: AlgorandApiService,
+    @Inject('APIService') apiService: AlgorandApiService,
     nodeConfig: NodeConfig,
     sandboxService: SandboxService<SafeAPI, AlgorandApi>,
     dsProcessorService: DsProcessorService,
-    dynamicDsService: DynamicDsService,
+    dynamicDsService: DynamicDsService<AlgorandDataSource>,
+    @Inject('IUnfinalizedBlocksService')
     unfinalizedBlocksService: UnfinalizedBlocksService,
+    @Inject('IBlockchainService') blockchainService: BlockchainService,
   ) {
     super(
       apiService,
@@ -67,6 +70,7 @@ export class IndexerManager extends BaseIndexerManager<
       unfinalizedBlocksService,
       FilterTypeMap,
       ProcessorTypeMap,
+      blockchainService,
     );
   }
 

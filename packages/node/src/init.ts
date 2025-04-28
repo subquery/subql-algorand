@@ -1,15 +1,15 @@
-// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2025 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { NestFactory } from '@nestjs/core';
 import {
   exitWithError,
+  FetchService,
   getLogger,
   getValidPort,
   NestLogger,
 } from '@subql/node-core';
 import { AppModule } from './app.module';
-import { FetchService } from './indexer/fetch.service';
 import { yargsOptions } from './yargs';
 const pjson = require('../package.json');
 
