@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2025-04-28
+### Changed
+- Update `@subql/types-core`
+
 ## [4.0.1] - 2024-10-22
 ### Changed
 - Bump `@subql/types-core` dependency (#135)
@@ -89,7 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.1] - 2022-08-04
 
 ## [1.2.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/types-algorand/4.0.1...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/types-algorand/4.1.0...HEAD
+[4.1.0]: https://github.com/subquery/subql-algorand/compare/types-algorand/4.0.1...types-algorand/4.1.0
 [4.0.1]: https://github.com/subquery/subql-algorand/compare/types-algorand/3.6.1...types-algorand/4.0.1
 [3.6.1]: https://github.com/subquery/subql-algorand/compare/types-algorand/3.5.0...types-algorand/3.6.1
 [3.5.0]: https://github.com/subquery/subql-algorand/compare/types-algorand/3.4.0...types-algorand/3.5.0
