@@ -18,6 +18,7 @@ export function algorandBlockToHeader(block: BlockContent): Header {
     blockHeight: block.round,
     blockHash: block.hash,
     parentHash: block.previousBlockHash,
+    timestamp: new Date(block.timestamp),
   };
 }
 

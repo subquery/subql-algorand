@@ -5,41 +5,32 @@ import { Module } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   ConnectionPoolService,
-  WorkerDynamicDsService,
-  WorkerUnfinalizedBlocksService,
+  DsProcessorService,
+  ProjectService,
   WorkerCoreModule,
 } from '@subql/node-core';
-import { AlgorandApiService, AlgorandApiConnection } from '../../algorand';
-import { SubqueryProject } from '../../configure/SubqueryProject';
-import { DsProcessorService } from '../ds-processor.service';
-import { DynamicDsService } from '../dynamic-ds.service';
+import { AlgorandApiService } from '../../algorand';
+import { BlockchainService } from '../../blockchain.service';
 import { IndexerManager } from '../indexer.manager';
-import { ProjectService } from '../project.service';
-import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
 import { WorkerService } from './worker.service';
 
 @Module({
   imports: [WorkerCoreModule],
   providers: [
+    DsProcessorService,
     IndexerManager,
     {
-      provide: AlgorandApiService,
+      provide: 'APIService',
       useFactory: AlgorandApiService.init,
       inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
-    },
-    DsProcessorService,
-    {
-      provide: DynamicDsService,
-      useFactory: () => new WorkerDynamicDsService((global as any).host),
     },
     {
       provide: 'IProjectService',
       useClass: ProjectService,
     },
     {
-      provide: UnfinalizedBlocksService,
-      useFactory: () =>
-        new WorkerUnfinalizedBlocksService((global as any).host),
+      provide: 'IBlockchainService',
+      useClass: BlockchainService,
     },
     WorkerService,
   ],

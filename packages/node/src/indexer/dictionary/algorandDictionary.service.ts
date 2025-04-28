@@ -4,10 +4,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NETWORK_FAMILY } from '@subql/common';
-import { NodeConfig, DictionaryService, getLogger } from '@subql/node-core';
+import {
+  NodeConfig,
+  DictionaryService,
+  getLogger,
+  DsProcessorService,
+} from '@subql/node-core';
 import { AlgorandBlock, AlgorandDataSource } from '@subql/types-algorand';
 import { SubqueryProject } from '../../configure/SubqueryProject';
-import { DsProcessorService } from '../ds-processor.service';
 import { AlgorandDictionaryV1 } from './v1';
 
 const logger = getLogger('AlograndDictionary');

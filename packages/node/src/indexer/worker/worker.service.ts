@@ -33,7 +33,7 @@ export class WorkerService extends BaseWorkerService<
   {}
 > {
   constructor(
-    private apiService: AlgorandApiService,
+    @Inject('APIService') private apiService: AlgorandApiService,
     private indexerManager: IndexerManager,
     @Inject('IProjectService')
     projectService: IProjectService<AlgorandDataSource>,
