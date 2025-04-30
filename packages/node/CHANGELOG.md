@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.2] - 2025-05-01
+### Changed
+- Re release of previously failed release
+
 ## [4.0.1] - 2025-05-01
 ### Changed
 - Update `@subql/node-core` with workers performance fix
@@ -304,7 +308,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.1...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.2...HEAD
+[4.0.2]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.1...node-algorand/4.0.2
 [4.0.1]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.0...node-algorand/4.0.1
 [4.0.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.17.0...node-algorand/4.0.0
 [3.17.0]: https://github.com/subquery/subql-algorand/compare/node-algorand/3.16.0...node-algorand/3.17.0
