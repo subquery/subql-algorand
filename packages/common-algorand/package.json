@@ -1,6 +1,6 @@
 {
   "name": "@subql/common-algorand",
-  "version": "4.4.3-0",
+  "version": "4.4.3",
   "description": "",
   "scripts": {
     "build": "rm -rf dist && tsc -b",
@@ -29,5 +29,17 @@
     "@types/pino": "^6.3.12",
     "@types/semver": "^7"
   },
-  "stableVersion": "4.4.2"
+  "files": [
+    "/dist",
+    "!/dist/**/*.spec.js",
+    "!/dist/**/*.spec.d.ts",
+    "!/dist/**/*.spec.js.map",
+    "!/dist/**/*.test.js",
+    "!/dist/**/*.test.d.ts",
+    "!/dist/**/*.test.js.map",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ]
 }
