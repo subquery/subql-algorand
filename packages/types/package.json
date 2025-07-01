@@ -1,6 +1,6 @@
 {
   "name": "@subql/types-algorand",
-  "version": "4.1.1-0",
+  "version": "4.1.1",
   "description": "",
   "homepage": "https://github.com/subquery/subql",
   "repository": "github:subquery/subql-algorand",
@@ -13,8 +13,17 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "files": [
-    "src/global.d.ts",
-    "/dist"
+    "/dist",
+    "!/dist/**/*.spec.js",
+    "!/dist/**/*.spec.d.ts",
+    "!/dist/**/*.spec.js.map",
+    "!/dist/**/*.test.js",
+    "!/dist/**/*.test.d.ts",
+    "!/dist/**/*.test.js.map",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "peerDependencies": {
     "algosdk": "^2.8.0"
@@ -25,6 +34,5 @@
   },
   "dependencies": {
     "@subql/types-core": "^2.1.0"
-  },
-  "stableVersion": "4.1.0"
+  }
 }
