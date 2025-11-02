@@ -5,7 +5,7 @@ import { INestApplication } from '@nestjs/common';
 import { AlgorandBlock } from '@subql/types-algorand';
 import { prepareApiService } from './algorand.spec';
 import { AlgorandApiService } from './api.service.algorand';
-import { filterTransaction } from './utils.algorand';
+import { algorandBlockToHeader, filterTransaction } from './utils.algorand';
 
 describe('Algorand Filters', () => {
   describe('Transaction Filters', () => {
@@ -93,6 +93,12 @@ describe('Algorand Filters', () => {
           receiver: undefined,
         }),
       ).toBeTruthy();
+    });
+
+    it('can correctly get a block timestamp date', () => {
+      const header = algorandBlockToHeader(block);
+
+      expect(header.timestamp).toEqual(new Date('2023-07-13T10:44:35.000Z'));
     });
   });
 });
