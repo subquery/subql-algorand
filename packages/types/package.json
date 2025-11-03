@@ -1,6 +1,6 @@
 {
   "name": "@subql/types-algorand",
-  "version": "4.1.1",
+  "version": "4.1.2-0",
   "description": "",
   "homepage": "https://github.com/subquery/subql",
   "repository": "github:subquery/subql-algorand",
@@ -34,5 +34,6 @@
   },
   "dependencies": {
     "@subql/types-core": "^2.2.0"
-  }
+  },
+  "stableVersion": "4.1.1"
 }
