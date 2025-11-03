@@ -1,6 +1,6 @@
 {
   "name": "@subql/node-algorand",
-  "version": "4.0.4-1",
+  "version": "4.0.4",
   "description": "",
   "author": "Ian He",
   "license": "GPL-3.0",
@@ -62,6 +62,5 @@
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
-  ],
-  "stableVersion": "4.0.4-0"
+  ]
 }
