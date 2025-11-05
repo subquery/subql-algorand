@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.5] - 2025-11-05
 ### Changed
-- Update `@subql/common`, `@subql/node-core`  (#161)
 - Update `@subql/common`, `@subql/node-core`
 
 ## [4.0.4] - 2025-11-03
