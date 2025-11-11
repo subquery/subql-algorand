@@ -5,11 +5,11 @@ import { INestApplication } from '@nestjs/common';
 import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
 import {
-  ApiService,
   ConnectionPoolService,
   ConnectionPoolStateManager,
   NodeConfig,
 } from '@subql/node-core';
+import { AlgorandBlock } from '@subql/types-algorand';
 import { GraphQLSchema } from 'graphql';
 import { AlgorandApiService, filterTransaction } from '../algorand';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -67,13 +67,6 @@ export const prepareApiService = async (
 
 jest.setTimeout(90000);
 describe('Algorand RPC', () => {
-  let app: INestApplication;
-  let apiService: ApiService;
-
-  afterEach(() => {
-    return app?.close();
-  });
-
   it('Can filter acfg with sender', () => {
     const tx = {
       assetConfigTransaction: {
@@ -125,43 +118,89 @@ describe('Algorand RPC', () => {
     ).toBe(true);
   });
 
-  // This is failing since switching from algo explorer api. This is due to a node configuration limit
-  it('paginate large blocks', async () => {
-    [app, apiService] = await prepareApiService(
-      testnetEndpoint,
-      testnetChainId,
-    );
-    const failingBlock = 27739202; // testnet
-    const api = apiService.api;
+  describe('testnet data', () => {
+    let app: INestApplication;
+    let apiService: AlgorandApiService;
 
-    const paginateSpy = jest.spyOn(api, 'paginatedTransactions');
-    const result = await api.getBlockByHeight(failingBlock);
-    expect(paginateSpy).toHaveBeenCalledTimes(3);
-    expect(result.transactions.length).toEqual(13916);
+    beforeEach(async () => {
+      [app, apiService] = await prepareApiService(
+        testnetEndpoint,
+        testnetChainId,
+      );
+    });
+
+    afterEach(() => {
+      return app?.close();
+    });
+
+    // This is failing since switching from algo explorer api. This is due to a node configuration limit
+    it('paginate large blocks', async () => {
+      const failingBlock = 27739202; // testnet
+      const api = apiService.api;
+
+      const paginateSpy = jest.spyOn(api, 'paginatedTransactions');
+      const result = await api.getBlockByHeight(failingBlock);
+      expect(paginateSpy).toHaveBeenCalledTimes(3);
+      expect(result.transactions?.length).toEqual(13916);
+    });
+
+    // There was a bug that would cause block nums to be mutated, when a network request failed, it would result in the retry missing blocks because of the mutation
+    it('block caching doesnt mutate the block nums', async () => {
+      const blockHeight = 57397158;
+
+      const blockNums = [blockHeight];
+
+      // Get the previous block, it will fetch the next block to get the hash of the current block.
+      await apiService.api.fetchBlocks([blockHeight - 1]);
+      // This block should hit the cache because of the previous request
+      const [block1] = await apiService.api.fetchBlocks(blockNums);
+      // The cache should have cleared the previous block, so this fetch is fresh
+      const [block2] = await apiService.api.fetchBlocks(blockNums);
+
+      // Block nums should not be mutated
+      expect(blockNums).toEqual([blockHeight]);
+
+      expect(block1).toBeDefined();
+      expect(block2).toBeDefined();
+
+      expect(JSON.stringify(block1)).toEqual(JSON.stringify(block2));
+    });
   });
 
-  it('can stringify blocks and transactions with circular references', async () => {
-    [app, apiService] = await prepareApiService();
+  describe('mainnet data', () => {
+    let app: INestApplication;
+    let apiService: AlgorandApiService;
+    let block: AlgorandBlock;
 
-    const block = await apiService.api.getBlockByHeight(30478896);
+    beforeEach(async () => {
+      [app, apiService] = await prepareApiService();
 
-    // The circular ref
-    expect(block.transactions[13].block).toBeDefined();
+      block = await apiService.api.getBlockByHeight(30478896);
+    });
 
-    // We can stringify the objects
-    expect(() => JSON.stringify(block)).not.toThrow();
-    expect(() => JSON.stringify(block.transactions[13])).not.toThrow();
+    afterEach(() => {
+      return app?.close();
+    });
 
-    expect(JSON.parse(JSON.stringify(block)).round).toEqual(block.round);
-  });
+    it('can stringify blocks and transactions with circular references', () => {
+      const transaction = block.transactions![13];
 
-  it('can get the grouped transactions within a block', async () => {
-    [app, apiService] = await prepareApiService();
+      // The circular ref
+      expect(transaction.block).toBeDefined();
 
-    const block = await apiService.api.getBlockByHeight(30478896);
+      // We can stringify the objects
+      expect(() => JSON.stringify(block)).not.toThrow();
+      expect(() => JSON.stringify(transaction)).not.toThrow();
 
-    const groupTx = block.getTransactionsByGroup(block.transactions[13].group);
+      expect(JSON.parse(JSON.stringify(block)).round).toEqual(block.round);
+    });
 
-    expect(groupTx.length).toEqual(3);
+    it('can get the grouped transactions within a block', () => {
+      const groupTx = block.getTransactionsByGroup(
+        block.transactions![13].group!,
+      );
+
+      expect(groupTx.length).toEqual(3);
+    });
   });
 });
