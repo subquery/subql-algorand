@@ -67,9 +67,7 @@ export class AlgorandApi {
     try {
       const blockInfo = await this.api.lookupBlock(height).do();
 
-      const block = this.constructBlock(camelCaseObjectKey(blockInfo));
-
-      return block;
+      return this.constructBlock(camelCaseObjectKey(blockInfo));
     } catch (error: any) {
       if (error.message.includes('Max transactions limit exceeded')) {
         logger.warn('Max transactions limit exceeded, paginating transactions');

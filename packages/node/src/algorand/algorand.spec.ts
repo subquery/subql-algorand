@@ -5,7 +5,6 @@ import { INestApplication } from '@nestjs/common';
 import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
 import {
-  ApiService,
   ConnectionPoolService,
   ConnectionPoolStateManager,
   NodeConfig,
