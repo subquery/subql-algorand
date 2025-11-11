@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [4.0.6] - 2025-11-12
 ### Fixed
 - Cache mutation potentially causing blocks to be skipped (#165)
 
@@ -322,7 +324,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synced latest changes from main repo. (#10)
 
 ## [1.6.0] - 2022-08-04
-[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.5...HEAD
+[Unreleased]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.6...HEAD
+[4.0.6]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.5...node-algorand/4.0.6
 [4.0.5]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.4...node-algorand/4.0.5
 [4.0.4]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.3...node-algorand/4.0.4
 [4.0.3]: https://github.com/subquery/subql-algorand/compare/node-algorand/4.0.2...node-algorand/4.0.3
