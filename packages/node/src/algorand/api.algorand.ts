@@ -66,7 +66,10 @@ export class AlgorandApi {
   async getBlockByHeight(height: number): Promise<AlgorandBlock> {
     try {
       const blockInfo = await this.api.lookupBlock(height).do();
-      return this.constructBlock(camelCaseObjectKey(blockInfo));
+
+      const block = this.constructBlock(camelCaseObjectKey(blockInfo));
+
+      return block;
     } catch (error: any) {
       if (error.message.includes('Max transactions limit exceeded')) {
         logger.warn('Max transactions limit exceeded, paginating transactions');
@@ -165,15 +168,6 @@ export class AlgorandApi {
     return newBlock;
   }
 
-  async fetchBlocksArray(blockArray: number[]): Promise<any[]> {
-    return Promise.all(
-      blockArray.map(async (height) => this.getBlockByHeight(height)),
-    );
-  }
-  async fetchBlocksBatches(blockArray: number[]): Promise<AlgorandBlock[]> {
-    return this.fetchBlocksArray(blockArray);
-  }
-
   getGenesisHash(): string {
     return this.genesisHash;
   }
@@ -186,19 +180,11 @@ export class AlgorandApi {
     return new SafeAPIService(this, height);
   }
   async fetchBlocks(blockNums: number[]): Promise<IBlock<AlgorandBlock>[]> {
-    let blocks: AlgorandBlock[] = [];
-
-    for (let i = 0; i < blockNums.length; i++) {
-      const cached = this.blockInCache(blockNums[i]);
-      if (cached) {
-        blocks.push(cached);
-        blockNums.splice(i, 1);
-      }
-    }
-
-    const fetchedBlocks = await this.fetchBlocksBatches(blockNums);
-
-    blocks = [...blocks, ...fetchedBlocks];
+    const blocks = await Promise.all(
+      blockNums.map(
+        (num) => this.blockInCache(num) ?? this.getBlockByHeight(num),
+      ),
+    );
 
     const formattedBlocks = await Promise.all(
       blocks.map(async (block) => {
